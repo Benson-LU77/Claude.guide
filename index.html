@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Claude 全貌指南 · claude.json</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#10141c;
+    --bg-panel:#151b26;
+    --bg-panel-2:#1a212e;
+    --ink:#c9d1d9;
+    --ink-soft:#8b94a3;
+    --ink-faint:#5c6470;
+    --key-blue:#7aa2d9;
+    --string-amber:#e3a857;
+    --type-violet:#b58cd9;
+    --green:#7fc99a;
+    --border:#232938;
+    --border-soft:#1d2330;
+    --gutter-w:3.4rem;
+    --content-max:760px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg-deep);
+    color:var(--ink);
+    font-family:'Inter',-apple-system,sans-serif;
+    font-size:16px;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--string-amber);color:#10141c;}
+
+  a{color:var(--key-blue);text-decoration:none;}
+  a:hover{color:var(--string-amber);}
+
+  code,.mono{font-family:'JetBrains Mono',monospace;}
+
+  /* ---------- Layout shell ---------- */
+  .shell{
+    display:flex;
+    min-height:100vh;
+  }
+
+  /* ---------- Sidebar (JSON tree nav) ---------- */
+  .sidebar{
+    width:268px;
+    flex-shrink:0;
+    background:var(--bg-panel);
+    border-right:1px solid var(--border);
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow-y:auto;
+    padding:1.6rem 0 2rem;
+  }
+  .sidebar-brand{
+    padding:0 1.4rem 1.2rem;
+    border-bottom:1px solid var(--border-soft);
+    margin-bottom:1rem;
+  }
+  .sidebar-brand .tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.72rem;
+    color:var(--ink-faint);
+    letter-spacing:.06em;
+  }
+  .sidebar-brand h1{
+    font-family:'JetBrains Mono',monospace;
+    font-size:1.02rem;
+    margin:.3rem 0 0;
+    color:var(--ink);
+    font-weight:600;
+  }
+  .sidebar-brand h1 .b{color:var(--string-amber);}
+
+  nav.tree{padding:0 .6rem;}
+  .nav-divider{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.66rem;
+    letter-spacing:.08em;
+    color:var(--ink-faint);
+    padding:.9rem .8rem .3rem;
+    text-transform:uppercase;
+  }
+  nav.tree a{
+    display:flex;
+    align-items:baseline;
+    gap:.5rem;
+    padding:.42rem .8rem;
+    border-radius:6px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:.84rem;
+    color:var(--ink-soft);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  nav.tree a .idx{color:var(--type-violet);flex-shrink:0;}
+  nav.tree a:hover{background:var(--bg-panel-2);color:var(--ink);}
+  nav.tree a.active{
+    background:var(--bg-panel-2);
+    color:var(--string-amber);
+    box-shadow:inset 2px 0 0 var(--string-amber);
+  }
+  nav.tree a.active .idx{color:var(--string-amber);}
+
+  .sidebar-foot{
+    padding:1.2rem 1.4rem 0;
+    margin-top:1.2rem;
+    border-top:1px solid var(--border-soft);
+    font-family:'JetBrains Mono',monospace;
+    font-size:.7rem;
+    color:var(--ink-faint);
+    line-height:1.6;
+  }
+
+  /* ---------- Mobile top bar ---------- */
+  .topbar{
+    display:none;
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:var(--bg-panel);
+    border-bottom:1px solid var(--border);
+    padding:.8rem 1.1rem;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .topbar h1{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.92rem;
+    margin:0;
+    color:var(--ink);
+  }
+  .topbar h1 .b{color:var(--string-amber);}
+  .menu-btn{
+    background:none;border:1px solid var(--border);border-radius:6px;
+    color:var(--ink);width:36px;height:36px;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+  }
+  .menu-btn span, .menu-btn::before, .menu-btn::after{
+    content:'';display:block;width:16px;height:2px;background:var(--ink);
+    position:relative;
+  }
+  .menu-btn::before{ box-shadow:0 -5px 0 var(--ink), 0 5px 0 var(--ink); }
+
+  /* ---------- Main column ---------- */
+  main{
+    flex:1;
+    min-width:0;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding:5.4rem 2.4rem 4rem;
+    max-width:980px;
+  }
+  .hero-term{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.95rem;
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:1.4rem 1.6rem;
+    color:var(--ink-soft);
+    max-width:560px;
+    box-shadow:0 18px 50px -24px rgba(0,0,0,.6);
+  }
+  .hero-term .tt-line{white-space:pre;}
+  .hero-term .cur{
+    display:inline-block;width:.55em;height:1.05em;background:var(--string-amber);
+    vertical-align:text-bottom;animation:blink 1s step-end infinite;
+  }
+  @keyframes blink{50%{opacity:0;}}
+  .hero h2{
+    font-family:'JetBrains Mono',monospace;
+    font-size:clamp(1.7rem,3.6vw,2.6rem);
+    line-height:1.25;
+    margin:2rem 0 .9rem;
+    color:#fff;
+    font-weight:700;
+  }
+  .hero h2 .b{color:var(--string-amber);}
+  .hero p.lead{
+    color:var(--ink-soft);
+    font-size:1.05rem;
+    max-width:640px;
+    margin:0 0 1.6rem;
+  }
+  .hero .meta{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.78rem;
+    color:var(--ink-faint);
+  }
+  .scroll-cue{
+    margin-top:2.6rem;
+    font-family:'JetBrains Mono',monospace;
+    font-size:.78rem;
+    color:var(--ink-faint);
+    display:flex;
+    align-items:center;
+    gap:.5rem;
+  }
+  .scroll-cue .arrow{animation:bob 1.6s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+
+  /* ---------- Section / "JSON object" framing ---------- */
+  section.chapter{
+    max-width:980px;
+    padding:1.4rem 2.4rem 2.2rem;
+    scroll-margin-top:1.5rem;
+  }
+  .chap-head{
+    display:flex;
+    align-items:baseline;
+    gap:.7rem;
+    margin-bottom:.3rem;
+  }
+  .chap-head .brace{
+    font-family:'JetBrains Mono',monospace;
+    color:var(--ink-faint);
+    font-size:1.3rem;
+  }
+  .chap-head h2{
+    font-family:'JetBrains Mono',monospace;
+    font-size:clamp(1.25rem,2.4vw,1.55rem);
+    margin:0;
+    color:#fff;
+    font-weight:600;
+  }
+  .chap-head h2 .quote{color:var(--ink-faint);}
+  .chap-head h2 .key{color:var(--key-blue);}
+  .chap-sub{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.78rem;
+    color:var(--ink-faint);
+    margin:0 0 1.6rem 1.9rem;
+  }
+
+  .content{
+    margin-left:1.9rem;
+    padding-left:var(--gutter-w);
+    border-left:1px dashed var(--border);
+    position:relative;
+    counter-reset:line;
+  }
+  .content > *{
+    counter-increment:line;
+    position:relative;
+    max-width:var(--content-max);
+  }
+  .content > *::before{
+    content:counter(line,decimal-leading-zero);
+    position:absolute;
+    left:calc(-1 * var(--gutter-w));
+    width:calc(var(--gutter-w) - .9rem);
+    text-align:right;
+    font-family:'JetBrains Mono',monospace;
+    font-size:.68rem;
+    color:var(--ink-faint);
+    top:.2rem;
+    opacity:.7;
+  }
+  .content > h3{
+    font-family:'JetBrains Mono',monospace;
+    font-size:1.02rem;
+    color:var(--type-violet);
+    margin:1.8rem 0 .7rem;
+    font-weight:600;
+  }
+  .content > h3::before{top:.35rem;}
+  .content > p{margin:.9rem 0;color:var(--ink);}
+  .content > p.note{
+    color:var(--ink-soft);
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-left:3px solid var(--string-amber);
+    padding:.85rem 1.1rem;
+    border-radius:0 8px 8px 0;
+    font-size:.95rem;
+  }
+  .content > ul, .content > ol{margin:.9rem 0;padding-left:1.3rem;color:var(--ink);}
+  .content > ul li, .content > ol li{margin:.4rem 0;}
+  .content strong{color:#fff;font-weight:600;}
+  .content code.inline{
+    background:var(--bg-panel-2);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:.1rem .4rem;
+    font-size:.86em;
+    color:var(--string-amber);
+  }
+
+  .content > .closing-brace{
+    font-family:'JetBrains Mono',monospace;
+    color:var(--ink-faint);
+    font-size:1.1rem;
+    margin-top:1.6rem;
+  }
+  .content > .closing-brace::before{content:'';}
+
+  /* ---------- Tables ---------- */
+  .content > .table-wrap{overflow-x:auto;margin:1.1rem 0 1.4rem;}
+  table{
+    border-collapse:collapse;
+    width:100%;
+    font-size:.88rem;
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:8px;
+    overflow:hidden;
+  }
+  thead th{
+    background:var(--bg-panel-2);
+    color:var(--key-blue);
+    font-family:'JetBrains Mono',monospace;
+    font-weight:600;
+    text-align:left;
+    padding:.6rem .9rem;
+    font-size:.78rem;
+    border-bottom:1px solid var(--border);
+  }
+  tbody td{
+    padding:.55rem .9rem;
+    border-bottom:1px solid var(--border-soft);
+    color:var(--ink-soft);
+    vertical-align:top;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody td code{color:var(--string-amber);font-family:'JetBrains Mono',monospace;font-size:.85em;}
+
+  /* ---------- Code blocks ---------- */
+  .content > .code-block{
+    margin:1.1rem 0 1.4rem;
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    background:#0d1117;
+  }
+  .code-block .cb-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--bg-panel-2);
+    padding:.45rem .9rem;
+    border-bottom:1px solid var(--border);
+    font-family:'JetBrains Mono',monospace;
+    font-size:.72rem;
+    color:var(--ink-faint);
+  }
+  .code-block .dots{display:flex;gap:.35rem;}
+  .code-block .dots span{width:8px;height:8px;border-radius:50%;background:var(--border);}
+  .code-block .copy-btn{
+    background:none;border:1px solid var(--border);color:var(--ink-faint);
+    font-family:'JetBrains Mono',monospace;font-size:.68rem;
+    padding:.2rem .55rem;border-radius:5px;cursor:pointer;
+  }
+  .code-block .copy-btn:hover{color:var(--string-amber);border-color:var(--string-amber);}
+  .code-block pre{
+    margin:0;
+    padding:1rem 1.2rem;
+    overflow-x:auto;
+    font-family:'JetBrains Mono',monospace;
+    font-size:.82rem;
+    line-height:1.65;
+    color:var(--ink);
+  }
+  .tok-key{color:var(--key-blue);}
+  .tok-string{color:var(--string-amber);}
+  .tok-num{color:var(--type-violet);}
+  .tok-bool{color:var(--green);}
+  .tok-null{color:var(--ink-faint);}
+  .tok-comment{color:var(--ink-faint);font-style:italic;}
+  .tok-keyword{color:var(--key-blue);}
+
+  /* ---------- Flow diagram ---------- */
+  .content > .flow{
+    margin:1.2rem 0 1.4rem;
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:1.2rem 1.3rem;
+    font-family:'JetBrains Mono',monospace;
+    font-size:.82rem;
+  }
+  .flow .fstep{
+    padding:.5rem .7rem;
+    border-radius:6px;
+    background:var(--bg-panel-2);
+    color:var(--ink);
+    border-left:3px solid var(--key-blue);
+  }
+  .flow .fstep.you{border-left-color:var(--string-amber);}
+  .flow .fstep .lab{color:var(--ink-faint);font-size:.72rem;display:block;margin-bottom:.15rem;}
+  .flow .farrow{text-align:center;color:var(--ink-faint);padding:.25rem 0;}
+
+  /* ---------- Card grid (ecosystem) ---------- */
+  .content > .card-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:.9rem;
+    margin:1.1rem 0 1.4rem;
+  }
+  .card{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:1rem 1.1rem;
+  }
+  .card .ck{
+    font-family:'JetBrains Mono',monospace;
+    color:var(--key-blue);
+    font-size:.86rem;
+    font-weight:600;
+    display:block;
+    margin-bottom:.4rem;
+  }
+  .card p{margin:0;color:var(--ink-soft);font-size:.88rem;line-height:1.6;}
+  .card.feature{grid-column:1/-1;border-color:var(--string-amber);background:linear-gradient(160deg,var(--bg-panel),var(--bg-panel-2));}
+  .card.feature .ck{color:var(--string-amber);font-size:1rem;}
+
+  .pill{
+    display:inline-block;
+    font-family:'JetBrains Mono',monospace;
+    font-size:.68rem;
+    color:var(--type-violet);
+    border:1px solid var(--border);
+    border-radius:99px;
+    padding:.12rem .55rem;
+    margin:0 .25rem .25rem 0;
+  }
+
+  /* ---------- Footer ---------- */
+  footer{
+    max-width:980px;
+    padding:2rem 2.4rem 5rem 4.3rem;
+    font-family:'JetBrains Mono',monospace;
+    font-size:.8rem;
+    color:var(--ink-faint);
+    border-top:1px solid var(--border-soft);
+    margin-top:1rem;
+  }
+  footer a{color:var(--ink-soft);}
+  footer .links{margin-top:.8rem;display:flex;flex-direction:column;gap:.3rem;}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:1023px){
+    .sidebar{
+      position:fixed;
+      left:0;top:0;bottom:0;
+      transform:translateX(-100%);
+      transition:transform .25s ease;
+      z-index:60;
+      box-shadow:20px 0 40px rgba(0,0,0,.4);
+    }
+    .sidebar.open{transform:translateX(0);}
+    .topbar{display:flex;}
+    .scrim{
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:55;
+    }
+    .scrim.show{display:block;}
+    section.chapter{padding:1.2rem 1.3rem 1.6rem;}
+    .hero{padding:2.6rem 1.3rem 2.4rem;}
+    .content{padding-left:2.2rem;--gutter-w:2.2rem;}
+    .content > *::before{font-size:.6rem;}
+    .content > .card-grid{grid-template-columns:1fr;}
+    footer{padding:1.6rem 1.3rem 3rem 1.3rem;}
+    .chap-sub{margin-left:0;}
+  }
+
+  /* ---------- Definition cards ---------- */
+  .content > .def-stack{
+    display:flex;
+    flex-direction:column;
+    gap:.9rem;
+    margin:1.1rem 0 1.4rem;
+  }
+  .def-card{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:1.1rem 1.3rem;
+  }
+  .def-card h4{
+    margin:0 0 .8rem;
+    font-family:'JetBrains Mono',monospace;
+    color:#fff;
+    font-size:1rem;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:.55rem;
+  }
+  .def-card h4 .dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--string-amber);
+    flex-shrink:0;
+  }
+  .def-list{
+    margin:0;
+    display:grid;
+    grid-template-columns:96px 1fr;
+    row-gap:.65rem;
+    column-gap:1rem;
+  }
+  .def-list dt{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.72rem;
+    color:var(--type-violet);
+    padding-top:.15rem;
+    white-space:nowrap;
+  }
+  .def-list dd{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:.88rem;
+    line-height:1.7;
+  }
+  .def-list dd code.inline{
+    background:var(--bg-panel-2);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:.1rem .4rem;
+    font-size:.86em;
+    color:var(--string-amber);
+  }
+  @media (max-width:1023px){
+    .def-list{grid-template-columns:72px 1fr;}
+  }
+
+</style>
+</head>
+<body>
+
+<div class="scrim" id="scrim"></div>
+
+<div class="shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="tag">// anthropic / claude</div>
+      <h1>claude<span class="b">.</span>guide<span class="b">.json</span></h1>
+    </div>
+    <nav class="tree">
+      <a href="#hero"><span class="idx">[*]</span>intro</a>
+      <div class="nav-divider">一般使用者</div>
+      <a href="#getting-started"><span class="idx">[0]</span>getting_started</a>
+      <a href="#overview"><span class="idx">[1]</span>overview</a>
+      <a href="#claudeai"><span class="idx">[2]</span>claude_ai</a>
+      <a href="#prompting"><span class="idx">[3]</span>prompting_basics</a>
+      <div class="nav-divider">開發者</div>
+      <a href="#api"><span class="idx">[4]</span>api_and_json</a>
+      <a href="#tooluse"><span class="idx">[5]</span>tool_use</a>
+      <a href="#codeexec"><span class="idx">[6]</span>code_execution</a>
+      <a href="#claudecode"><span class="idx">[7]</span>claude_code</a>
+      <a href="#ecosystem"><span class="idx">[8]</span>ecosystem</a>
+      <a href="#practical"><span class="idx">[9]</span>practical_usage</a>
+      <a href="#features"><span class="idx">[10]</span>feature_reference</a>
+      <a href="#extensions"><span class="idx">[11]</span>developer_extensions</a>
+      <div class="nav-divider">其他</div>
+      <a href="#safety"><span class="idx">[12]</span>safety_and_limits</a>
+      <a href="#resources"><span class="idx">[13]</span>resources</a>
+    </nav>
+    <div class="sidebar-foot">
+      整理時間 2026-06 · 內容以官方文件最新狀態為準
+    </div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <h1>claude<span class="b">.</span>guide<span class="b">.json</span></h1>
+      <button class="menu-btn" id="menuBtn" aria-label="開啟選單"><span></span></button>
+    </div>
+
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="hero">
+      <div class="hero-term">
+        <div class="tt-line" id="typeLine"></div>
+      </div>
+      <h2>Claude 全貌指南<br><span class="b">{ 從產品到 JSON，從 JSON 到程式怎麼跑 }</span></h2>
+      <p class="lead">一份分區介紹手冊。把 claude.ai、Claude API、Claude Code、Claude Design 這些「外殼」，跟底下那套 messages / tool_use / code_execution 的 JSON 機制，攤開來一次看完。</p>
+      <div class="meta">給開發者和一般使用者 · 8 個章節 · 含可複製的程式碼範例</div>
+      <div class="scroll-cue"><span class="arrow">↓</span> 往下捲動，從總覽開始</div>
+    </section>
+
+    <!-- ============ 0. GETTING STARTED ============ -->
+    <section class="chapter" id="getting-started">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">00_getting_started</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">新手第一步 — 帳號、方案、限額</p>
+      <div class="content">
+        <p>在談任何技術細節之前，先把最基本的事情講清楚：怎麼開始用、要不要付錢、免費版卡在哪。</p>
+
+        <h3>怎麼開始</h3>
+        <ul>
+          <li><strong>網頁版</strong> — 到 claude.ai 註冊即可，不需要額外安裝</li>
+          <li><strong>桌面版</strong> — macOS / Windows 的 Claude Desktop，整合 Cowork 等桌面限定功能</li>
+          <li><strong>手機版</strong> — iOS / Android App</li>
+          <li><strong>使用門檻</strong> — 必須年滿 18 歲，且帳號所在地要在 Anthropic 支援的地區清單內</li>
+        </ul>
+
+        <h3>方案怎麼選</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>方案</th><th>適合誰</th></tr></thead>
+          <tbody>
+            <tr><td>Free</td><td>先試用看看；有「每 5 小時重置」的對話次數限制，會隨系統負載浮動</td></tr>
+            <tr><td>Pro</td><td>把 Claude 用在日常工作的個人，用量比免費版寬鬆很多，多數人從這裡開始</td></tr>
+            <tr><td>Max（5x / 20x）</td><td>整天活在 Claude 裡的重度使用者，比 Pro 再多幾倍用量、優先處理</td></tr>
+            <tr><td>Team</td><td>團隊協作，多人共用工作區、共享設定</td></tr>
+            <tr><td>Enterprise</td><td>組織級管理：admin console、集中式安全與權限控制</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">確切價格跟用量數字常會更新，直接看 claude.ai 上的方案頁面以最新資訊為準，這裡只列「適合誰」幫你判斷該往哪個方向考慮。</p>
+
+        <h3>免費版的限制長什麼樣</h3>
+        <p>用量限制是「會話制」而非吃到飽——每 5 小時重置一次，能傳幾則訊息會隨當下系統負載浮動。如果單則訊息或附件太大，超過模型的上下文視窗，Claude 會直接告訴你。想看精確規則，到 Settings 或官方說明文件查當前數字最準確。</p>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <!-- ============ 0. OVERVIEW ============ -->
+    <section class="chapter" id="overview">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">01_overview</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">Claude 不是一個東西，是一個產品家族</p>
+      <div class="content">
+        <p>「Claude」這個名字底下，其實涵蓋三個彼此獨立、但互相串接的產品層：<strong>claude.ai / App</strong>（聊天介面，一般使用者用）、<strong>Claude API</strong>（開發者直接呼叫模型，走 JSON）、<strong>Claude Code</strong>（終端機裡跑的 agentic coding 工具，本身是 API 的重度應用）。這三層共用同一套底層模型，但「怎麼用」「JSON 長什麼樣」「程式碼怎麼跑」是完全不同的問題，所以這份指南分開講。</p>
+
+        <h3>模型家族（目前公開可用）</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>模型</th><th>定位</th></tr></thead>
+          <tbody>
+            <tr><td><code class="inline">claude-opus-4-8</code> / 4-7 / 4-6</td><td>最強推理與複雜任務</td></tr>
+            <tr><td><code class="inline">claude-sonnet-4-6</code></td><td>平衡型，速度與智慧的折衷 — 你現在對話的就是它</td></tr>
+            <tr><td><code class="inline">claude-haiku-4-5</code></td><td>最快、最便宜，高量低延遲場景</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">另外還有 Claude Mythos Preview，僅提供給少數受信任機構做研究（Project Glasswing），一般使用者目前還用不到。</p>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <!-- ============ 1. CLAUDE.AI ============ -->
+    <section class="chapter" id="claudeai">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">02_claude_ai</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">一般使用者怎麼用 — 你現在用的就是這層</p>
+      <div class="content">
+        <p>這一層對使用者來說是「黑盒子」——不需要懂 JSON，Claude 在背後幫你組好所有 API 請求。重點功能分區：</p>
+        <ul>
+          <li><strong>對話本體</strong> — 純文字、圖片、檔案上傳都能丟進來問</li>
+          <li><strong>Artifacts</strong> — 回答涉及程式碼、文件、網頁、圖表時，獨立面板渲染出來，方便直接看 / 下載 / 迭代</li>
+          <li><strong>記憶（Memory）</strong> — 記住過去對話重點，自動帶入上下文</li>
+          <li><strong>Projects（專案）</strong> — 把同一主題的多次對話、參考檔案、專屬指示收進同一個空間，跨對話保留上下文；免費帳號最多建立 5 個</li>
+          <li><strong>網路搜尋 / 深度研究</strong> — 需要即時資訊時自動或手動觸發</li>
+          <li><strong>程式碼執行與檔案產生</strong> — 背後就是 <code class="inline">code_execution</code> 工具，見第 4 章</li>
+          <li><strong>周邊應用</strong> — Claude Code、Claude Design、Claude in Chrome / Excel / PowerPoint / Outlook、Cowork</li>
+        </ul>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <!-- ============ 3. PROMPTING BASICS ============ -->
+    <section class="chapter" id="prompting">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">03_prompting_basics</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">怎麼跟 Claude 講話 — 在學 JSON 之前，先學會「問」</p>
+      <div class="content">
+        <p>後面幾章會講 API 怎麼打、JSON 怎麼組，但這些都建立在一個更根本的能力上：知道怎麼把需求講清楚。這件事跟懂不懂技術無關。</p>
+
+        <h3>基本心態</h3>
+        <p>把 Claude 當成一個剛加入團隊、什麼都聰明但不知道你公司內部脈絡的同事來說話——自然語言，不用刻意用「指令」的語氣。問題可以很簡單（「幫我把這段話潤一下」），也可以很複雜（多步驟的專案、資料分析、技術除錯），複雜需求不用一次塞完，可以先給大方向，看它的回應再逐步修正方向，不用整段重講。</p>
+
+        <h3>輸入框裡的小工具</h3>
+        <ul>
+          <li>左下角的 <strong>「+」</strong> 按鈕，或直接打 <strong>「/」</strong>，叫出附加選項（上傳檔案、開關功能）</li>
+          <li>目前對話用的模型名稱顯示在輸入框下方（網頁/桌面版）或頂端（手機版），可以隨時切換</li>
+          <li>圖片、PDF、程式碼檔案都能直接拖進輸入框，Claude 會直接讀</li>
+        </ul>
+
+        <h3>讓回答更準的幾個習慣</h3>
+        <ul>
+          <li><strong>給脈絡，不要只給結論式的問題</strong> ——「幫我寫信」不如「幫我寫一封信給客戶，說明出貨延遲一週，語氣要誠懇但不過度道歉」</li>
+          <li><strong>需要精確結果就直接說</strong> ——「幫我算」「幫我搜尋最新資料」「跑一下程式碼驗證」，這些關鍵字會讓 Claude 更傾向使用對應工具（見第 4、9 章）</li>
+          <li><strong>覺得方向不對，直接打斷修正</strong>，不用等它講完整段才回應</li>
+          <li><strong>長文件丟進來，先問它有沒有讀懂重點</strong>，再往下展開細節需求</li>
+        </ul>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <!-- ============ 2. API & JSON ============ -->
+    <section class="chapter" id="api">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">04_api_and_json</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">開發者怎麼跟 Claude「對話」— 核心只有一個端點</p>
+      <div class="content">
+        <p>自己寫程式呼叫 Claude，核心只有一個端點：<code class="inline">POST /v1/messages</code>。理解這個端點的 JSON 結構，基本上就理解了 Claude API 的全貌。</p>
+
+        <h3>最基本的請求 / 回應</h3>
+        <div class="code-block" data-lang="python">
+<div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>request.py</span><button class="copy-btn">複製</button></div>
+<pre><code># message = anthropic.Anthropic().messages.create(
+    model="claude-sonnet-4-6",
+    max_tokens=1024,
+    messages=[{"role": "user", "content": "Hello, Claude"}],
+)</code></pre>
+        </div>
+
+        <div class="code-block" data-lang="json">
+<div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>response.json</span><button class="copy-btn">複製</button></div>
+<pre><code>{
+  "id": "msg_01XFDUDYJgAACzvnptvVoYEL",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    { "type": "text", "text": "Hello!" }
+  ],
+  "model": "claude-sonnet-4-6",
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": { "input_tokens": 12, "output_tokens": 6 }
+}</code></pre>
+        </div>
+
+        <ul>
+          <li><strong>messages</strong> — 對話歷史陣列。<strong>API 是無狀態的</strong>，每次都要把完整歷史重傳一次。</li>
+          <li><strong>content</strong> — 可以是字串，也可以是混合文字 / 圖片 / 工具呼叫的「內容區塊」陣列。</li>
+          <li><strong>stop_reason</strong> — 這次生成為什麼停：<code class="inline">end_turn</code> / <code class="inline">max_tokens</code> / <code class="inline">tool_use</code> / <code class="inline">stop_sequence</code> / <code class="inline">refusal</code>。寫迴圈邏輯的關鍵判斷依據。</li>
+          <li><strong>usage</strong> — 這次呼叫吃掉多少 token，計費依據。</li>
+        </ul>
+
+        <h3>多模態輸入：圖片怎麼塞進 JSON</h3>
+        <div class="code-block" data-lang="json">
+<div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>image-message.json</span><button class="copy-btn">複製</button></div>
+<pre><code>{
+  "role": "user",
+  "content": [
+    {
+      "type": "image",
+      "source": { "type": "base64", "media_type": "image/jpeg", "data": "..." }
+    },
+    { "type": "text", "text": "What is in the above image?" }
+  ]
+}</code></pre>
+        </div>
+        <p>content 從字串升級成陣列的瞬間，就是「多模態訊息」的標準寫法——之後工具呼叫、工具結果，也是同一套「陣列裡塞不同 type 區塊」的模式。</p>
+
+        <h3>JSON 是語法，不是語意</h3>
+        <p><strong>JSON 本身只是語法（syntax）</strong>——大括號、陣列、字串怎麼排列的規則，跟意義無關，純粹是個通用容器格式。<strong><code class="inline">role</code> / <code class="inline">content</code> / <code class="inline">tool_use</code> / <code class="inline">stop_reason</code> 這些欄位名稱和排列方式，才是 Anthropic 訂出來的「語意層」</strong>——看到 <code class="inline">"role": "user"</code> 要解讀成「這是使用者說的話」，這套規則 JSON 語法本身完全不知道、也不在乎。</p>
+        <p class="note">同一套語意理論上可以換成 XML、Protobuf 表達，骨架照樣存在。理解 Claude API，本質上是在背這套「語意層的約定」，JSON 只是裝它的容器。</p>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <!-- ============ 3. TOOL USE ============ -->
+    <section class="chapter" id="tooluse">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">05_tool_use</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">Claude 怎麼「做事」而不只是「講話」— 完整 JSON 定義</p>
+      <div class="content">
+        <p class="note"><strong>Claude 本身永遠不會執行任何東西。</strong> 它只會吐出結構化請求（<code class="inline">tool_use</code> 區塊），告訴你想呼叫什麼工具、帶什麼參數。真正「跑」這件事的，是你的程式碼，或者 Anthropic 的伺服器——取決於工具種類。</p>
+
+        <h3>工具的三種類型</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>類型</th><th>誰寫 schema</th><th>誰執行</th><th>例子</th></tr></thead>
+          <tbody>
+            <tr><td>使用者自訂工具</td><td>你</td><td>你</td><td>查資料庫、內部 API</td></tr>
+            <tr><td>Anthropic 標準工具</td><td>Anthropic</td><td>你</td><td><code class="inline">bash</code> / <code class="inline">text_editor</code> / <code class="inline">computer</code> / <code class="inline">memory</code></td></tr>
+            <tr><td>伺服器端工具</td><td>Anthropic</td><td>Anthropic 伺服器</td><td><code class="inline">web_search</code> / <code class="inline">code_execution</code></td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h3>content 區塊的完整型別表</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>type</th><th>用在哪</th><th>誰產生</th></tr></thead>
+          <tbody>
+            <tr><td><code class="inline">text</code></td><td>一般文字</td><td>user / assistant</td></tr>
+            <tr><td><code class="inline">image</code> / <code class="inline">document</code></td><td>圖片 / PDF 輸入</td><td>user</td></tr>
+            <tr><td><code class="inline">tool_use</code></td><td>要求呼叫工具</td><td>assistant</td></tr>
+            <tr><td><code class="inline">tool_result</code></td><td>回傳工具結果</td><td>user</td></tr>
+            <tr><td><code class="inline">thinking</code></td><td>推理過程（extended thinking）</td><td>assistant</td></tr>
+            <tr><td><code class="inline">server_tool_use</code> / <code class="inline">*_tool_result</code></td><td>伺服器端工具呼叫與結果</td><td>assistant</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h3>工具定義的 JSON Schema</h3>
+        <div class="code-block" data-lang="json">
+<div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>tool-definition.json</span><button class="copy-btn">複製</button></div>
+<pre><code>{
+  "name": "get_weather",
+  "description": "取得指定地點目前的天氣。當使用者問到天氣、溫度、是否要帶傘等問題時使用。輸入城市名稱即可，不需要完整地址。此工具不提供未來天氣預報。",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "location": { "type": "string", "description": "城市名稱，例如「台北」" },
+      "unit": { "type": "string", "enum": ["celsius", "fahrenheit"] }
+    },
+    "required": ["location"]
+  }
+}</code></pre>
+        </div>
+        <p><code class="inline">tool_choice</code> 控制模型怎麼選工具，四種值：<code class="inline">{"type":"auto"}</code> 模型自己決定 · <code class="inline">{"type":"any"}</code> 必須用某一個 · <code class="inline">{"type":"tool","name":"x"}</code> 強制指定 · <code class="inline">{"type":"none"}</code> 禁止使用。</p>
+
+        <h3>標準迴圈</h3>
+        <div class="flow">
+          <div class="fstep you"><span class="lab">YOU →</span>發送請求，帶上 tools 陣列 + 使用者訊息</div>
+          <div class="farrow">↓</div>
+          <div class="fstep"><span class="lab">CLAUDE →</span>回應 stop_reason: "tool_use"，附上 tool_use 區塊</div>
+          <div class="farrow">↓</div>
+          <div class="fstep you"><span class="lab">YOU →</span>執行工具，把結果包成 tool_result 區塊</div>
+          <div class="farrow">↓</div>
+          <div class="fstep you"><span class="lab">YOU →</span>把完整歷史 + tool_result 一起送回去</div>
+          <div class="farrow">↓ 重複，直到 stop_reason ≠ "tool_use"</div>
+        </div>
+
+        <p><strong>第一次回應</strong>——Claude 要求呼叫工具：</p>
+        <div class="code-block" data-lang="json">
+<div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>response-1.json</span><button class="copy-btn">複製</button></div>
+<pre><code>{
+  "role": "assistant",
+  "content": [
+    { "type": "text", "text": "我幫你查一下舊金山的天氣。" },
+    {
+      "type": "tool_use",
+      "id": "toolu_01A09q90qw90lq917835lq9",
+      "name": "get_weather",
+      "input": { "location": "San Francisco, CA" }
+    }
+  ],
+  "stop_reason": "tool_use"
+}</code></pre>
+        </div>
+
+        <p><strong>你回傳的第二次請求</strong>，<code class="inline">tool_use_id</code> 必須跟上一輪的 <code class="inline">id</code> 對上：</p>
+        <div class="code-block" data-lang="json">
+<div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>tool-result.json</span><button class="copy-btn">複製</button></div>
+<pre><code>{
+  "role": "user",
+  "content": [
+    {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01A09q90qw90lq917835lq9",
+      "content": "15°C，晴時多雲"
+    }
+  ]
+}</code></pre>
+        </div>
+        <p>失敗時多帶一個 <code class="inline">"is_error": true</code>，Claude 會試著調整參數重試或改用別的方式回答。</p>
+
+        <h3>Streaming：JSON 被切碎成事件流</h3>
+        <div class="code-block" data-lang="json">
+<div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>stream-events.txt</span><button class="copy-btn">複製</button></div>
+<pre><code>event: content_block_delta
+data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"我"}}
+
+event: message_delta
+data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"output_tokens":15}}</code></pre>
+        </div>
+
+        <h3>完整可跑範例</h3>
+        <div class="code-block" data-lang="python">
+<div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>claude_tool_use_demo.py</span><button class="copy-btn">複製</button></div>
+<pre><code>def run_agent(user_message: str, max_turns: int = 8) -> str:
+    messages = [{"role": "user", "content": user_message}]
+
+    for turn in range(max_turns):
+        response = client.messages.create(
+            model=MODEL, max_tokens=1024, tools=TOOLS, messages=messages,
+        )
+        messages.append({"role": "assistant", "content": response.content})
+
+        if response.stop_reason != "tool_use":
+            return "".join(b.text for b in response.content if b.type == "text")
+
+        tool_use_blocks = [b for b in response.content if b.type == "tool_use"]
+        tool_results = []
+        for block in tool_use_blocks:
+            result_text, is_error = execute_tool(block.name, block.input)
+            tr = {"type": "tool_result", "tool_use_id": block.id, "content": result_text}
+            if is_error:
+                tr["is_error"] = True
+            tool_results.append(tr)
+
+        messages.append({"role": "user", "content": tool_results})
+
+    return "（已達最大輪數）"</code></pre>
+        </div>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <!-- ============ 4. CODE EXECUTION ============ -->
+    <section class="chapter" id="codeexec">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">06_code_execution</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">程式碼到底怎麼「跑」起來的</p>
+      <div class="content">
+        <p>啟用方式很單純，JSON 裡加一個工具宣告，不需要額外參數：</p>
+        <div class="code-block" data-lang="json">
+<div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>enable.json</span><button class="copy-btn">複製</button></div>
+<pre><code>{ "type": "code_execution_20250825", "name": "code_execution" }</code></pre>
+        </div>
+        <p>加上之後，Claude 自動拿到兩個子能力：<code class="inline">bash_code_execution</code>（執行 shell 指令）與 <code class="inline">text_editor_code_execution</code>（建立 / 檢視 / 編輯檔案）。</p>
+
+        <h3>執行環境</h3>
+        <ul>
+          <li>Linux 容器，x86_64，Python 3.11.12</li>
+          <li>資源限制：5 GiB 記憶體、5 GiB 硬碟、1 顆 CPU</li>
+          <li><strong>網路完全沒有對外連線能力</strong>（安全考量，沙箱完全隔離）</li>
+          <li>單一程式碼區塊上限 90 秒，超過回傳 <code class="inline">detection_timeout</code></li>
+          <li>容器建立後 30 天過期；可用 <code class="inline">container.id</code> 跨請求重複使用</li>
+          <li>預裝 pandas、numpy、matplotlib、openpyxl、python-docx、python-pptx、reportlab 等套件</li>
+        </ul>
+
+        <h3>一次請求的實際流程</h3>
+        <div class="flow">
+          <div class="fstep you"><span class="lab">YOU →</span>「幫我算 [1..10] 的平均值和標準差」</div>
+          <div class="farrow">↓</div>
+          <div class="fstep"><span class="lab">CLAUDE →</span>判斷需要精確計算，該用工具</div>
+          <div class="farrow">↓</div>
+          <div class="fstep"><span class="lab">server_tool_use →</span>bash_code_execution 執行 python3 指令</div>
+          <div class="farrow">↓ Anthropic 伺服器在沙箱容器裡實際執行</div>
+          <div class="fstep"><span class="lab">tool_result →</span>{ stdout: "mean=5.5, std=2.87...", return_code: 0 }</div>
+          <div class="farrow">↓</div>
+          <div class="fstep"><span class="lab">CLAUDE →</span>讀結果，組成自然語言答案</div>
+        </div>
+        <p class="note">整個過程對你來說是「一次請求」，但背後可能是 Claude 自己跑了好幾輪程式碼、看結果、再修正再跑——這個內部迴圈是 Anthropic 伺服器自己管的，你不用介入。</p>
+
+        <h3>什麼時候 Claude 會真的跑程式碼</h3>
+        <p>會跑：複雜數學、資料分析 / 視覺化、檔案解析、明確要求「執行 / 計算」。不會跑：簡單算術、常識性問答、翻譯——直接用語言模型本身回答更快。</p>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <!-- ============ 5. CLAUDE CODE ============ -->
+    <section class="chapter" id="claudecode">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">07_claude_code</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">給工程師的「在終端機裡跑的 Claude」</p>
+      <div class="content">
+        <p>Claude Code 本質上是一個 <strong>agentic coding CLI</strong>：把第 3 章講的「工具調用迴圈」包裝成完整的開發助理，差別在於工具是<strong>真的在你電腦上執行</strong>（讀寫檔案、跑 shell 指令、操作 git），而不是雲端沙箱。</p>
+        <ul>
+          <li>安裝後在專案目錄下打 <code class="inline">claude</code> 就能進入互動模式</li>
+          <li>支援自訂 slash command（例如 <code class="inline">/create-slide</code>），本質上是把一段提示詞包裝成指令</li>
+          <li>可以接 MCP 伺服器，串接外部服務（Notion、Gmail、Figma 等）</li>
+          <li>有 Plan Mode（先規劃再動手）、sub-agents（拆任務給專門化子代理）等進階功能</li>
+        </ul>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <!-- ============ 6. ECOSYSTEM ============ -->
+    <section class="chapter" id="ecosystem">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">08_ecosystem</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">其他周邊與生態 — 從「賣模型」到「賣垂直應用」</p>
+      <div class="content">
+        <div class="card-grid">
+          <div class="card feature">
+            <span class="ck">Claude Design</span>
+            <p>在 <code class="inline">claude.ai/design</code> 用自然語言描述需求，左邊聊天、右邊即時畫布，生成互動式原型 / 簡報 / 一頁式網頁。第一次設定時讀你的程式碼庫，自動建立品牌設計系統，之後每個專案自動套用。完成的設計可匯出 Canva / PDF / PPTX / HTML，或一鍵打包交給 Claude Code 落地成真正的程式碼——探索到原型到正式程式碼是同一個對話裡完成的閉環。</p>
+            <div style="margin-top:.7rem;">
+              <span class="pill">claude.ai/design</span>
+              <span class="pill">Research Preview</span>
+              <span class="pill">Pro / Max / Team / Enterprise</span>
+            </div>
+          </div>
+          <div class="card">
+            <span class="ck">Claude in Chrome / Excel / PowerPoint / Outlook</span>
+            <p>把「工具調用」機制包進對應軟體的操作介面裡——看到 Excel 公式被寫出來，背後是 Claude 對著一個「Excel 操作」工具發出 tool_use 呼叫。</p>
+          </div>
+          <div class="card">
+            <span class="ck">Cowork</span>
+            <p>定位介於聊天視窗跟 Claude Code 之間。適合研究、長文寫作、跨檔案整理這類「步驟多但不寫程式」的工作，桌面版 App 裡的獨立分頁。</p>
+          </div>
+          <div class="card">
+            <span class="ck">MCP（Model Context Protocol）</span>
+            <p>開放協定，讓 Claude（API / Claude Code / claude.ai）能標準化地串接外部工具與資料源。本質是把「使用者自訂工具」標準化，讓任何服務商照同一份規格寫 server。</p>
+          </div>
+          <div class="card">
+            <span class="ck">Claude Agent SDK / Managed Agents</span>
+            <p>給開發者的高階封裝：不用自己手刻第 3 章那個 while 迴圈，Anthropic 幫你管整個 agent 的執行狀態與長時間運行任務。</p>
+          </div>
+        </div>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <!-- ============ 7. PRACTICAL USAGE ============ -->
+    <section class="chapter" id="practical">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">09_practical_usage</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">實務層面 — 終端機指令、介面操作、API 怎麼真的打一輪</p>
+      <div class="content">
+        <p>前面幾章講的是「機制」，這章講「手要怎麼動」：終端機裝完打什麼指令、claude.ai 裡設定藏在哪、API key 申請完第一行程式碼怎麼寫。</p>
+
+        <h3>1. Claude Code 終端機實戰</h3>
+        <p>安裝有三種方式，原生安裝程式是 Anthropic 目前建議的預設路徑（不需要 Node.js，背景自動更新）：</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>方式</th><th>指令</th><th>適合</th></tr></thead>
+          <tbody>
+            <tr><td>原生安裝（macOS/Linux）</td><td><code class="inline">curl -fsSL https://claude.ai/install.sh | bash</code></td><td>大多數人，官方主推</td></tr>
+            <tr><td>原生安裝（Windows PowerShell）</td><td><code class="inline">irm https://claude.ai/install.ps1 | iex</code></td><td>Windows 原生環境</td></tr>
+            <tr><td>npm</td><td><code class="inline">npm install -g @anthropic-ai/claude-code</code></td><td>已經在用 Node.js 工具鏈、要釘版本的人</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">npm 安裝不要加 <code class="inline">sudo</code>，會導致權限問題；遇到 EACCES 錯誤就改用 nvm 或把 npm 全域目錄指到自己擁有的資料夾。</p>
+
+        <p>裝完驗證、第一次啟動、之後天天會用到的指令，整理成一張表：</p>
+        <div class="code-block" data-lang="bash">
+<div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>terminal</span><button class="copy-btn">複製</button></div>
+<pre><code># 驗證安裝
+claude --version
+claude doctor          # 環境/設定診斷
+
+# 進到你的專案目錄，啟動互動模式
+cd ~/projects/open-slide
+claude                 # 第一次會跳瀏覽器要你登入授權
+
+# 互動模式裡的常用指令
+/init                  # 掃描專案，自動生成 CLAUDE.md（專案記憶）
+/help                  # 列出所有指令
+/clear                 # 清空目前對話，重新開始
+/agents                # 管理子代理
+/bug                   # 回報問題給 Anthropic
+/exit                  # 離開
+
+# 接 MCP 伺服器
+claude mcp add <name>
+claude mcp list
+
+# 更新
+claude update</code></pre>
+        </div>
+
+        <p><strong>典型工作流程</strong>長這樣：<code class="inline">cd</code> 進專案 → 打 <code class="inline">claude</code> 進入互動模式 → 用一般語言描述需求（例如「幫我修這個登入失敗的 bug」）→ Claude 讀程式碼、規劃、改檔案，每個會動到磁碟或執行指令的動作會先列出來等你確認（預設是 Ask Mode）→ 看過 diff 沒問題就確認執行 → 自己用 git 做 commit。第一次進新專案建議先跑一次 <code class="inline">/init</code>，讓 Claude 把專案慣例寫進 <code class="inline">CLAUDE.md</code>，之後每次啟動都會自動載入，不用每次重新解釋一遍專案規則。</p>
+
+        <h3>2. claude.ai 介面操作實務</h3>
+        <p>大部分功能不需要手動開，Claude 會自己判斷要不要用——但有幾個開關確實要去設定裡找：</p>
+        <ul>
+          <li><strong>頭像 → Settings</strong>：可以個別開關 Web search、Deep research、Code execution and file creation、Artifacts</li>
+          <li><strong>要 Claude 真的執行程式碼 / 產生檔案</strong>：直接用自然語言要求即可（「幫我算」「幫我畫圖」「整理成 Excel」），不需要額外語法；前提是上面那個 Code execution 開關是打開的</li>
+          <li><strong>Artifacts</strong>：產生程式碼/文件/網頁時自動跳到側邊欄，右上角有下載按鈕；要它繼續改就直接在對話裡說「改這裡」，不用重新整段貼回去</li>
+          <li><strong>Memory</strong>：Settings 裡的 <em>Search and reference past chats</em> 和 <em>Generate memory from chat history</em>，分別控制「能不能搜過去對話」跟「會不會從對話自動生成長期記憶」</li>
+        </ul>
+
+        <h3>3. API：申請 key 到打出第一個請求</h3>
+        <div class="flow">
+          <div class="fstep you"><span class="lab">STEP 1 →</span>console.anthropic.com 註冊，左側 Settings → API keys 建立金鑰</div>
+          <div class="farrow">↓</div>
+          <div class="fstep you"><span class="lab">STEP 2 →</span>把金鑰存成環境變數，不要寫死在程式碼裡</div>
+          <div class="farrow">↓</div>
+          <div class="fstep you"><span class="lab">STEP 3 →</span>裝 SDK：pip install anthropic 或 npm install @anthropic-ai/sdk</div>
+          <div class="farrow">↓</div>
+          <div class="fstep you"><span class="lab">STEP 4 →</span>打第一個請求，驗證能跑通</div>
+        </div>
+
+        <div class="code-block" data-lang="bash">
+<div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>setup.sh</span><button class="copy-btn">複製</button></div>
+<pre><code>export ANTHROPIC_API_KEY="sk-ant-..."
+pip install anthropic</code></pre>
+        </div>
+
+        <p>不靠 SDK，純用 curl 直接打也行——理解這個版本，因為它就是最底層、不靠任何語言包裝的真實 HTTP 請求：</p>
+        <div class="code-block" data-lang="bash">
+<div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>raw-request.sh</span><button class="copy-btn">複製</button></div>
+<pre><code>curl https://api.anthropic.com/v1/messages \
+  -H "x-api-key: $ANTHROPIC_API_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "content-type: application/json" \
+  -d '{
+    "model": "claude-sonnet-4-6",
+    "max_tokens": 1024,
+    "messages": [{"role": "user", "content": "Hello, Claude!"}]
+  }'</code></pre>
+        </div>
+        <p class="note">兩個容易踩的坑：認證用的是 <code class="inline">x-api-key</code>，不是常見的 <code class="inline">Authorization: Bearer</code>；<code class="inline">anthropic-version</code> 這個 header 每次請求都必填，沒帶會直接 400。SDK（Python/TypeScript/Go/Java）會自動讀 <code class="inline">ANTHROPIC_API_KEY</code> 環境變數，程式碼裡通常完全不用寫金鑰。</p>
+
+        <h3>4. Code execution：claude.ai 跟 API 的操作差異對照</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th></th><th>claude.ai</th><th>API</th></tr></thead>
+          <tbody>
+            <tr><td>怎麼啟用</td><td>Settings 開關打開即可，之後自動判斷</td><td>請求裡的 <code class="inline">tools</code> 陣列要明確加 <code class="inline">code_execution_20250825</code></td></tr>
+            <tr><td>怎麼觸發</td><td>直接用自然語言要求運算/畫圖/做檔案</td><td>同樣靠模型自己判斷，但你必須先把工具掛上去，沒掛就完全不會跑</td></tr>
+            <tr><td>怎麼除錯</td><td>看對話裡顯示的執行過程跟產出檔案</td><td>讀回應裡 <code class="inline">stdout</code> / <code class="inline">stderr</code> / <code class="inline">return_code</code> 三個欄位</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p>除錯時最常見的判斷順序：<code class="inline">return_code</code> 不是 0 → 看 <code class="inline">stderr</code> 找錯誤訊息 → 確認是不是套件沒裝、檔案路徑寫錯、還是撞到 90 秒的單一區塊執行上限。</p>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <!-- ============ 8. FEATURE REFERENCE ============ -->
+    <section class="chapter" id="features">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">10_feature_reference</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">API 與 Settings 各項功能定義 — 定義 / 功能 / 如何使用 / 應用範圍</p>
+      <div class="content">
+        <p>每一項都用同一個格式拆開：這是什麼、它具體做什麼、怎麼按出來、適合用在哪。Settings 裡的開關大多集中在 <code class="inline">Settings → Capabilities</code>（Team / Enterprise 是 <code class="inline">Organization settings → Capabilities</code>）。</p>
+
+        <div class="def-stack">
+          <div class="def-card">
+            <h4><span class="dot"></span>Claude API（Messages API）</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>Anthropic 提供的 REST 介面，讓開發者直接向 Claude 模型送請求、拿回應，核心端點是 <code class="inline">POST /v1/messages</code>。</dd>
+              <dt>功能</dt><dd>把對話歷史、系統提示、工具定義、檔案打包成 JSON 送出，換回文字、工具呼叫、或串流回應——第 2、3 章講的全部內容都是這個東西的細節。</dd>
+              <dt>如何使用</dt><dd>console.anthropic.com 申請 API key → 裝 SDK（<code class="inline">pip install anthropic</code> / <code class="inline">npm install @anthropic-ai/sdk</code>）或直接用 curl → 每個請求都要帶 <code class="inline">x-api-key</code> 與 <code class="inline">anthropic-version</code> 兩個 header。</dd>
+              <dt>應用範圍</dt><dd>把 Claude 接進自己的產品/後端、寫自動化腳本、組 agent——任何「claude.ai 介面之外」要用 Claude 的場景。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
+            <h4><span class="dot"></span>Web Search（網路搜尋）</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>讓 Claude 回答前先查即時網路內容。claude.ai 裡是 Capabilities 裡一個可開關的能力，API 裡是叫 <code class="inline">web_search</code> 的伺服器端工具。</dd>
+              <dt>功能</dt><dd>針對問題即時搜尋多個來源，整合進回答並附引用連結，不再受限於模型訓練資料的時間點；開啟後也會連帶支援圖片搜尋結果與「給連結直接讀內容」的 web fetch。</dd>
+              <dt>如何使用</dt><dd>claude.ai：點輸入框左下角滑桿圖示 → 開 Web search，Claude 自動判斷何時查，也能在訊息裡明講「幫我搜尋」強制觸發。API：<code class="inline">tools</code> 陣列加 <code class="inline">{"type":"web_search_20260318","name":"web_search"}</code>。</dd>
+              <dt>應用範圍</dt><dd>問最新消息、即時股價、近期發布的產品或法規——任何「答案可能在訓練之後才出現」的問題。不需要的時候建議關掉，省 token。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
+            <h4><span class="dot"></span>Code execution and file creation（程式碼執行與檔案產生）</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>讓 Claude 在隔離沙箱容器裡真的執行 Python / Bash、產生並回傳檔案的能力。claude.ai 裡是 Capabilities 的總開關，Artifacts 跟 Skills 現在都依賴它才能運作。</dd>
+              <dt>功能</dt><dd>精確計算、資料分析與視覺化、產生 Word / Excel / PPT / PDF 等檔案、處理你上傳的 CSV 等資料檔。</dd>
+              <dt>如何使用</dt><dd>claude.ai：Capabilities → 打開 Code execution and file creation（Team / Enterprise 還能設定 network egress：完全關閉、或只開放套件管理員存取）；開了之後不用額外語法，直接自然語言要求即可。API：<code class="inline">tools</code> 加 <code class="inline">{"type":"code_execution_20250825","name":"code_execution"}</code>。</dd>
+              <dt>應用範圍</dt><dd>任何「不只是講出答案、還要真的算出來/做出一個檔案」的任務——財務模型、資料清理、報表、簡報產生，第 4 章的整套機制細節都在這裡。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
+            <h4><span class="dot"></span>Artifacts（成品面板）</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>Claude 產出的內容夠完整、自成一體時（通常超過 15 行、你可能想編輯或重複使用），獨立開一個側邊面板呈現，而不是塞在對話文字裡。</dd>
+              <dt>功能</dt><dd>即時預覽程式碼/網頁/圖表/文件，保留版本紀錄、可下載、可發布成獨立連結分享，甚至能做成內嵌 Claude 智能的小應用程式。</dd>
+              <dt>如何使用</dt><dd>不用手動觸發，內容符合條件就自動產生；要它改就在對話裡描述改哪裡。要分享：開啟 artifact 點「Publish」。Capabilities 裡可整體開關（現在跟 Code execution 綁在一起）。</dd>
+              <dt>應用範圍</dt><dd>任何你會想下載、迭代、或單獨分享出去的產出——網頁原型、報告、互動式小工具，這份指南本身的網站版就是一個 Artifact。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
+            <h4><span class="dot"></span>Skills（技能）</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>一包打包好的「指令 + 腳本 + 參考資料」資料夾，讓 Claude 在特定任務類型上有更熟練、更一致的做法，本質上是寫死的最佳實踐文件。</dd>
+              <dt>功能</dt><dd>Claude 偵測到任務符合某個 skill 的描述時自動載入該 skill 的詳細指引，不用每次在對話裡重新解釋一遍規則。</dd>
+              <dt>如何使用</dt><dd><code class="inline">Customize → Skills</code> 裡開關內建或上傳自訂 skill；前提是 Code execution 要先打開，因為 skill 靠這套沙箱環境執行。</dd>
+              <dt>應用範圍</dt><dd>重複性高、有固定最佳實踐的任務——固定格式的報表、特定風格的簡報、企業內部規範文件。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
+            <h4><span class="dot"></span>Memory（記憶）— 兩個獨立開關</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>claude.ai 用來「記得你」的兩個機制：<em>Search and reference past chats</em>（搜尋過去對話）跟 <em>Generate memory from chat history</em>（自動生成長期記憶）。</dd>
+              <dt>功能</dt><dd>前者讓 Claude 能在當前對話裡主動翻找你過去聊過的內容；後者從對話歷史萃取重點（偏好、身份、進行中的專案），自動帶入之後每次新對話——也就是這份指南最初記得你在玩 open-slide 的那個機制。</dd>
+              <dt>如何使用</dt><dd>Capabilities 裡分別開關；記憶內容可以在設定裡查看，刪單筆或全部清除。</dd>
+              <dt>應用範圍</dt><dd>不想每次重新自我介紹、想讓 Claude 記得專案背景或寫作風格時開啟；共用裝置或重視隱私的情境建議關閉。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
+            <h4><span class="dot"></span>Code Execution — 技術機制本身（再深一層）</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>不是一個按鈕，是底層真正執行程式碼的沙箱機制——一個網路完全隔離的 Linux 容器，Claude 在裡面跑 Python / Bash。claude.ai 的開關跟 API 的 <code class="inline">code_execution</code> 工具，是同一套底層機制的兩種啟用方式。</dd>
+              <dt>功能</dt><dd>精確計算、資料處理、檔案產生/編輯；也讓 web_search / web_fetch 能先用程式碼篩選結果再放進對話脈絡，降低 token 消耗。</dd>
+              <dt>如何使用</dt><dd>claude.ai 端見上面「Code execution and file creation」；API 端完全靠 <code class="inline">tools</code> 陣列裡那一行宣告控制，沒加就完全不會跑，細節見第 4 章的完整 JSON。</dd>
+              <dt>應用範圍</dt><dd>任何「光靠語言模型推理會算錯或編造」的場景——精確數學、資料分析、生成真正可以打開的檔案。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
+            <h4><span class="dot"></span>Connectors（連接器）</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>Settings 裡獨立一個分類，用來管理 Claude 跟外部服務（Notion、Gmail、Google Drive、Figma 等）之間的連線——技術上就是第 8 章講過的 MCP 連線的使用者介面。</dd>
+              <dt>功能</dt><dd>讓 Claude 能讀（部分情況下能寫）你授權的外部服務資料，例如搜尋你的 Notion 工作區、讀 Gmail 信件、查 Google Drive 檔案。</dd>
+              <dt>如何使用</dt><dd>Settings → Connectors → 選擇服務 → 走該服務的 OAuth 授權流程；之後對話裡需要時 Claude 會主動詢問要不要使用，或你可以直接指名要用哪個連接器。</dd>
+              <dt>應用範圍</dt><dd>工作資料分散在多個工具裡、不想每次手動複製貼上的情境——例如直接問「我 Notion 裡那份簡報草稿寫了什麼」而不用先自己打開 Notion 複製內容。</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <!-- ============ 9. DEVELOPER EXTENSIONS ============ -->
+    <section class="chapter" id="extensions">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">11_developer_extensions</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">給開發者的延伸介面 — IDE 外掛、瀏覽器擴充、CI/CD 整合</p>
+      <div class="content">
+        <p>第 5 章講的是終端機裡的 <code class="inline">claude</code>。但同一個引擎還有好幾個「外殼」，把它接進你已經在用的工具裡，不用切視窗。底層都是同一套 Claude Code（同樣的模型、同樣的 <code class="inline">CLAUDE.md</code>、同樣的 hooks 跟 MCP），差別只在介面。</p>
+
+        <div class="def-stack">
+          <div class="def-card">
+            <h4><span class="dot"></span>VS Code 擴充套件</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>Claude Code 在 VS Code 裡的原生圖形介面，官方推薦的 VS Code 整合方式。本質不是另一個產品，是同一個 <code class="inline">claude</code> 引擎包了一層看得到游標位置、能畫 inline diff 的面板。</dd>
+              <dt>功能</dt><dd>側邊面板對話、改動前可先檢視/編輯計畫、逐行 inline diff 審閱、用 <code class="inline">@檔名</code> 引用特定檔案或選取的行範圍、多組對話開分頁並行、串接 Claude in Chrome 做瀏覽器除錯（<code class="inline">@browser</code>）。</dd>
+              <dt>如何使用</dt><dd><code class="inline">Cmd/Ctrl+Shift+X</code> 開擴充套件市集搜尋「Claude Code」安裝 → 第一次開啟用 Anthropic 帳號登入（Pro/Max/Team/Enterprise 訂閱或 Console 帳號都可，不一定要 API key）。</dd>
+              <dt>應用範圍</dt><dd>日常開發、想要視覺化 diff 跟逐步審查每個改動的場景；複雜任務、寫 MCP 設定、headless 自動化還是建議切回終端機 CLI。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
+            <h4><span class="dot"></span>JetBrains 外掛（IntelliJ / PyCharm / WebStorm 等）</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>Claude Code 的 JetBrains 系列外掛，目前是 Beta。跟 VS Code 版不同，它主要是在 IDE 內嵌終端機裡跑同一支 CLI，再把改動結果顯示在 IDE 自帶的 diff viewer 上，圖形整合程度比 VS Code 版淺。</dd>
+              <dt>功能</dt><dd>IDE 內快速喚出 Claude Code、共享診斷與檔案脈絡、改動顯示在原生 diff 介面。</dd>
+              <dt>如何使用</dt><dd>Settings → Plugins → Marketplace 搜尋「Claude Code」安裝；認證跟 CLI 共用，沒登入過就在內嵌終端機跑一次 <code class="inline">claude</code> 走登入流程。</dd>
+              <dt>應用範圍</dt><dd>已經活在 JetBrains 系 IDE 裡、只是想少開一個終端機視窗的人；想要 VS Code 那種深度圖形整合（計畫審閱、inline 編輯）目前還是 VS Code 版更完整。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
+            <h4><span class="dot"></span>Claude in Chrome（瀏覽器擴充）</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>讓 Claude 直接操作你的 Chrome 瀏覽器的擴充功能——開分頁、點擊、填表單、讀 console log，本質是把第 4 章講的「工具調用」接到一個真正的瀏覽器上。</dd>
+              <dt>功能</dt><dd>測試自己做的網頁應用、debug 時讀瀏覽器 console 錯誤訊息、自動化重複性的網頁操作；送出表單、付款等有副作用的動作會先跟你確認才執行。</dd>
+              <dt>如何使用</dt><dd>到 Chrome 線上應用程式商店安裝擴充套件；裝好後在 Claude Code（VS Code 版）裡打 <code class="inline">@browser</code> 加上指令，例如「<code class="inline">@browser go to localhost:3000 and check the console for errors</code>」，需要擴充套件版本 1.0.36 以上。</dd>
+              <dt>應用範圍</dt><dd>本地網頁開發時的即時除錯、跑通某個操作流程要不要動到後端、不想自己一直切視窗手動點。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
+            <h4><span class="dot"></span>GitHub App / Action</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>把 Claude Code 接進 GitHub 工作流程的兩種方式：在 Issue/PR 裡 <code class="inline">@claude</code> 標記直接對話的 GitHub App，跟寫進 CI pipeline 自動跑的 GitHub Action。</dd>
+              <dt>功能</dt><dd>自動 review PR、根據 Issue 描述產出修復、在 CI 流程裡跑非互動模式的 Claude Code 任務。</dd>
+              <dt>如何使用</dt><dd>GitHub repo 安裝 Claude GitHub App 後在 Issue/PR 留言 <code class="inline">@claude</code> 加指令；或在 workflow yaml 裡接 Claude Code Action，搭配非互動模式（<code class="inline">-p</code> 參數/headless）跑。</dd>
+              <dt>應用範圍</dt><dd>團隊協作場景——自動 PR review、把簡單的 bug 修復外包給 Claude 而不用本地開終端機、CI/CD pipeline 裡的自動化檢查。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
+            <h4><span class="dot"></span>Claude Agent SDK</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>給開發者的高階封裝，把第 3 章那個要自己手刻的 <code class="inline">while stop_reason == "tool_use"</code> 迴圈、檔案系統存取、子代理調度等通通包好，讓你用程式碼建構「自己的 Claude Code」。</dd>
+              <dt>功能</dt><dd>提供跟 Claude Code 同樣的底層能力（檔案讀寫、shell 執行、MCP 串接）給你寫成獨立應用，而不是透過 CLI 互動。</dd>
+              <dt>如何使用</dt><dd>TypeScript / Python 兩種語言的套件，匯入後用程式碼定義 agent 的行為、可用工具、權限規則，自己決定要包裝成什麼介面。</dd>
+              <dt>應用範圍</dt><dd>要做「自己公司版的 Claude Code」、把 agentic coding 能力嵌進內部工具或產品裡的場景，而不是單純呼叫一次性問答的 Messages API。</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <!-- ============ 12. SAFETY & LIMITS ============ -->
+    <section class="chapter" id="safety">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">12_safety_and_limits</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">Claude 不是萬能的 — 幾個新手容易誤踩的點</p>
+      <div class="content">
+        <p>前面講了一堆能做什麼，這章講幾個「不是這樣」的地方，避免用錯期待。</p>
+
+        <h3>知識截止日（Knowledge Cutoff）</h3>
+        <p>每個模型的訓練資料都有一個時間點，超過那個時間點發生的事情、發布的產品，Claude 不會自動知道——除非你開了 Web Search（見第 10 章），它才會去查當下的網路內容。問「現在的」「最新的」「目前是誰」這類問題時，留意它是不是在用舊資訊回答。</p>
+
+        <h3>會「講得很肯定」不等於「一定對」</h3>
+        <p>語言模型有時會自信滿滿地講出聽起來合理但其實錯誤或編造的內容（業界統稱 hallucination）。對精確數字、法條、引用來源、API 細節這類「錯了會有實質後果」的資訊，養成習慣讓 Claude 用工具驗證（搜尋、跑程式碼），或自己交叉查證，而不是照單全收。</p>
+
+        <h3>不是顧問，是輔助</h3>
+        <p>法律、財務、醫療這類需要專業執照判斷的決定，Claude 可以幫你整理資訊、列出選項，但不能取代真正的律師、會計師、醫師——它會主動提醒這一點，這不是故意保守，是因為它的回答不構成專業建議。</p>
+
+        <h3>機密資料不要隨手貼上去</h3>
+        <p>對話內容、上傳的檔案，會依照你的方案與資料保留政策被處理（細節見支援文件 Privacy 相關說明）。客戶個資、未公開財報、密碼金鑰這類東西，貼之前先想一下是不是真的有必要。</p>
+
+        <h3>它不會持續「在背景幫你做事」</h3>
+        <p>除非你明確用了排程任務（Scheduled tasks）或讓 Claude Code 跑長任務，否則對話結束後 Claude 不會自己繼續動作；每次互動都是你主動觸發的，不是一個一直在運作的代理人。</p>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <!-- ============ 7. RESOURCES ============ -->
+    <section class="chapter" id="resources">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">13_resources</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">延伸閱讀，官方文件最新狀態以連結為準</p>
+      <div class="content">
+        <ul>
+          <li><a href="https://platform.claude.com/docs/en/home" target="_blank" rel="noopener">API 總覽</a></li>
+          <li><a href="https://platform.claude.com/docs/en/build-with-claude/working-with-messages" target="_blank" rel="noopener">Messages API 基礎用法</a></li>
+          <li><a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works" target="_blank" rel="noopener">工具調用機制</a></li>
+          <li><a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools" target="_blank" rel="noopener">工具定義細節（schema、tool_choice）</a></li>
+          <li><a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool" target="_blank" rel="noopener">Code execution 工具細節</a></li>
+          <li><a href="https://code.claude.com/docs/en/overview" target="_blank" rel="noopener">Claude Code 文件</a></li>
+          <li><a href="https://support.claude.com" target="_blank" rel="noopener">claude.ai 使用說明</a></li>
+        </ul>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <footer>
+      claude.guide.json · 整理時間 2026-06，部分名稱與版本以官方文件最新狀態為準
+      <div class="links">
+        <span>配套可跑範例：claude_tool_use_demo.py</span>
+      </div>
+    </footer>
+  </main>
+</div>
+
+<script>
+// ---------- mobile menu ----------
+const sidebar = document.getElementById('sidebar');
+const scrim = document.getElementById('scrim');
+const menuBtn = document.getElementById('menuBtn');
+function closeMenu(){ sidebar.classList.remove('open'); scrim.classList.remove('show'); }
+menuBtn.addEventListener('click', ()=>{
+  sidebar.classList.toggle('open');
+  scrim.classList.toggle('show');
+});
+scrim.addEventListener('click', closeMenu);
+document.querySelectorAll('nav.tree a').forEach(a=>a.addEventListener('click', closeMenu));
+
+// ---------- scroll-spy ----------
+const navLinks = document.querySelectorAll('nav.tree a');
+const targets = [...navLinks].map(a => document.querySelector(a.getAttribute('href')));
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      const id = '#' + entry.target.id;
+      navLinks.forEach(a=>a.classList.toggle('active', a.getAttribute('href')===id));
+    }
+  });
+}, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+targets.forEach(t => t && io.observe(t));
+
+// ---------- hero typing animation ----------
+const typeEl = document.getElementById('typeLine');
+const ttLines = [
+  '{',
+  '  "name": "Claude",',
+  '  "made_by": "Anthropic",',
+  '  "surfaces": ["claude.ai", "api", "claude_code"],',
+  '  "status": "reading guide..."',
+  '}'
+];
+let li = 0, ci = 0;
+function typeTick(){
+  if(li >= ttLines.length){ return; }
+  const line = ttLines[li];
+  if(ci <= line.length){
+    let html = '';
+    for(let k=0;k<li;k++){ html += escapeHtml(ttLines[k]) + '\n'; }
+    html += escapeHtml(line.slice(0, ci));
+    typeEl.innerHTML = html + '<span class="cur"></span>';
+    ci++;
+    setTimeout(typeTick, 18 + Math.random()*22);
+  } else {
+    li++; ci = 0;
+    setTimeout(typeTick, 110);
+  }
+}
+function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+typeTick();
+
+// ---------- syntax highlighting ----------
+function highlightJSON(src){
+  src = escapeHtml(src);
+  const re = /("(?:\\.|[^"\\])*")(\s*:)?|\b(true|false)\b|\b(null)\b|(-?\b\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\b)/g;
+  return src.replace(re, function(m, str, colon, bool, nul, num){
+    if(str){ return '<span class="' + (colon ? 'tok-key' : 'tok-string') + '">' + str + '</span>' + (colon||''); }
+    if(bool){ return '<span class="tok-bool">' + bool + '</span>'; }
+    if(nul){ return '<span class="tok-null">' + nul + '</span>'; }
+    if(num){ return '<span class="tok-num">' + num + '</span>'; }
+    return m;
+  });
+}
+function highlightPY(src){
+  src = escapeHtml(src);
+  const kw = '\\b(def|class|return|if|else|elif|for|while|import|from|as|in|not|and|or|True|False|None|with|try|except|raise|yield|lambda|print)\\b';
+  const strPattern = '"""[\\s\\S]*?"""|' + "'''[\\s\\S]*?'''" + '|"(?:\\\\.|[^"\\\\])*"|' + "'(?:\\\\.|[^'\\\\])*'";
+  const pattern = new RegExp('(#.*$)|(' + strPattern + ')|' + kw + '|\\b(\\d+\\.?\\d*)\\b', 'gm');
+  return src.replace(pattern, function(m, comment, str, keyword, num){
+    if(comment) return '<span class="tok-comment">' + comment + '</span>';
+    if(str) return '<span class="tok-string">' + str + '</span>';
+    if(keyword) return '<span class="tok-keyword">' + keyword + '</span>';
+    if(num) return '<span class="tok-num">' + num + '</span>';
+    return m;
+  });
+}
+
+document.querySelectorAll('.code-block').forEach(block=>{
+  const lang = block.getAttribute('data-lang');
+  const codeEl = block.querySelector('pre code');
+  const raw = codeEl.textContent;
+  codeEl.innerHTML = lang === 'python' ? highlightPY(raw) : (lang === 'json' ? highlightJSON(raw) : escapeHtml(raw));
+  const btn = block.querySelector('.copy-btn');
+  if(btn){
+    btn.addEventListener('click', ()=>{
+      navigator.clipboard.writeText(raw).then(()=>{
+        const old = btn.textContent;
+        btn.textContent = '已複製';
+        setTimeout(()=>btn.textContent = old, 1400);
+      });
+    });
+  }
+});
+</script>
+</body>
+</html>
