@@ -563,9 +563,11 @@
       <a href="#practical"><span class="idx">[9]</span>practical_usage</a>
       <a href="#features"><span class="idx">[10]</span>feature_reference</a>
       <a href="#extensions"><span class="idx">[11]</span>developer_extensions</a>
+      <div class="nav-divider">系統視角</div>
+      <a href="#aicoding"><span class="idx">[12]</span>ai_coding_map</a>
       <div class="nav-divider">其他</div>
-      <a href="#safety"><span class="idx">[12]</span>safety_and_limits</a>
-      <a href="#resources"><span class="idx">[13]</span>resources</a>
+      <a href="#safety"><span class="idx">[13]</span>safety_and_limits</a>
+      <a href="#resources"><span class="idx">[14]</span>resources</a>
     </nav>
     <div class="sidebar-foot">
       整理時間 2026-06 · 內容以官方文件最新狀態為準
@@ -1289,11 +1291,68 @@ pip install anthropic</code></pre>
       </div>
     </section>
 
-    <!-- ============ 12. SAFETY & LIMITS ============ -->
+    <!-- ============ 12. AI CODING MAP ============ -->
+    <section class="chapter" id="aicoding">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">12_ai_coding_map</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">一個系統的 12 塊積木 — 換個視角：用 AI 打造系統，需要哪些零件</p>
+      <div class="content">
+        <p>前面幾章講「怎麼用 Claude」。這一章換個視角：如果要用 AI 幫你打造一個<strong>會自己動的系統</strong>，那個系統由哪些零件組成？把它拆成 12 塊積木、分成 4 個分區，像蓋房子——先有地基，中間有大腦調度，四周接工具，最外層是使用者碰得到的介面。（工具名稱以 2026 年主流狀態整理。）</p>
+
+        <h3>4 分區（先記這個骨架）</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>分區</th><th>角色</th><th>放哪些積木</th></tr></thead>
+          <tbody>
+            <tr><td><strong>入口</strong></td><td>接收使用者和外界進來的東西</td><td>展示、觸發</td></tr>
+            <tr><td><strong>守門 + 調度</strong></td><td>把關、驗證、決定要呼叫誰（中樞）</td><td>邏輯、身份</td></tr>
+            <tr><td><strong>工具箱</strong></td><td>真正幹活的功能積木</td><td>連線、爬蟲、AI、通知、記憶、檔案</td></tr>
+            <tr><td><strong>地基</strong></td><td>讓產品活在網路上、可回溯</td><td>版本控制、部署</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h3>12 塊積木：工具 + 實際應用</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>積木</th><th>做什麼</th><th>現在大家用什麼</th><th>實際應用（最小可行）</th><th>難度</th></tr></thead>
+          <tbody>
+            <tr><td>展示</td><td>使用者看得到、摸得到的介面</td><td>React／Next.js＋Tailwind、shadcn/ui；AI 直接生：v0、Lovable、Bolt</td><td>一頁式活動報名頁；本指南網站本身</td><td>★★★★</td></tr>
+            <tr><td>觸發</td><td>決定系統「何時」動起來</td><td>手動按鈕、排程（Vercel Cron／GitHub Actions）、Webhook、n8n</td><td>每早 8 點自動抓天氣寄給你；有人填表就即時啟動</td><td>★★★</td></tr>
+            <tr><td>邏輯</td><td>中間人，串接所有積木的 API route</td><td>Next.js API Routes、FastAPI、Express；不寫程式可用 n8n 視覺化</td><td>表單送出後決定「先存庫→再寄信→回感謝頁」的順序</td><td>★★</td></tr>
+            <tr><td>身份</td><td>讓系統認識使用者是誰</td><td>Clerk、Supabase Auth、Auth0（背後多是 OAuth）</td><td>只有登入會員能看後台，其他人擋在登入牆外</td><td>★★★</td></tr>
+            <tr><td>連線</td><td>跟「有 API」的外部系統對話</td><td>各家官方 SDK、REST／GraphQL、MCP</td><td>串 Google Calendar API 把會議自動寫進行事曆</td><td>★★★★</td></tr>
+            <tr><td>爬蟲</td><td>從「沒 API」的網頁直接抓資料</td><td>Firecrawl（吐 AI 好讀的結構化資料）、Playwright、BeautifulSoup</td><td>每天抓某電商商品頁的價格存起來比對</td><td>★★★</td></tr>
+            <tr><td>AI</td><td>讓系統會思考、分析、生成</td><td>Claude API、OpenAI API；實務常做「模型分流」</td><td>把使用者貼的長文丟給 Claude 回傳三點摘要</td><td>★★★</td></tr>
+            <tr><td>通知</td><td>主動把訊息推給人</td><td>Email（Resend／SendGrid）、Twilio、LINE Messaging API、Discord Webhook</td><td>表單一有新填寫就自動發 LINE 或 Email 給你</td><td>★★★</td></tr>
+            <tr><td>記憶</td><td>讓系統記住資料（結構化）</td><td>Supabase（Postgres）、SQLite；AI 檢索用 pgvector 向量搜尋</td><td>把每次查詢紀錄存起來做成歷史清單／月報表</td><td>★★★★</td></tr>
+            <tr><td>檔案</td><td>上傳／儲存／讀取檔案</td><td>Supabase Storage、Cloudflare R2、AWS S3</td><td>讓使用者上傳 PDF，存起來並產生下載連結</td><td>★★★</td></tr>
+            <tr><td>版本控制</td><td>幫程式碼存檔、可回溯</td><td>Git＋GitHub（本站 <code class="inline">deploy.command</code> 就在用這塊）</td><td>網站改壞了，一行指令回到昨天的版本</td><td>★★★</td></tr>
+            <tr><td>部署</td><td>讓產品活在網路上</td><td>GitHub Pages（本站用的）、Vercel、Cloudflare Pages、Netlify</td><td>把做好的網站推上去，全世界用網址就能連</td><td>★★★</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h3>把積木組起來：真實小產品範例</h3>
+        <p>理解積木的關鍵是「組合」。同樣幾塊，換個排列就是不同產品。</p>
+        <ul>
+          <li><strong>價格追蹤小幫手</strong> — 觸發（每天排程）→ 爬蟲（抓價格）→ 邏輯（判斷是否低於門檻）→ 記憶（存每天價格）→ 通知（低於就發 LINE）→ 部署。用 5–6 塊，不需要「展示」和「身份」，因為只服務你一人、沒畫面。</li>
+          <li><strong>上傳 PDF 幫你摘要</strong> — 展示（上傳頁）→ 檔案（收檔）→ AI（產摘要）→ 記憶（存歷史）→ 部署。想限定只有自己能用，再加一塊「身份」。</li>
+          <li><strong>本指南網站（已經在跑的例子）</strong> — 展示（HTML）→ 版本控制（Git）→ 部署（GitHub Pages）。只用 3 塊，<code class="inline">deploy.command</code> 把後兩塊自動化成按一下就完成。想加功能就往工具箱那排一塊一塊加。</li>
+        </ul>
+
+        <p class="note">不用 12 塊全上。先想清楚：入口怎麼進來 → 中樞怎麼調度 → 要動用哪些工具 → 地基怎麼上線。越靠「地基」和「入口」的積木越通用，工具箱那排是按需求選配。</p>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <!-- ============ 13. SAFETY & LIMITS ============ -->
     <section class="chapter" id="safety">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="quote">"</span><span class="key">12_safety_and_limits</span><span class="quote">"</span>:</h2>
+        <h2><span class="quote">"</span><span class="key">13_safety_and_limits</span><span class="quote">"</span>:</h2>
       </div>
       <p class="chap-sub">Claude 不是萬能的 — 幾個新手容易誤踩的點</p>
       <div class="content">
@@ -1321,7 +1380,7 @@ pip install anthropic</code></pre>
     <section class="chapter" id="resources">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="quote">"</span><span class="key">13_resources</span><span class="quote">"</span>:</h2>
+        <h2><span class="quote">"</span><span class="key">14_resources</span><span class="quote">"</span>:</h2>
       </div>
       <p class="chap-sub">延伸閱讀，官方文件最新狀態以連結為準</p>
       <div class="content">
