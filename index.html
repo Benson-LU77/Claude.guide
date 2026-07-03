@@ -640,18 +640,20 @@
       <div class="content">
         <p>「Claude」這個名字底下，其實涵蓋三個彼此獨立、但互相串接的產品層：<strong>claude.ai / App</strong>（聊天介面，一般使用者用）、<strong>Claude API</strong>（開發者直接呼叫模型，走 JSON）、<strong>Claude Code</strong>（終端機裡跑的 agentic coding 工具，本身是 API 的重度應用）。這三層共用同一套底層模型，但「怎麼用」「JSON 長什麼樣」「程式碼怎麼跑」是完全不同的問題，所以這份指南分開講。</p>
 
-        <h3>模型家族（目前公開可用）</h3>
+        <h3>模型家族：哪種任務用哪個</h3>
+        <p>三個公開模型不是「越貴越好」，而是各有適用區間。實務上的判斷是：先想這個任務「需不需要深度推理」，再想「量大不大、要不要快」。</p>
         <div class="table-wrap">
         <table>
-          <thead><tr><th>模型</th><th>定位</th></tr></thead>
+          <thead><tr><th>模型</th><th>定位</th><th>適合的任務</th><th>價格(輸入/輸出，每百萬 token)</th></tr></thead>
           <tbody>
-            <tr><td><code class="inline">claude-opus-4-8</code> / 4-7 / 4-6</td><td>最強推理與複雜任務</td></tr>
-            <tr><td><code class="inline">claude-sonnet-4-6</code></td><td>平衡型，速度與智慧的折衷 — 你現在對話的就是它</td></tr>
-            <tr><td><code class="inline">claude-haiku-4-5</code></td><td>最快、最便宜，高量低延遲場景</td></tr>
+            <tr><td><code class="inline">claude-opus-4-8</code></td><td>最深推理，旗艦</td><td>最難的問題：大型 codebase 分析、複雜架構決策、多步驟推理、多 agent 工作流。開 extended thinking 時推理優勢更明顯</td><td>$5 / $25</td></tr>
+            <tr><td><code class="inline">claude-sonnet-4-6</code></td><td>日常主力，平衡型</td><td>大多數的寫程式、寫作、分析——「日常駕駛」。能力接近 Opus，成本低約 40%，同樣支援 extended thinking</td><td>$3 / $15</td></tr>
+            <tr><td><code class="inline">claude-haiku-4-5</code></td><td>最快、最便宜</td><td>高量低複雜度：分類、抽取、格式轉換、即時聊天介面、背景 AI 功能。近前沿智慧但不支援 extended thinking</td><td>$1 / $5</td></tr>
           </tbody>
         </table>
         </div>
-        <p class="note">另外還有 Claude Mythos Preview，僅提供給少數受信任機構做研究（Project Glasswing），一般使用者目前還用不到。</p>
+        <p>白話對照：<strong>判斷 / 推理 / 架構</strong>這類「想得越深越好」的 → Opus；<strong>一般日常工作</strong> → Sonnet；<strong>格式轉換 / 分類 / 大量重複</strong>這類「快而準就好、不用想太多」的 → Haiku。實務上常「模型分流」：把大量簡單任務丟 Haiku、難的才升到 Sonnet / Opus，成本可省 6–7 成而幾乎不掉品質。</p>
+        <p class="note">另外還有僅供少數受信任機構做研究的前沿預覽模型（如 Project Glasswing），以及部分特化用途的模型，一般使用者目前還用不到，實際可用清單以官方文件為準。</p>
         <div class="closing-brace">}</div>
       </div>
     </section>
@@ -978,6 +980,7 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
           <li>可以接 MCP 伺服器，串接外部服務（Notion、Gmail、Figma 等）</li>
           <li>有 Plan Mode（先規劃再動手）、sub-agents（拆任務給專門化子代理）等進階功能</li>
         </ul>
+        <p class="note">Claude Code 的專案記憶檔 <code class="inline">CLAUDE.md</code>、生命週期 <code class="inline">hooks</code>、外掛 <code class="inline">plugins</code>、<code class="inline">session log</code>，以及把這一切串起來的 <strong>harness engineering</strong>，完整說明見 <a href="#features">第 10 章 feature_reference</a>。</p>
         <div class="closing-brace">}</div>
       </div>
     </section>
@@ -1219,6 +1222,56 @@ pip install anthropic</code></pre>
               <dt>功能</dt><dd>讓 Claude 能讀（部分情況下能寫）你授權的外部服務資料，例如搜尋你的 Notion 工作區、讀 Gmail 信件、查 Google Drive 檔案。</dd>
               <dt>如何使用</dt><dd>Settings → Connectors → 選擇服務 → 走該服務的 OAuth 授權流程；之後對話裡需要時 Claude 會主動詢問要不要使用，或你可以直接指名要用哪個連接器。</dd>
               <dt>應用範圍</dt><dd>工作資料分散在多個工具裡、不想每次手動複製貼上的情境——例如直接問「我 Notion 裡那份簡報草稿寫了什麼」而不用先自己打開 Notion 複製內容。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
+            <h4><span class="dot"></span>CLAUDE.md（專案記憶檔）— 完整教學</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>Claude Code 的「專案記憶檔」，一個純 markdown 檔。每次開新 session 都是全新脈絡，Claude 會在開頭自動把 CLAUDE.md 讀進 context，當成你給它的持久性指示。</dd>
+              <dt>功能</dt><dd>把「每次都得重講」的事寫死一次：build / test 指令、程式風格、專案架構、命名慣例、「一律要做 X」的規則。分四層由廣到窄載入：<code class="inline">組織 managed policy</code> → <code class="inline">使用者 ~/.claude/CLAUDE.md</code> → <code class="inline">專案 ./CLAUDE.md</code> → <code class="inline">本機 CLAUDE.local.md</code>。另有互補的 <em>auto memory</em>——Claude 根據你的糾正自己寫的學習筆記。</dd>
+              <dt>如何使用</dt><dd>專案根目錄放 <code class="inline">CLAUDE.md</code>，或跑 <code class="inline">/init</code> 讓 Claude 掃描 codebase 自動生成一份。用 <code class="inline">/memory</code> 檢視目前載入哪些檔、開關 auto memory。撰寫要訣：控制在 200 行內、寫「具體可驗證」的指示（「用 2 空格縮排」勝過「把程式碼排好」）、避免互相矛盾。大型專案用 <code class="inline">.claude/rules/</code> 依檔案類型 scope，只在碰到對應檔時才載入。</dd>
+              <dt>應用範圍</dt><dd>讓 Claude 在你的 codebase 表現一致、不重複犯同樣的錯、新人不用口頭交接就有脈絡。延伸教學影片：<a href="https://www.youtube.com/watch?v=p9qBs1fAirc" target="_blank" rel="noopener">CLAUDE.md 完整教學</a>。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
+            <h4><span class="dot"></span>Hooks（生命週期掛鉤）</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>在 Claude Code 生命週期的「固定時點」自動執行的 shell 指令。跟 CLAUDE.md 不同——CLAUDE.md 是建議、Claude 可能不照做；hooks 是<strong>強制執行</strong>，不管 Claude 怎麼決定都會跑。</dd>
+              <dt>功能</dt><dd>共 12 種生命週期事件，常用的有：<code class="inline">SessionStart</code>（開始 / 恢復 session 時載入脈絡）、<code class="inline">SessionEnd</code>（結束時，可做 session 紀錄）、<code class="inline">PreToolUse</code>（工具執行前，可硬性擋下危險動作）、<code class="inline">PostToolUse</code>（工具執行後，可替換輸出）、<code class="inline">InstructionsLoaded</code>（CLAUDE.md 載入時）。2026 起支援 <code class="inline">async: true</code> 讓 hook 在背景跑、不擋住 Claude。</dd>
+              <dt>如何使用</dt><dd>在 <code class="inline">settings.json</code> 的 <code class="inline">hooks</code> 區設定：綁「事件 + matcher + 要執行的指令」；接受工作區信任對話框後生效。</dd>
+              <dt>應用範圍</dt><dd>任何「一定要在某時點發生」的事——commit 前一律跑 lint、每次編輯後自動格式化、擋掉刪檔類危險指令、session 結束自動存紀錄。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
+            <h4><span class="dot"></span>Plugins（外掛）</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>把 skills、subagents、hooks、MCP servers、slash commands 打包成「可安裝、可分享」的一整包擴充。</dd>
+              <dt>功能</dt><dd>一鍵把一整套工作流裝進 Claude Code，跨專案、跨團隊共用；多個 plugin 可組成 marketplace 分發。2026 支援 plugin zip 打包。</dd>
+              <dt>如何使用</dt><dd>從 plugin marketplace 安裝現成的，或自己建一個 plugin 資料夾（含 manifest 描述檔）；團隊透過 marketplace 統一散布、集中維護。</dd>
+              <dt>應用範圍</dt><dd>把「個人的一套設定」升級成「團隊標準」；把一組相關的 skill / hook / MCP 綁在一起，一次裝好而不是各自零散設定。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
+            <h4><span class="dot"></span>Session log（工作階段紀錄）</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>把一次工作階段「做了什麼」記錄下來的機制。可以用一個 <code class="inline">SessionEnd</code> hook 或一個 skill，自動產生 <code class="inline">SESSION_LOG.md</code>。</dd>
+              <dt>功能</dt><dd>記錄日期時間、完成的任務、改動過的檔案、做過的決定、待解問題。<code class="inline">SessionEnd</code> hook 的 payload 會帶 <code class="inline">session_id</code> 與 <code class="inline">transcript_path</code>（該次完整逐字稿的檔案路徑），逐字稿本身也存在磁碟可回溯。</dd>
+              <dt>如何使用</dt><dd>寫一個 <code class="inline">SessionEnd</code> hook 或 skill，把當次摘要 append 進 <code class="inline">SESSION_LOG.md</code>；需要時再從 transcript 逐字稿翻完整細節。</dd>
+              <dt>應用範圍</dt><dd>跨 session 交接、稽核 Claude 到底做過什麼、團隊回顧——跟本專案 <code class="inline">Claude Project</code> 裡每個資料夾的 <code class="inline">00_對話交接紀錄.md</code> 是同一個精神。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
+            <h4><span class="dot"></span>Harness engineering（框架工程）</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>「Harness（框架 / 馬具）」指的是包在模型外面那一圈：agent loop（呼叫模型 → 跑工具 → 回餵結果 → 再來一輪）加上工具、防護、驗證、耐久狀態。Harness engineering 就是刻意去設計這一圈，而不是去改模型本身。</dd>
+              <dt>功能</dt><dd>在「固定的模型」之上，透過塑造環境、repo 內指示（CLAUDE.md）、工具中介、回饋迴圈與驗證，決定 agent 的實際表現。它把 context engineering 包含進去，還多管了多步驟結構、工具中介、驗證、與跨步驟的持久狀態。</dd>
+              <dt>如何使用</dt><dd>實務重點：良好的 repo 結構與檢查點、把「生成」和「評估」拆成不同 agent（自己評自己會偏樂觀）、明確的驗證與委派。你已經接觸過的 CLAUDE.md、hooks、plugins、skills，都是 harness 的零件。</dd>
+              <dt>應用範圍</dt><dd>當你發現「換更強的模型也沒把問題解決」，通常該調的是 harness 而不是模型——長時間運行的 agent、多步驟自動化、需要可靠驗證的工作流。</dd>
             </dl>
           </div>
         </div>
