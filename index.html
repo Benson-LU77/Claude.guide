@@ -307,6 +307,11 @@
 
   /* ---------- Tables ---------- */
   .content > .table-wrap{overflow-x:auto;margin:1.1rem 0 1.4rem;}
+  .diagram-wrap{margin:1.1rem 0 1.4rem;padding:1rem;background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;}
+  .fig-cap{margin:.7rem 0 0;font-size:.82rem;color:var(--ink-soft);text-align:center;}
+  .steps{margin:1rem 0;display:flex;flex-direction:column;gap:.6rem;}
+  .steps .step{display:flex;gap:.7rem;align-items:flex-start;}
+  .steps .sn{flex:none;width:24px;height:24px;border-radius:50%;background:var(--bg-panel-2);border:1px solid var(--border);color:var(--string-amber);font:600 13px system-ui,sans-serif;display:flex;align-items:center;justify-content:center;margin-top:.1rem;}
   table{
     border-collapse:collapse;
     width:100%;
@@ -641,19 +646,35 @@
         <p>「Claude」這個名字底下，其實涵蓋三個彼此獨立、但互相串接的產品層：<strong>claude.ai / App</strong>（聊天介面，一般使用者用）、<strong>Claude API</strong>（開發者直接呼叫模型，走 JSON）、<strong>Claude Code</strong>（終端機裡跑的 agentic coding 工具，本身是 API 的重度應用）。這三層共用同一套底層模型，但「怎麼用」「JSON 長什麼樣」「程式碼怎麼跑」是完全不同的問題，所以這份指南分開講。</p>
 
         <h3>模型家族：哪種任務用哪個</h3>
-        <p>三個公開模型不是「越貴越好」，而是各有適用區間。實務上的判斷是：先想這個任務「需不需要深度推理」，再想「量大不大、要不要快」。</p>
+        <p>模型不是「越貴越好」，而是各有適用區間。判斷方式：先想這個任務「需不需要深度推理 / 長時間自主完成」，再想「量大不大、要不要快」。由強到快：</p>
         <div class="table-wrap">
         <table>
           <thead><tr><th>模型</th><th>定位</th><th>適合的任務</th><th>價格(輸入/輸出，每百萬 token)</th></tr></thead>
           <tbody>
-            <tr><td><code class="inline">claude-opus-4-8</code></td><td>最深推理，旗艦</td><td>最難的問題：大型 codebase 分析、複雜架構決策、多步驟推理、多 agent 工作流。開 extended thinking 時推理優勢更明顯</td><td>$5 / $25</td></tr>
+            <tr><td><code class="inline">claude-fable-5</code></td><td>最強，Mythos 級</td><td>長時間、跨情境的自主 agentic 工作——那種原本要人盯著跑好幾小時/天的端到端任務、複雜 vibe coding。目前 Anthropic 最貴的公開模型</td><td>$10 / $50</td></tr>
+            <tr><td><code class="inline">claude-opus-4-8</code></td><td>最深推理，旗艦</td><td>最難的單次問題：大型 codebase 分析、複雜架構決策、多步驟推理。開 extended thinking 時推理優勢更明顯</td><td>$5 / $25</td></tr>
             <tr><td><code class="inline">claude-sonnet-4-6</code></td><td>日常主力，平衡型</td><td>大多數的寫程式、寫作、分析——「日常駕駛」。能力接近 Opus，成本低約 40%，同樣支援 extended thinking</td><td>$3 / $15</td></tr>
-            <tr><td><code class="inline">claude-haiku-4-5</code></td><td>最快、最便宜</td><td>高量低複雜度：分類、抽取、格式轉換、即時聊天介面、背景 AI 功能。近前沿智慧但不支援 extended thinking</td><td>$1 / $5</td></tr>
+            <tr><td><code class="inline">claude-haiku-4-5</code></td><td>最快、最便宜</td><td>高量低複雜度：分類、抽取、格式轉換、即時聊天、背景 AI 功能。近前沿智慧但不支援 extended thinking</td><td>$1 / $5</td></tr>
           </tbody>
         </table>
         </div>
-        <p>白話對照：<strong>判斷 / 推理 / 架構</strong>這類「想得越深越好」的 → Opus；<strong>一般日常工作</strong> → Sonnet；<strong>格式轉換 / 分類 / 大量重複</strong>這類「快而準就好、不用想太多」的 → Haiku。實務上常「模型分流」：把大量簡單任務丟 Haiku、難的才升到 Sonnet / Opus，成本可省 6–7 成而幾乎不掉品質。</p>
-        <p class="note">另外還有僅供少數受信任機構做研究的前沿預覽模型（如 Project Glasswing），以及部分特化用途的模型，一般使用者目前還用不到，實際可用清單以官方文件為準。</p>
+        <p>白話對照：<strong>長時間自主跑完一整件事</strong> → Fable；<strong>最難的單次判斷 / 推理 / 架構</strong> → Opus；<strong>一般日常工作</strong> → Sonnet；<strong>格式轉換 / 分類 / 大量重複</strong> → Haiku。實務上常「模型分流」：大量簡單任務丟 Haiku、難的才升到 Sonnet / Opus / Fable，成本可省 6–7 成而幾乎不掉品質。</p>
+        <p class="note">Fable 5 屬 Mythos 級（與 Claude Mythos 5 同期推出）。<strong>2026/7/20 起，Max 與 Team Premium 訂閱永久包含 Fable 5</strong>（用量上限為週限額的 50%，不另計費）；Pro / Team Standard 則轉為一次性額度、用完後改 API 計量（$10 / $50）。前沿研究預覽（如 Project Glasswing）另計，實際方案與價格以官方為準。</p>
+
+        <h3>我該用哪一個？claude.ai / Claude Code / API / Cowork 選用對照</h3>
+        <p>同一套模型，四個入口，差別在「你想怎麼用」。新手最大的困惑就是選錯入口，這張表幫你對號入座：</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>入口</th><th>適合誰 / 什麼情境</th><th>要不要寫程式</th></tr></thead>
+          <tbody>
+            <tr><td><strong>claude.ai / App</strong></td><td>聊天、問答、寫作、分析、產生檔案——一次性或對話式的工作</td><td>不用</td></tr>
+            <tr><td><strong>Cowork</strong>（桌面）</td><td>步驟多、要動很多工具、跨檔案整理、長文研究，但你不寫程式；能連你電腦的資料夾直接處理檔案</td><td>不用</td></tr>
+            <tr><td><strong>Claude Code</strong>（終端機）</td><td>在自己電腦上實際讀寫檔案、跑指令、操作 git 的開發工作——工程師的主場</td><td>要（開發者）</td></tr>
+            <tr><td><strong>Claude API</strong></td><td>把 Claude 接進你自己的產品/後端、寫自動化、組 agent</td><td>要（開發者）</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">一句話判斷：只是要「問 / 產出」→ claude.ai；要它「跨檔案、多步驟幫你做事」但你不寫程式 → Cowork；你是工程師要它動你的專案 → Claude Code；要把它「裝進別的系統」→ API。</p>
         <div class="closing-brace">}</div>
       </div>
     </section>
@@ -707,6 +728,18 @@
           <li><strong>覺得方向不對，直接打斷修正</strong>，不用等它講完整段才回應</li>
           <li><strong>長文件丟進來，先問它有沒有讀懂重點</strong>，再往下展開細節需求</li>
         </ul>
+
+        <h3>進階提示工程：讓輸出穩定又準的幾招</h3>
+        <p>上面是心態，這裡是技巧。這幾招是 Anthropic 官方最常教、CP 值最高的，claude.ai 和 API 都適用：</p>
+        <ul>
+          <li><strong>角色 / 系統設定</strong>：開頭給它身份與任務框架——「你是一位嚴謹的財務分析師，只根據我提供的數字回答，不確定就說不知道」。API 裡就是 <code class="inline">system</code> 提示，claude.ai 裡寫在對話開頭或 Project 的自訂指示。</li>
+          <li><strong>給範例（few-shot）</strong>：與其描述你要的格式，不如直接示範一兩個「輸入→輸出」的例子，模型會照抄那個模式。這是讓輸出穩定最有效的一招。</li>
+          <li><strong>用 XML 標籤把區塊框起來</strong>：把資料、指令、範例分開標記，例如 <code class="inline">&lt;文章&gt;...&lt;/文章&gt;</code>、<code class="inline">&lt;要求&gt;...&lt;/要求&gt;</code>，模型更不會搞混哪段是資料、哪段是命令。</li>
+          <li><strong>要求逐步推理</strong>：複雜問題加一句「請一步一步想再給結論」，或請它先列思路再作答，正確率明顯提升（也可用模型的 extended thinking，見第 10 章）。</li>
+          <li><strong>明確指定輸出格式</strong>：要表格就說「用表格」、要 JSON 就說「只回傳 JSON、不要多餘文字」、要長度就說「三點、每點一句」。講得越具體越好驗證。</li>
+          <li><strong>先讓它複述再開工</strong>：長或重要的任務，先問「你理解的需求是什麼」，確認方向對了再讓它動手，省得整段重來。</li>
+        </ul>
+        <p class="note">更完整的提示技巧可看官方指南：<a href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview" target="_blank" rel="noopener">Prompt engineering overview</a>。</p>
         <div class="closing-brace">}</div>
       </div>
     </section>
@@ -842,6 +875,48 @@
           <div class="farrow">↓</div>
           <div class="fstep you"><span class="lab">YOU →</span>把完整歷史 + tool_result 一起送回去</div>
           <div class="farrow">↓ 重複，直到 stop_reason ≠ "tool_use"</div>
+        </div>
+
+        <div class="diagram-wrap">
+        <svg viewBox="0 0 720 250" role="img" aria-label="工具調用迴圈流程圖" style="width:100%;height:auto;">
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-soft)"/>
+            </marker>
+          </defs>
+          <style>
+            .bx{fill:var(--bg-panel-2);stroke:var(--border);}
+            .bxc{fill:var(--bg-panel-2);stroke:var(--key-blue);}
+            .bt{fill:var(--ink);font:600 13px system-ui,sans-serif;}
+            .bs{fill:var(--ink-soft);font:11px system-ui,sans-serif;}
+            .ln{stroke:var(--ink-soft);stroke-width:1.5;fill:none;}
+            .el{fill:var(--string-amber);font:600 11px system-ui,sans-serif;}
+            .eg{fill:var(--green);font:600 11px system-ui,sans-serif;}
+          </style>
+          <!-- boxes -->
+          <rect class="bx" x="16" y="96" width="156" height="54" rx="9"/>
+          <text class="bt" x="94" y="120" text-anchor="middle">你送出請求</text>
+          <text class="bs" x="94" y="138" text-anchor="middle">帶上 tools 陣列</text>
+          <rect class="bxc" x="262" y="96" width="176" height="54" rx="9"/>
+          <text class="bt" x="350" y="120" text-anchor="middle">Claude 回應</text>
+          <text class="bs" x="350" y="138" text-anchor="middle">看 stop_reason</text>
+          <rect class="bx" x="520" y="96" width="184" height="54" rx="9"/>
+          <text class="bt" x="612" y="120" text-anchor="middle">你執行工具</text>
+          <text class="bs" x="612" y="138" text-anchor="middle">包成 tool_result</text>
+          <rect class="bx" x="262" y="196" width="176" height="42" rx="9"/>
+          <text class="bt" x="350" y="222" text-anchor="middle">最終答案</text>
+          <!-- arrows -->
+          <line class="ln" x1="172" y1="123" x2="256" y2="123" marker-end="url(#ah)"/>
+          <line class="ln" x1="438" y1="123" x2="514" y2="123" marker-end="url(#ah)"/>
+          <text class="el" x="476" y="114" text-anchor="middle">tool_use</text>
+          <!-- loop back C top -> B top -->
+          <path class="ln" d="M612,96 L612,52 L350,52 L350,90" marker-end="url(#ah)"/>
+          <text class="el" x="481" y="44" text-anchor="middle">把 tool_result + 完整歷史再送回</text>
+          <!-- B -> 最終答案 -->
+          <line class="ln" x1="350" y1="150" x2="350" y2="192" marker-end="url(#ah)"/>
+          <text class="eg" x="360" y="176" text-anchor="start">end_turn</text>
+        </svg>
+        <p class="fig-cap">只要 stop_reason 還是 tool_use，就一直繞這個圈；直到它變成 end_turn，才拿到最終答案。</p>
         </div>
 
         <p><strong>第一次回應</strong>——Claude 要求呼叫工具：</p>
@@ -1009,7 +1084,7 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
           </div>
           <div class="card">
             <span class="ck">Cowork</span>
-            <p>定位介於聊天視窗跟 Claude Code 之間。適合研究、長文寫作、跨檔案整理這類「步驟多但不寫程式」的工作，桌面版 App 裡的獨立分頁。</p>
+            <p>定位介於聊天視窗跟 Claude Code 之間，桌面版 App 裡的獨立分頁，給「不寫程式但要它跨檔案、多步驟幫忙做事」的人。能力包含：<strong>連你電腦的資料夾</strong>直接讀寫檔案、<strong>skills</strong>（固定最佳做法）、<strong>connectors</strong>（接 Notion / Gmail / Slack 等）、<strong>排程任務</strong>（每天自動跑）、<strong>artifacts</strong>（可反覆開啟的即時頁面）。適合研究、長文寫作、檔案整理、把重複工作自動化。（這份指南就是在 Cowork 裡做出來的。）</p>
           </div>
           <div class="card">
             <span class="ck">MCP（Model Context Protocol）</span>
@@ -1033,6 +1108,18 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
       <p class="chap-sub">實務層面 — 終端機指令、介面操作、API 怎麼真的打一輪</p>
       <div class="content">
         <p>前面幾章講的是「機制」，這章講「手要怎麼動」：終端機裝完打什麼指令、claude.ai 裡設定藏在哪、API key 申請完第一行程式碼怎麼寫。</p>
+
+        <h3>0. 終端機基礎（不熟終端機先看這個）</h3>
+        <p>不用怕，日常只會用到幾個。終端機就是「用打字叫電腦做事」的視窗。</p>
+        <ul>
+          <li><strong>開啟</strong>：按 <code class="inline">Cmd + 空白鍵</code> 叫出 Spotlight，打「終端機」或「Terminal」按 Enter。</li>
+          <li><strong>三個最常用</strong>：<code class="inline">pwd</code>（我現在在哪個資料夾）、<code class="inline">ls</code>（這裡有什麼檔案）、<code class="inline">cd 資料夾</code>（進到某個資料夾）。<code class="inline">~</code> 代表你的個人資料夾。</li>
+          <li><strong>路徑有空格或中文要包引號</strong>：<code class="inline">cd ~/Claude/"Claude Project"</code>——沒包引號空格會被拆開、出錯。</li>
+          <li><strong>執行 <code class="inline">.command</code> 腳本</strong>：最簡單是在 Finder 按兩下；或在終端機把檔案「拖進視窗」自動填好路徑，再按 Enter。</li>
+          <li><strong>刪檔要小心</strong>：<code class="inline">rm</code> 不會進垃圾桶、無法復原，刪前看清楚路徑；<code class="inline">rm -rf</code> 威力更大更要看清楚。</li>
+          <li><strong>卡住 / 想中止</strong>：按 <code class="inline">Ctrl + C</code>。貼了指令沒反應，通常是上一個還沒結束。</li>
+        </ul>
+        <p class="note">看到紅字別慌，抓關鍵字就懂：<code class="inline">command not found</code>＝指令打錯或沒安裝；<code class="inline">No such file or directory</code>＝路徑或檔名錯；<code class="inline">Operation not permitted</code>＝權限不足；<code class="inline">index.lock: File exists</code>＝git 卡了鎖檔，把那個 <code class="inline">.git/index.lock</code> 刪掉再試即可。</p>
 
         <h3>1. Claude Code 終端機實戰</h3>
         <p>安裝有三種方式，原生安裝程式是 Anthropic 目前建議的預設路徑（不需要 Node.js，背景自動更新）：</p>
@@ -1076,6 +1163,35 @@ claude update</code></pre>
         </div>
 
         <p><strong>典型工作流程</strong>長這樣：<code class="inline">cd</code> 進專案 → 打 <code class="inline">claude</code> 進入互動模式 → 用一般語言描述需求（例如「幫我修這個登入失敗的 bug」）→ Claude 讀程式碼、規劃、改檔案，每個會動到磁碟或執行指令的動作會先列出來等你確認（預設是 Ask Mode）→ 看過 diff 沒問題就確認執行 → 自己用 git 做 commit。第一次進新專案建議先跑一次 <code class="inline">/init</code>，讓 Claude 把專案慣例寫進 <code class="inline">CLAUDE.md</code>，之後每次啟動都會自動載入，不用每次重新解釋一遍專案規則。</p>
+
+        <h4>斜線指令「/」：在互動模式裡下的控制指令</h4>
+        <p>在 <code class="inline">claude</code> 互動模式裡打 <code class="inline">/</code> 會跳出指令清單。它們不是給模型的問題，而是「控制這個 session」的操作。常用的：</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>指令</th><th>用途</th></tr></thead>
+          <tbody>
+            <tr><td><code class="inline">/help</code></td><td>列出目前所有可用指令（內建 + skill + 自訂 + MCP）——忘記能幹嘛就打它</td></tr>
+            <tr><td><code class="inline">/init</code></td><td>掃描專案，自動生成 <code class="inline">CLAUDE.md</code> 專案記憶檔</td></tr>
+            <tr><td><code class="inline">/memory</code></td><td>檢視 / 編輯載入的 CLAUDE.md 與 auto memory，開關自動記憶</td></tr>
+            <tr><td><code class="inline">/model</code></td><td>列出並切換模型（日常用 Sonnet、難題升 Opus）</td></tr>
+            <tr><td><code class="inline">/clear</code></td><td>清空當前對話重新開始——換主題時用，省 context</td></tr>
+            <tr><td><code class="inline">/compact</code></td><td>壓縮目前對話、保留重點——對話太長、回應開始變差時用</td></tr>
+            <tr><td><code class="inline">/context</code></td><td>看目前 context 用了多少</td></tr>
+            <tr><td><code class="inline">/agents</code></td><td>管理 subagents（把任務拆給專門化子代理）</td></tr>
+            <tr><td><code class="inline">/mcp</code></td><td>管理 MCP 連線：列出 / 新增 / 移除 / 除錯外部服務連線</td></tr>
+            <tr><td><code class="inline">/plugin</code></td><td>管理外掛與 marketplace：加來源、安裝、移除</td></tr>
+            <tr><td><code class="inline">/cost</code> · <code class="inline">/config</code> · <code class="inline">/bug</code> · <code class="inline">/exit</code></td><td>看花費 · 開設定 · 回報問題 · 離開</td></tr>
+            <tr><td><code class="inline">/你的指令</code></td><td>自訂 slash command——把常用的一段提示詞包成一個指令重複用</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h4>Skills 與 Plugins：怎麼用、差在哪</h4>
+        <ul>
+          <li><strong>Skill（技能）</strong>＝一包 <code class="inline">SKILL.md</code>＋腳本，放在 <code class="inline">.claude/skills/&lt;名字&gt;/</code>。Claude 偵測到任務符合該 skill 的描述時<strong>自動載入</strong>，你也能在對話裡直接點名要用。用途：讓某類任務有固定最佳做法（固定格式報表、特定風格簡報、公司內部規範）。</li>
+          <li><strong>Plugin（外掛）</strong>＝把一組相關的 <em>slash 指令 / subagents / skills / hooks / MCP</em> 打包成一包，用 git repo 分發。用 <code class="inline">/plugin</code> 加 marketplace 來源再安裝；Anthropic 有官方 Claude Code Plugins marketplace，社群也有很多。用途：一鍵把整套工作流裝好，適合團隊統一設定。</li>
+          <li><strong>關係</strong>：skill 是「單一能力」，plugin 是「把 skill／指令／hook／MCP 綁成一包一起散布」。細節見第 10 章對應卡片。</li>
+        </ul>
 
         <h3>2. claude.ai 介面操作實務</h3>
         <p>大部分功能不需要手動開，Claude 會自己判斷要不要用——但有幾個開關確實要去設定裡找：</p>
@@ -1130,6 +1246,42 @@ pip install anthropic</code></pre>
         </table>
         </div>
         <p>除錯時最常見的判斷順序：<code class="inline">return_code</code> 不是 0 → 看 <code class="inline">stderr</code> 找錯誤訊息 → 確認是不是套件沒裝、檔案路徑寫錯、還是撞到 90 秒的單一區塊執行上限。</p>
+
+        <h3>5. 成本與 Token：怎麼算、怎麼省</h3>
+        <p><strong>Token</strong> 是模型處理文字的最小單位，約略「1 token ≈ 英文 4 個字元 / 中文 1～2 字」。計費就是「輸入 token + 輸出 token」各自乘上該模型單價（見上方模型表），claude.ai 的訂閱則是包月、不用自己算 token。</p>
+        <p><strong>Context window</strong>＝模型一次能看的 token 上限（對話歷史 + 你這次輸入 + 它的輸出都算在內）。塞太滿回應會變差，這也是 Claude Code 有 <code class="inline">/compact</code>、claude.ai 有記憶機制的原因。</p>
+        <p>API 端兩個最有效的省錢手段，可以疊加：</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>手段</th><th>省多少</th><th>適合</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Prompt caching（提示快取）</strong></td><td>重複的輸入最多省 90%</td><td>每次請求都帶同一段長前綴（系統提示、規則、文件）時，快取起來重複命中只付 0.1×</td></tr>
+            <tr><td><strong>Batch API（批次）</strong></td><td>全模型輸入輸出各半價（50%）</td><td>不急著要即時回應的大量請求，丟批次、24 小時內回</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">兩者可疊加，重複又不急的量大場景有機會壓到原價的一成以下。claude.ai 的一般使用者不需要管這些，這是 API 開發者的成本槓桿。</p>
+
+        <h3>6. MCP 實作：怎麼真的接一個外部服務</h3>
+        <p>第 8 章講了 MCP 是什麼，這裡講手怎麼動——兩個入口：</p>
+        <ul>
+          <li><strong>claude.ai / Cowork（給一般使用者）</strong>：<code class="inline">Settings → Connectors</code> → 選服務（Notion、Gmail、Google Drive…）→ 走該服務的 OAuth 授權。之後對話裡需要時 Claude 會主動用，或你直接指名「用我的 Notion 連接器查…」。</li>
+          <li><strong>Claude Code（給開發者）</strong>：終端機 <code class="inline">claude mcp add &lt;名字&gt; &lt;啟動指令&gt;</code> 掛上一個 server，<code class="inline">claude mcp list</code> 看已接哪些，互動模式裡用 <code class="inline">/mcp</code> 管理與除錯。</li>
+        </ul>
+        <p class="note">授權外部服務等於把讀（有時可寫）的權限交給 Claude，第一次連會顯示要授權的範圍，看清楚再同意。</p>
+
+        <h3>7. 常見 API 錯誤怎麼看</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>狀態碼</th><th>意思</th><th>通常怎麼解</th></tr></thead>
+          <tbody>
+            <tr><td><code class="inline">401</code></td><td>認證失敗</td><td>API key 沒帶、打錯、或用錯 header——認證是 <code class="inline">x-api-key</code>，不是 <code class="inline">Authorization: Bearer</code></td></tr>
+            <tr><td><code class="inline">400</code></td><td>請求格式錯</td><td>少了 <code class="inline">anthropic-version</code> header、JSON 打錯、或 <code class="inline">max_tokens</code>／欄位不合法</td></tr>
+            <tr><td><code class="inline">429</code></td><td>觸及速率 / 用量上限</td><td>放慢請求、加指數退避重試，或到 Console 調高額度</td></tr>
+            <tr><td><code class="inline">529</code></td><td>伺服器過載</td><td>暫時性，稍後重試即可</td></tr>
+          </tbody>
+        </table>
+        </div>
         <div class="closing-brace">}</div>
       </div>
     </section>
@@ -1168,7 +1320,7 @@ pip install anthropic</code></pre>
           <div class="def-card">
             <h4><span class="dot"></span>Code execution and file creation（程式碼執行與檔案產生）</h4>
             <dl class="def-list">
-              <dt>定義</dt><dd>讓 Claude 在隔離沙箱容器裡真的執行 Python / Bash、產生並回傳檔案的能力。claude.ai 裡是 Capabilities 的總開關，Artifacts 跟 Skills 現在都依賴它才能運作。</dd>
+              <dt>定義</dt><dd>讓 Claude 在隔離沙箱容器裡真的執行 Python / Bash、產生並回傳檔案的能力。底層是一個<strong>網路完全隔離的 Linux 容器</strong>；claude.ai 的開關與 API 的 <code class="inline">code_execution</code> 工具是同一套機制的兩種啟用方式。claude.ai 裡是 Capabilities 的總開關，Artifacts 跟 Skills 都依賴它才能運作。</dd>
               <dt>功能</dt><dd>精確計算、資料分析與視覺化、產生 Word / Excel / PPT / PDF 等檔案、處理你上傳的 CSV 等資料檔。</dd>
               <dt>如何使用</dt><dd>claude.ai：Capabilities → 打開 Code execution and file creation（Team / Enterprise 還能設定 network egress：完全關閉、或只開放套件管理員存取）；開了之後不用額外語法，直接自然語言要求即可。API：<code class="inline">tools</code> 加 <code class="inline">{"type":"code_execution_20250825","name":"code_execution"}</code>。</dd>
               <dt>應用範圍</dt><dd>任何「不只是講出答案、還要真的算出來/做出一個檔案」的任務——財務模型、資料清理、報表、簡報產生，第 4 章的整套機制細節都在這裡。</dd>
@@ -1206,12 +1358,22 @@ pip install anthropic</code></pre>
           </div>
 
           <div class="def-card">
-            <h4><span class="dot"></span>Code Execution — 技術機制本身（再深一層）</h4>
+            <h4><span class="dot"></span>Extended thinking（延伸思考）</h4>
             <dl class="def-list">
-              <dt>定義</dt><dd>不是一個按鈕，是底層真正執行程式碼的沙箱機制——一個網路完全隔離的 Linux 容器，Claude 在裡面跑 Python / Bash。claude.ai 的開關跟 API 的 <code class="inline">code_execution</code> 工具，是同一套底層機制的兩種啟用方式。</dd>
-              <dt>功能</dt><dd>精確計算、資料處理、檔案產生/編輯；也讓 web_search / web_fetch 能先用程式碼篩選結果再放進對話脈絡，降低 token 消耗。</dd>
-              <dt>如何使用</dt><dd>claude.ai 端見上面「Code execution and file creation」；API 端完全靠 <code class="inline">tools</code> 陣列裡那一行宣告控制，沒加就完全不會跑，細節見第 4 章的完整 JSON。</dd>
-              <dt>應用範圍</dt><dd>任何「光靠語言模型推理會算錯或編造」的場景——精確數學、資料分析、生成真正可以打開的檔案。</dd>
+              <dt>定義</dt><dd>讓模型在給出答案前，先做一段額外的內部推理。Fable 5 / Opus 4.8 / Sonnet 4.6 支援，Haiku 4.5 不支援。</dd>
+              <dt>功能</dt><dd>對數學、多步驟邏輯、複雜規劃這類難題，明顯提升正確率；可設定「思考預算」，複雜的多想、簡單的少想以省成本。</dd>
+              <dt>如何使用</dt><dd>claude.ai：難題直接要求「一步一步想再回答」，或用支援深度思考的模式。API：在請求開 <code class="inline">thinking</code> 並給 token 預算，回應會多一個 <code class="inline">thinking</code> 區塊（見第 4 章 content 型別表）。</dd>
+              <dt>應用範圍</dt><dd>會「想錯一步就全錯」的任務——複雜推理、架構決策、多步驟計算。單純問答、格式轉換不需要開，開了只是變慢變貴。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
+            <h4><span class="dot"></span>Projects（claude.ai 專案）</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>claude.ai 裡把同一主題的多次對話、參考檔案、專屬指示收進同一個空間的功能，跨對話保留上下文。</dd>
+              <dt>功能</dt><dd>可設「自訂指示」（這個專案裡 Claude 一律用什麼語氣、遵守什麼規則）、上傳「知識檔」（Claude 在這專案裡都看得到的參考資料），之後每次在這專案裡開對話都自動帶入。</dd>
+              <dt>如何使用</dt><dd>左側 Projects → 新增專案 → 填自訂指示、上傳知識檔；免費帳號最多建立 5 個。</dd>
+              <dt>應用範圍</dt><dd>長期、反覆的同一主題工作——某個產品的文案、某本書的研究、某段程式的維護；不想每次重貼背景與規則時特別有用。</dd>
             </dl>
           </div>
 
@@ -1388,6 +1550,54 @@ pip install anthropic</code></pre>
         </table>
         </div>
 
+        <h3>一張圖看懂：4 分區 × 12 積木</h3>
+        <div class="diagram-wrap">
+        <svg viewBox="0 0 720 400" role="img" aria-label="4 分區與 12 塊積木的層疊架構圖" style="width:100%;height:auto;">
+          <style>
+            .lyr{fill:var(--bg-panel-2);stroke:var(--border);}
+            .lbl{fill:var(--bg-panel);stroke:var(--border);}
+            .chip{fill:var(--bg-deep);stroke:var(--border);}
+            .ct{fill:var(--key-blue);font:600 12px system-ui,sans-serif;}
+            .lt{font:700 15px system-ui,sans-serif;}
+            .ls{fill:var(--ink-soft);font:11px system-ui,sans-serif;}
+            .fl{fill:var(--ink-faint);font:italic 11px system-ui,sans-serif;}
+          </style>
+          <!-- 入口 -->
+          <rect class="lyr" x="12" y="14" width="696" height="78" rx="10"/>
+          <rect class="lbl" x="20" y="22" width="150" height="62" rx="8"/>
+          <text class="lt" x="34" y="48" fill="var(--key-blue)">入口</text>
+          <text class="ls" x="34" y="68">接收使用者/外界</text>
+          <rect class="chip" x="188" y="37" width="86" height="32" rx="7"/><text class="ct" x="231" y="58" text-anchor="middle">展示</text>
+          <rect class="chip" x="284" y="37" width="86" height="32" rx="7"/><text class="ct" x="327" y="58" text-anchor="middle">觸發</text>
+          <!-- 守門+調度 -->
+          <rect class="lyr" x="12" y="110" width="696" height="78" rx="10"/>
+          <rect class="lbl" x="20" y="118" width="150" height="62" rx="8"/>
+          <text class="lt" x="34" y="144" fill="var(--type-violet)">守門+調度</text>
+          <text class="ls" x="34" y="164">驗證、決定呼叫誰</text>
+          <rect class="chip" x="188" y="133" width="86" height="32" rx="7"/><text class="ct" x="231" y="154" text-anchor="middle">邏輯</text>
+          <rect class="chip" x="284" y="133" width="86" height="32" rx="7"/><text class="ct" x="327" y="154" text-anchor="middle">身份</text>
+          <!-- 工具箱 -->
+          <rect class="lyr" x="12" y="206" width="696" height="78" rx="10"/>
+          <rect class="lbl" x="20" y="214" width="150" height="62" rx="8"/>
+          <text class="lt" x="34" y="240" fill="var(--string-amber)">工具箱</text>
+          <text class="ls" x="34" y="260">真正幹活的功能</text>
+          <rect class="chip" x="188" y="229" width="80" height="32" rx="7"/><text class="ct" x="228" y="250" text-anchor="middle">連線</text>
+          <rect class="chip" x="276" y="229" width="80" height="32" rx="7"/><text class="ct" x="316" y="250" text-anchor="middle">爬蟲</text>
+          <rect class="chip" x="364" y="229" width="80" height="32" rx="7"/><text class="ct" x="404" y="250" text-anchor="middle">AI</text>
+          <rect class="chip" x="452" y="229" width="80" height="32" rx="7"/><text class="ct" x="492" y="250" text-anchor="middle">通知</text>
+          <rect class="chip" x="540" y="229" width="80" height="32" rx="7"/><text class="ct" x="580" y="250" text-anchor="middle">記憶</text>
+          <rect class="chip" x="628" y="229" width="72" height="32" rx="7"/><text class="ct" x="664" y="250" text-anchor="middle">檔案</text>
+          <!-- 地基 -->
+          <rect class="lyr" x="12" y="302" width="696" height="78" rx="10"/>
+          <rect class="lbl" x="20" y="310" width="150" height="62" rx="8"/>
+          <text class="lt" x="34" y="336" fill="var(--green)">地基</text>
+          <text class="ls" x="34" y="356">上線、可回溯</text>
+          <rect class="chip" x="188" y="325" width="96" height="32" rx="7"/><text class="ct" x="236" y="346" text-anchor="middle">版本控制</text>
+          <rect class="chip" x="294" y="325" width="86" height="32" rx="7"/><text class="ct" x="337" y="346" text-anchor="middle">部署</text>
+        </svg>
+        <p class="fig-cap">越靠上＝越貼近使用者，越靠下＝越接近地基。做一個產品＝從這四層裡挑需要的積木疊起來。</p>
+        </div>
+
         <h3>把積木組起來：真實小產品範例</h3>
         <p>理解積木的關鍵是「組合」。同樣幾塊，換個排列就是不同產品。</p>
         <ul>
@@ -1395,6 +1605,29 @@ pip install anthropic</code></pre>
           <li><strong>上傳 PDF 幫你摘要</strong> — 展示（上傳頁）→ 檔案（收檔）→ AI（產摘要）→ 記憶（存歷史）→ 部署。想限定只有自己能用，再加一塊「身份」。</li>
           <li><strong>本指南網站（已經在跑的例子）</strong> — 展示（HTML）→ 版本控制（Git）→ 部署（GitHub Pages）。只用 3 塊，<code class="inline">deploy.command</code> 把後兩塊自動化成按一下就完成。想加功能就往工具箱那排一塊一塊加。</li>
         </ul>
+
+        <h3>動手做：把「價格追蹤小幫手」做出來（實際操作）</h3>
+        <p>把上面第一個範例落地成真的會跑的東西。你不用自己寫程式——用 Claude Code 幫你組，你負責描述需求與按確認。</p>
+        <p><strong>前置準備</strong>（約 10 分鐘）：一個 GitHub 帳號、裝好 Claude Code（見第 9 章）、一個能收通知的網址（最快用 Discord 頻道的 Webhook，或 LINE Notify）。</p>
+        <div class="steps">
+          <div class="step"><span class="sn">1</span><div><strong>開資料夾、進 Claude Code</strong>：終端機 <code class="inline">mkdir price-bot &amp;&amp; cd price-bot &amp;&amp; claude</code>。</div></div>
+          <div class="step"><span class="sn">2</span><div><strong>把需求整段講給它</strong>（直接貼下面這段，換成你的商品網址和門檻）：</div></div>
+        </div>
+        <div class="code-block" data-lang="text">
+<div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>對 Claude Code 說的話</span><button class="copy-btn">複製</button></div>
+<pre><code>幫我做一個每天自動追蹤商品價格的小工具，用 GitHub Actions 排程，不需要網頁介面：
+1. 每天早上 9 點自動抓 https://要追蹤的商品網址 的價格
+2. 跟門檻價 1200 元比較，低於就發通知
+3. 通知打到我的 Discord Webhook（網址我會放在 GitHub Secrets 的 WEBHOOK_URL）
+4. 每天的價格存成 prices.json，用 git 記錄歷史
+請寫好程式和 .github/workflows 的排程檔，並告訴我要在哪裡設定 Secrets。</code></pre>
+        </div>
+        <div class="steps">
+          <div class="step"><span class="sn">3</span><div><strong>看它產出、按確認</strong>：Claude 會建立抓價腳本 + <code class="inline">.github/workflows/track.yml</code>（cron 排程）。每個動作它都先列出來等你確認，看過沒問題就放行。</div></div>
+          <div class="step"><span class="sn">4</span><div><strong>設定祕密值</strong>：把 repo push 到 GitHub 後，到 <code class="inline">Settings → Secrets and variables → Actions</code> 新增 <code class="inline">WEBHOOK_URL</code>，貼你的 Discord Webhook 網址。</div></div>
+          <div class="step"><span class="sn">5</span><div><strong>驗證</strong>：到 repo 的 <code class="inline">Actions</code> 分頁手動觸發一次（Run workflow），看有沒有收到 Discord 通知。成功後它每天就自己跑了。</div></div>
+        </div>
+        <p class="note">對照積木：<strong>觸發</strong>＝Actions 排程／<strong>爬蟲</strong>＝抓價腳本／<strong>邏輯</strong>＝比對門檻／<strong>記憶</strong>＝prices.json＋git／<strong>通知</strong>＝Webhook／<strong>部署</strong>＝GitHub Actions 幫你天天跑。全程沒用到「展示」和「身份」——因為只服務你、沒有畫面。</p>
 
         <p class="note">不用 12 塊全上。先想清楚：入口怎麼進來 → 中樞怎麼調度 → 要動用哪些工具 → 地基怎麼上線。越靠「地基」和「入口」的積木越通用，工具箱那排是按需求選配。</p>
         <div class="closing-brace">}</div>
@@ -1421,7 +1654,21 @@ pip install anthropic</code></pre>
         <p>法律、財務、醫療這類需要專業執照判斷的決定，Claude 可以幫你整理資訊、列出選項，但不能取代真正的律師、會計師、醫師——它會主動提醒這一點，這不是故意保守，是因為它的回答不構成專業建議。</p>
 
         <h3>機密資料不要隨手貼上去</h3>
-        <p>對話內容、上傳的檔案，會依照你的方案與資料保留政策被處理（細節見支援文件 Privacy 相關說明）。客戶個資、未公開財報、密碼金鑰這類東西，貼之前先想一下是不是真的有必要。</p>
+        <p>對話內容、上傳的檔案，會依照你的方案與資料保留政策被處理。客戶個資、未公開財報、密碼金鑰這類東西，貼之前先想一下是不是真的有必要。</p>
+
+        <h3>你的資料會不會被拿去訓練？（消費者 vs API 不一樣）</h3>
+        <p>這是最常被問、也最常被搞混的一題。分兩邊看：</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th></th><th>claude.ai 消費者版（Free / Pro / Max）</th><th>API / 商用</th></tr></thead>
+          <tbody>
+            <tr><td>會不會拿去訓練</td><td>可能會，屬「選擇退出」制——除非你關掉，否則預設可能被用於訓練</td><td>不會，商用條款明訂不拿客戶內容訓練</td></tr>
+            <tr><td>資料保留</td><td>同意用於訓練 → 最長 5 年；不同意 → 30 天</td><td>輸入輸出約 7 天後自動刪除</td></tr>
+            <tr><td>怎麼控制</td><td>Settings → Privacy 裡的訓練開關，隨時可改</td><td>預設就不訓練，無需設定</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">重點：想讓 claude.ai 不拿你的對話訓練，去 Privacy 設定把訓練關掉。真正敏感的工作，用 API / 商用方案或本來就別貼。政策細節與生效日期會變動，以官方 Privacy 頁面為準。</p>
 
         <h3>它不會持續「在背景幫你做事」</h3>
         <p>除非你明確用了排程任務（Scheduled tasks）或讓 Claude Code 跑長任務，否則對話結束後 Claude 不會自己繼續動作；每次互動都是你主動觸發的，不是一個一直在運作的代理人。</p>
@@ -1435,8 +1682,30 @@ pip install anthropic</code></pre>
         <span class="brace">{</span>
         <h2><span class="quote">"</span><span class="key">14_resources</span><span class="quote">"</span>:</h2>
       </div>
-      <p class="chap-sub">延伸閱讀，官方文件最新狀態以連結為準</p>
+      <p class="chap-sub">術語表 + 延伸閱讀，官方文件最新狀態以連結為準</p>
       <div class="content">
+        <h3>術語表：一分鐘看懂常見名詞</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>名詞</th><th>白話解釋</th></tr></thead>
+          <tbody>
+            <tr><td>Token</td><td>模型處理文字的最小單位，計費就是按 token 算（約 1 token ≈ 英文 4 字元 / 中文 1～2 字）</td></tr>
+            <tr><td>Context window</td><td>模型一次能看的 token 上限，對話越長越吃它</td></tr>
+            <tr><td>System prompt</td><td>給模型的「開場設定」——身份、任務框架、一律遵守的規則</td></tr>
+            <tr><td>Temperature</td><td>取樣隨機度，低＝穩定保守，高＝多樣有創意</td></tr>
+            <tr><td>Extended thinking</td><td>回答前先做一段內部推理，難題更準</td></tr>
+            <tr><td>Tool use / Function calling</td><td>模型請求呼叫外部工具，由你或伺服器執行後把結果餵回（第 4 章）</td></tr>
+            <tr><td>MCP</td><td>讓 Claude 標準化接外部工具/資料源的開放協定（第 8 章）</td></tr>
+            <tr><td>Agent</td><td>模型在「呼叫工具→看結果→再決定」的迴圈裡自主完成多步任務</td></tr>
+            <tr><td>RAG</td><td>先檢索相關資料、再讓模型根據它回答，減少編造</td></tr>
+            <tr><td>Hallucination</td><td>模型自信地講出聽起來合理但其實錯誤/編造的內容</td></tr>
+            <tr><td>Prompt caching</td><td>把重複的長前綴快取起來，重複命中最多省 90% 輸入費用</td></tr>
+            <tr><td>CLAUDE.md</td><td>Claude Code 的專案記憶檔，開 session 自動載入（第 10 章）</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h3>延伸閱讀</h3>
         <ul>
           <li><a href="https://platform.claude.com/docs/en/home" target="_blank" rel="noopener">API 總覽</a></li>
           <li><a href="https://platform.claude.com/docs/en/build-with-claude/working-with-messages" target="_blank" rel="noopener">Messages API 基礎用法</a></li>
