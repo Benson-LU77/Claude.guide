@@ -559,6 +559,7 @@
       <a href="#overview"><span class="idx">[1]</span>overview</a>
       <a href="#claudeai"><span class="idx">[2]</span>claude_ai</a>
       <a href="#prompting"><span class="idx">[3]</span>prompting_basics</a>
+      <a href="#aifluency"><span class="idx">[✦]</span>ai_fluency</a>
       <div class="nav-divider">開發者</div>
       <a href="#api"><span class="idx">[4]</span>api_and_json</a>
       <a href="#tooluse"><span class="idx">[5]</span>tool_use</a>
@@ -695,8 +696,32 @@
           <li><strong>Projects（專案）</strong> — 把同一主題的多次對話、參考檔案、專屬指示收進同一個空間，跨對話保留上下文；免費帳號最多建立 5 個</li>
           <li><strong>網路搜尋 / 深度研究</strong> — 需要即時資訊時自動或手動觸發</li>
           <li><strong>程式碼執行與檔案產生</strong> — 背後就是 <code class="inline">code_execution</code> 工具，見第 4 章</li>
-          <li><strong>周邊應用</strong> — Claude Code、Claude Design、Claude in Chrome / Excel / PowerPoint / Outlook、Cowork</li>
+          <li><strong>周邊應用</strong> — Claude Code、Claude Design、Claude Tag、Claude in Chrome、Claude for Microsoft 365（Word / Excel / PowerPoint / Outlook）、Cowork</li>
         </ul>
+
+        <h3>桌面 App 裡的三個模式：Chat · Cowork · Code</h3>
+        <p>桌面版把三種用法放在同一個 App 裡，選對模式比選對模型更重要：</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>模式</th><th>它是什麼</th><th>什麼任務選它</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Chat</strong></td><td>一場對話：問、答、改、再問</td><td>釐清問題、檢驗草稿、讀懂資料、一次性產出</td></tr>
+            <tr><td><strong>Cowork</strong></td><td>一個工作階段：你描述任務，它規劃並執行，你在過程中引導</td><td>跨檔案、多步驟、要動你電腦資料夾與應用的實際工作</td></tr>
+            <tr><td><strong>Code</strong></td><td>在你的程式專案裡讀寫、跑指令、操作 git</td><td>軟體開發：規劃、編寫、除錯、發布</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h3>給 Claude「可重複使用的脈絡」：Projects · Artifacts · Skills</h3>
+        <p>用得順的人跟一直重講的人，差別在有沒有把脈絡存起來：<strong>Projects</strong> 存「這個主題的背景、規則、參考檔」，<strong>Artifacts</strong> 存「做出來、可以再改再用的成品」，<strong>Skills</strong> 存「固定的做法」。三者搭起來，Claude 就不用每次從零認識你。</p>
+
+        <h3>把你的工具、公司知識、網路接進來</h3>
+        <ul>
+          <li><strong>Connectors</strong> — 接你的工具（Notion、Gmail、Drive、Slack…），Claude 能直接查、部分能寫。</li>
+          <li><strong>Enterprise Search</strong>（Team / Enterprise）— 跨公司內部知識庫搜尋，問「我們的退貨政策」它去翻內部文件。</li>
+          <li><strong>Research</strong> — 需要即時或多來源資訊時，讓它上網做深度研究並附引用。</li>
+        </ul>
+        <p class="note">Claude 101 的建議路徑：先從第一次對話與有效提示開始 → 用 Projects / Artifacts / Skills 組織工作 → 接 Connectors / Enterprise Search / Research → 再依你的角色（行銷、營運、研發…）套用對應的使用案例。本章與 <a href="#aifluency">AI 素養</a> 章搭配看效果最好。</p>
         <div class="closing-brace">}</div>
       </div>
     </section>
@@ -740,6 +765,70 @@
           <li><strong>先讓它複述再開工</strong>：長或重要的任務，先問「你理解的需求是什麼」，確認方向對了再讓它動手，省得整段重來。</li>
         </ul>
         <p class="note">更完整的提示技巧可看官方指南：<a href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview" target="_blank" rel="noopener">Prompt engineering overview</a>。</p>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <!-- ============ AI FLUENCY ============ -->
+    <section class="chapter" id="aifluency">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">ai_fluency</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">AI 素養 — 跟 AI 好好協作的思維，模型再怎麼變都適用</p>
+      <div class="content">
+        <p>前面講「怎麼用」，這章講「怎麼用得好」。這套框架來自 Anthropic 的 Claude Academy，重點不是某個按鈕，而是<strong>與 AI 協作的心智模型</strong>——就算模型和功能一直換，這套思路依然成立。目標是四件事：有效、高效、合乎道德、安全。</p>
+
+        <h3>先分清楚：三種互動方式</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>方式</th><th>意思</th><th>你保留多少主導權</th></tr></thead>
+          <tbody>
+            <tr><td>自動化 Automation</td><td>把整件事交給 AI 自己跑完</td><td>最少，設定好就放手</td></tr>
+            <tr><td>增強 Augmentation</td><td>人與 AI 一來一往協作，邊做邊修</td><td>最多，你全程主導</td></tr>
+            <tr><td>代理 Agency</td><td>你設好目標與規則，AI 在框架內自主行動</td><td>中間，靠你定的邊界把關</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h3>4D 框架：委派 · 描述 · 辨別 · 審慎</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>D</th><th>一句話</th><th>具體怎麼做</th></tr></thead>
+          <tbody>
+            <tr><td><strong>委派<br>Delegation</strong></td><td>決定什麼交給 AI、什麼自己做</td><td><strong>問題意識</strong>（先想清楚要解決什麼）＋<strong>平台意識</strong>（知道這工具擅長/不擅長什麼）＋<strong>任務委派</strong>（切成適合交出去的塊）</td></tr>
+            <tr><td><strong>描述<br>Description</strong></td><td>把需求講清楚，讓 AI 做對方向</td><td>說清<strong>產品</strong>（要什麼成果）、<strong>流程</strong>（希望它怎麼做）、<strong>表現</strong>（用什麼角色/語氣/限制）＋提示技巧（見第 3 章）</td></tr>
+            <tr><td><strong>辨別<br>Discernment</strong></td><td>批判性檢查 AI 的產出與過程</td><td>檢視輸出對不對、流程合不合理、行為有無偏差；用「<strong>描述→辨別→再描述</strong>」的循環反覆逼近想要的結果</td></tr>
+            <tr><td><strong>審慎<br>Diligence</strong></td><td>為 AI 協作的成果負責</td><td><strong>創作審慎</strong>（確認品質與原創）＋<strong>透明審慎</strong>（誠實揭露哪裡用了 AI）＋<strong>部署審慎</strong>（放出去前想清楚影響）</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">四個 D 不是照順序做一次，而是一直循環：委派出去 → 描述清楚 → 辨別好壞 → 審慎負責，不滿意就回到描述再來一輪。</p>
+
+        <h3>LLM 心智模型：四個特性，每個都是「能力→限制」的連續體</h3>
+        <p>4D 教的是「人的能力」，這一段教的是「機器的特性」——兩者配套。目標是<strong>校準信任</strong>：看到一個意外的輸出，先辨認它是哪一種意外，再下對的修正，而不是籠統地「再試一次」。先懂它怎麼來的：模型經過<strong>預訓練</strong>（讀海量文字學會預測下一個字）＋<strong>微調</strong>（訓練成有幫助的助手）兩階段，這也留下幾個行為印記：<em>迎合傾向、冗長、過度謹慎、信心校準鬆散</em>。</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>特性</th><th>它擅長的那一端</th><th>會出錯的那一端</th><th>對策</th></tr></thead>
+          <tbody>
+            <tr><td><strong>下一個詞元預測</strong></td><td>走熟路的任務：摘要、改寫、格式轉換，又快又順</td><td>預測不夠用的地方就會「編」——虛構集中出現在冷門事實、精確數字、引用來源</td><td>需要精確就要求驗證（搜尋、跑程式碼、給來源）</td></tr>
+            <tr><td><strong>知識</strong></td><td>主流主題、熱門語言、訓練資料裡常出現且一致的內容</td><td>冷門、太新（截止日之後）、小眾、有爭議的內容偏弱</td><td>判斷問題落在哪一端；弱的那端就開網路搜尋、給它資料、或用工具</td></tr>
+            <tr><td><strong>工作記憶</strong></td><td>context window 內的東西它都看得到</td><td>硬上限，超過就掉；長文件裡的注意力並不均勻；新對話不記得上一段</td><td>重要資訊前置、長內容分塊、關鍵資訊適時重提；開工前先估任務會不會塞爆視窗</td></tr>
+            <tr><td><strong>可操控性</strong></td><td>短、具體、可驗證的指令很聽話：「用表格回答」「100 字以內」</td><td>長推理鏈、抽象要求、要求原生精確度時會漂——出現「推理漂移」「拘泥字面而非精神」</td><td>把搖擺的指令改寫成具體可驗證的；複雜任務拆步驟</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note"><strong>診斷法</strong>：真實任務常是多個特性同時撞在一起（例如審一份長合約＝考驗工作記憶＋超出知識範圍）。遇到意外輸出時：先點名是哪個特性在作用 → 把任務放到那條連續體上定位 → 下針對性的修正。</p>
+
+        <h3>從單人到多人：人機團隊的四個原則</h3>
+        <p>多數人還在「單人模式」用 AI——當一個可靠的助手。當 agent 越來越能幹，團隊會走向「多人模式」：AI 成為團隊的一員，這比較像在<strong>組一支人機混合團隊</strong>，需要刻意設計。健康的人機團隊靠四件事：</p>
+        <ul>
+          <li><strong>清楚的角色</strong>——誰負責什麼、AI 負責什麼，寫明白。</li>
+          <li><strong>寫下來的北極星</strong>——團隊目標與標準以文字存在，AI 才有依據對齊。</li>
+          <li><strong>逐步放權</strong>——從小任務、高監督開始，隨信任建立再放大自主範圍。</li>
+          <li><strong>恰當的資訊存取</strong>——給 AI 剛好夠用的資料與工具，不多不少。</li>
+        </ul>
+        <p class="note">本章框架取自 Anthropic <a href="https://academy.claude.com/zh-TW" target="_blank" rel="noopener">Claude Academy</a> 的「AI 流暢度：框架與基礎」「AI 能力與限制」與「Building Effective Human Agent Teams」課程（前兩門與 Joseph Feller、Rick Dakan 教授合作）。想深入可到 Academy 免費修課、取得完成徽章。</p>
         <div class="closing-brace">}</div>
       </div>
     </section>
@@ -1048,14 +1137,59 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
       </div>
       <p class="chap-sub">給工程師的「在終端機裡跑的 Claude」</p>
       <div class="content">
-        <p>Claude Code 本質上是一個 <strong>agentic coding CLI</strong>：把第 3 章講的「工具調用迴圈」包裝成完整的開發助理，差別在於工具是<strong>真的在你電腦上執行</strong>（讀寫檔案、跑 shell 指令、操作 git），而不是雲端沙箱。</p>
+        <p>Claude Code 本質上是一個 <strong>agentic coding CLI</strong>：把第 5 章講的「工具調用迴圈」包裝成完整的開發助理，差別在於工具是<strong>真的在你電腦上執行</strong>（讀寫檔案、跑 shell 指令、操作 git），而不是雲端沙箱。它跟聊天式 AI 的差別，不在於更會寫程式，而在於它<strong>會自己動手、自己看結果、再決定下一步</strong>。</p>
+
+        <h3>它怎麼運作：agentic loop</h3>
+        <p>每個任務都在跑同一個迴圈：<strong>蒐集脈絡</strong>（讀檔案、grep、看 git）→ <strong>採取行動</strong>（改檔、跑指令）→ <strong>驗證結果</strong>（跑測試、看輸出）→ 再來一輪。四樣東西決定它能做什麼：<em>迴圈本身、context window（它一次能看多少）、工具（它能碰什麼）、權限（哪些動作要你點頭）</em>。可以裝在終端機、VS Code、JetBrains、Claude Desktop 或網頁版。</p>
+
+        <h3>三種操作模式：你要多少監督</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>模式</th><th>行為</th><th>適合</th></tr></thead>
+          <tbody>
+            <tr><td><strong>手動（預設）</strong></td><td>每個會動到磁碟或跑指令的動作先列出來等你確認</td><td>陌生專案、高風險改動、剛開始建立信任</td></tr>
+            <tr><td><strong>自動接受</strong></td><td>不逐一問，直接做</td><td>你熟、可回溯（有 git）、改動範圍小的例行工作</td></tr>
+            <tr><td><strong>Plan Mode</strong></td><td>只讀不改：先探索、產出計畫給你看，同意後才動手</td><td>大功能、跨多檔、想先看方向對不對</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h3>日常節奏：Explore → Plan → Code → Commit</h3>
+        <div class="steps">
+          <div class="step"><span class="sn">1</span><div><strong>Explore 探索</strong>：先讓它讀相關程式碼、理解現況，還不要寫。「先看看登入流程怎麼做的，不要改。」</div></div>
+          <div class="step"><span class="sn">2</span><div><strong>Plan 規劃</strong>：用 Plan Mode 讓它列出打算怎麼改、動哪些檔；你在這一步糾正方向最便宜。</div></div>
+          <div class="step"><span class="sn">3</span><div><strong>Code 實作</strong>：同意計畫後放它做；看 diff、跑測試，不對就用 <strong>rewind</strong>（回溯選單）退回上一步再調。</div></div>
+          <div class="step"><span class="sn">4</span><div><strong>Commit 提交</strong>：自己（或請它）寫 commit；也可以在合併前請它做 code review——自己的或隊友的。</div></div>
+        </div>
+
+        <h3>長 session 不變慢：管理 context window</h3>
         <ul>
-          <li>安裝後在專案目錄下打 <code class="inline">claude</code> 就能進入互動模式</li>
-          <li>支援自訂 slash command（例如 <code class="inline">/create-slide</code>），本質上是把一段提示詞包裝成指令</li>
-          <li>可以接 MCP 伺服器，串接外部服務（Notion、Gmail、Figma 等）</li>
-          <li>有 Plan Mode（先規劃再動手）、sub-agents（拆任務給專門化子代理）等進階功能</li>
+          <li><code class="inline">/context</code> 看目前用了多少；<code class="inline">/compact</code> 壓縮對話保留重點——可以<strong>指定要保留什麼</strong>（「保留目前的架構決策與待辦」）；<code class="inline">/clear</code> 換主題時整個清空。</li>
+          <li>經驗法則：一個任務一個 session，做完就 <code class="inline">/clear</code>；感覺它開始「忘東忘西」就是該 compact 了。</li>
         </ul>
-        <p class="note">Claude Code 的專案記憶檔 <code class="inline">CLAUDE.md</code>、生命週期 <code class="inline">hooks</code>、外掛 <code class="inline">plugins</code>、<code class="inline">session log</code>，以及把這一切串起來的 <strong>harness engineering</strong>，完整說明見 <a href="#features">第 10 章 feature_reference</a>。</p>
+
+        <h3>把它變成你的：四種客製工具怎麼選</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>工具</th><th>本質</th><th>什麼時候用</th></tr></thead>
+          <tbody>
+            <tr><td><strong>CLAUDE.md</strong></td><td>專案記憶檔，每次自動載入</td><td>「這個專案一律…」的慣例：指令、風格、架構。保持精簡、寫它真的會照做的</td></tr>
+            <tr><td><strong>Skills</strong></td><td><code class="inline">SKILL.md</code>＋腳本，符合請求時自動套用</td><td>會重複的「程序」：固定格式報表、部署步驟。可用 <code class="inline">allowed-tools</code> 限制它能碰的工具，大技能用參考檔與腳本做漸進式揭露</td></tr>
+            <tr><td><strong>Subagents</strong></td><td>用 <code class="inline">/agents</code> 建的獨立助手，有<strong>自己的 context window</strong>，做完只回摘要</td><td>會塞爆主對話的工作：code review、產文件、大範圍搜尋。設計要點：結構化輸出、遇阻回報、限制工具</td></tr>
+            <tr><td><strong>Hooks</strong></td><td>固定時點強制執行的指令</td><td>非做不可的規則：commit 前 lint、擋危險指令、用真實測試結果把關一輪能不能過</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">選擇口訣：<strong>要它記住 → CLAUDE.md；要它會做某件事 → Skill；要它分頭做不佔主線 → Subagent；要它一定做 → Hook；要接外部系統 → MCP。</strong> 子代理的反模式：拿來做本來一句話就能講清的小事、或讓它回傳整份原始輸出把主線塞爆。</p>
+
+        <h3>自動化與交出去：從單次提示到團隊工作流</h3>
+        <ul>
+          <li><strong>Routines 例行任務</strong>：把提示排程成在 Anthropic 基礎設施上定期跑的例行工作。</li>
+          <li><strong>Headless 無頭模式</strong>：不開互動介面、當作指令列工具塞進你自己的 pipeline。</li>
+          <li><strong>GitHub 整合</strong>：GitHub Action 與 managed code review，讓 Claude 直接參與 pull request。</li>
+          <li><strong>打包成 Plugin</strong>：把你調好的一整套（CLAUDE.md、skills、hooks、MCP）包成外掛，全隊一鍵安裝。</li>
+        </ul>
+        <p class="note"><strong>驗證原則</strong>：你看得越少，事後要驗得越多——無人監督跑完的東西，驗證力度要跟監督程度成反比；能用 hooks 把「測試沒過就不算完成」寫死，就別靠肉眼。CLAUDE.md、hooks、plugins、session log 與 harness engineering 的完整定義見 <a href="#features">第 10 章</a>；終端機指令與斜線指令見 <a href="#practical">第 9 章</a>。</p>
         <div class="closing-brace">}</div>
       </div>
     </section>
@@ -1087,8 +1221,12 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
             <p>定位介於聊天視窗跟 Claude Code 之間，桌面版 App 裡的獨立分頁，給「不寫程式但要它跨檔案、多步驟幫忙做事」的人。能力包含：<strong>連你電腦的資料夾</strong>直接讀寫檔案、<strong>skills</strong>（固定最佳做法）、<strong>connectors</strong>（接 Notion / Gmail / Slack 等）、<strong>排程任務</strong>（每天自動跑）、<strong>artifacts</strong>（可反覆開啟的即時頁面）。適合研究、長文寫作、檔案整理、把重複工作自動化。（這份指南就是在 Cowork 裡做出來的。）</p>
           </div>
           <div class="card">
+            <span class="ck">Claude Tag</span>
+            <p>給「整個團隊」的用法：在 Slack 裡直接標記 <code class="inline">@Claude</code> 公開委派任務，讓大家都看得到進度與結果。適合把 AI 協作放進團隊既有的溝通流裡，而不是每個人各自開私人對話。</p>
+          </div>
+          <div class="card">
             <span class="ck">MCP（Model Context Protocol）</span>
-            <p>開放協定，讓 Claude（API / Claude Code / claude.ai）能標準化地串接外部工具與資料源。本質是把「使用者自訂工具」標準化，讓任何服務商照同一份規格寫 server。</p>
+            <p>開放協定，讓 Claude（API / Claude Code / claude.ai）能標準化地串接外部工具與資料源。本質是把「使用者自訂工具」標準化，把工具定義與執行的負擔從你的程式搬到專門的 MCP server。三個基本元素，記住「誰控制」：<strong>Tools</strong>（模型控制——Claude 決定要不要呼叫）、<strong>Resources</strong>（應用程式控制——唯讀資料，像檔案或紀錄）、<strong>Prompts</strong>（使用者控制——預先做好的高品質指示範本）。</p>
           </div>
           <div class="card">
             <span class="ck">Claude Agent SDK / Managed Agents</span>
@@ -1114,7 +1252,7 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
         <ul>
           <li><strong>開啟</strong>：按 <code class="inline">Cmd + 空白鍵</code> 叫出 Spotlight，打「終端機」或「Terminal」按 Enter。</li>
           <li><strong>三個最常用</strong>：<code class="inline">pwd</code>（我現在在哪個資料夾）、<code class="inline">ls</code>（這裡有什麼檔案）、<code class="inline">cd 資料夾</code>（進到某個資料夾）。<code class="inline">~</code> 代表你的個人資料夾。</li>
-          <li><strong>路徑有空格或中文要包引號</strong>：<code class="inline">cd ~/Claude/"Claude Project"</code>——沒包引號空格會被拆開、出錯。</li>
+          <li><strong>路徑有空格或中文要包引號</strong>：<code class="inline">cd ~/Claude/"Claude instruction"</code>——沒包引號空格會被拆開、出錯。</li>
           <li><strong>執行 <code class="inline">.command</code> 腳本</strong>：最簡單是在 Finder 按兩下；或在終端機把檔案「拖進視窗」自動填好路徑，再按 Enter。</li>
           <li><strong>刪檔要小心</strong>：<code class="inline">rm</code> 不會進垃圾桶、無法復原，刪前看清楚路徑；<code class="inline">rm -rf</code> 威力更大更要看清楚。</li>
           <li><strong>卡住 / 想中止</strong>：按 <code class="inline">Ctrl + C</code>。貼了指令沒反應，通常是上一個還沒結束。</li>
@@ -1269,6 +1407,13 @@ pip install anthropic</code></pre>
           <li><strong>Claude Code（給開發者）</strong>：終端機 <code class="inline">claude mcp add &lt;名字&gt; &lt;啟動指令&gt;</code> 掛上一個 server，<code class="inline">claude mcp list</code> 看已接哪些，互動模式裡用 <code class="inline">/mcp</code> 管理與除錯。</li>
         </ul>
         <p class="note">授權外部服務等於把讀（有時可寫）的權限交給 Claude，第一次連會顯示要授權的範圍，看清楚再同意。</p>
+        <h4>自己寫一個 MCP server（開發者）</h4>
+        <ul>
+          <li><strong>用 SDK 的裝飾器定義工具</strong>（Python / TypeScript），不用手寫 JSON schema；型別提示與 <code class="inline">Field</code> 描述會自動變成工具說明。</li>
+          <li><strong>用內建 MCP Inspector 測試</strong>：瀏覽器介面裡直接呼叫你的工具、看資源、試提示，還沒接 Claude 就能除錯。</li>
+          <li><strong>傳輸方式</strong>：本機開發用 <strong>STDIO</strong>（最簡單）；要跨網路或多人用 <strong>Streamable HTTP</strong>（走 SSE）；要水平擴展就選<strong>無狀態 HTTP</strong> 搭配負載平衡，代價是放棄部分伺服器主動推送的功能。</li>
+          <li><strong>進階三招</strong>：<em>Sampling</em>（server 反過來請 client 幫它呼叫模型，把 AI 成本移到客戶端）、<em>Notifications／進度回報</em>（長任務給即時回饋）、<em>Roots</em>（授權 server 只能碰指定目錄，安全邊界）。</li>
+        </ul>
 
         <h3>7. 常見 API 錯誤怎麼看</h3>
         <div class="table-wrap">
@@ -1282,6 +1427,23 @@ pip install anthropic</code></pre>
           </tbody>
         </table>
         </div>
+
+        <h3>8. Cowork 實務：把一件多步驟的事真的交出去</h3>
+        <p>Chat 是一場對話，Cowork 是一個<strong>工作階段</strong>：你描述任務，它規劃並執行，你在過程中引導。不用寫程式，但要學會「交代」。</p>
+        <div class="steps">
+          <div class="step"><span class="sn">1</span><div><strong>設定工作空間</strong>：連你的<strong>工作資料夾</strong>（它才能讀寫檔案）、接需要的 <strong>Connectors</strong>、選<strong>權限模式</strong>（要不要每步問你）。安全習慣：先給小範圍資料夾，別一開始就把整顆硬碟交出去。</div></div>
+          <div class="step"><span class="sn">2</span><div><strong>寫任務提示</strong>：講清楚成果、來源、格式與限制（4D 的「描述」）。它會先<strong>問你澄清問題</strong>——認真答，這決定計畫品質。</div></div>
+          <div class="step"><span class="sn">3</span><div><strong>審計畫、邊跑邊引導</strong>：看它列的步驟對不對；執行中可以插話修正方向，不用等做完。</div></div>
+          <div class="step"><span class="sn">4</span><div><strong>審交付物</strong>：看輸出、看它改了哪些檔（4D 的「辨別」）；不滿意就描述哪裡要改再來一輪。</div></div>
+        </div>
+        <h4>讓它越用越順的四件事</h4>
+        <ul>
+          <li><strong>常駐脈絡</strong>：用<strong>全域指示</strong>（每次都套用的規則）與 <strong>Projects</strong>（某主題的背景）讓它記住你的用語、格式、偏好。</li>
+          <li><strong>週期性工作</strong>：<strong>排程任務</strong>讓它每天/每週自動跑；<strong>Dispatch</strong> 讓你從手機直接派任務給桌面的 Cowork。</li>
+          <li><strong>技能與外掛</strong>：把你重複的流程做成 <strong>skill</strong>；把一組 skill 打包成 <strong>plugin</strong>，可透過組織的市集分享給團隊。用 <strong>evals（評估）</strong>先驗證技能真的穩，再依賴它。</li>
+          <li><strong>延伸到瀏覽器與 Office</strong>：透過 <strong>Claude in Chrome</strong> 操作網頁工具，透過 <strong>Claude for Microsoft 365</strong> 在 Word / Excel / PowerPoint / Outlook 裡工作。</li>
+        </ul>
+        <p class="note">本指南從歸檔、寫文件到部署網站，全程就是在 Cowork 裡完成的——彙整資料夾 <code class="inline">Claude instruction</code> 就是「工作資料夾」，<code class="inline">README.md</code> 的規則就是「常駐脈絡」。</p>
         <div class="closing-brace">}</div>
       </div>
     </section>
@@ -1342,8 +1504,8 @@ pip install anthropic</code></pre>
             <dl class="def-list">
               <dt>定義</dt><dd>一包打包好的「指令 + 腳本 + 參考資料」資料夾，讓 Claude 在特定任務類型上有更熟練、更一致的做法，本質上是寫死的最佳實踐文件。</dd>
               <dt>功能</dt><dd>Claude 偵測到任務符合某個 skill 的描述時自動載入該 skill 的詳細指引，不用每次在對話裡重新解釋一遍規則。</dd>
-              <dt>如何使用</dt><dd><code class="inline">Customize → Skills</code> 裡開關內建或上傳自訂 skill；前提是 Code execution 要先打開，因為 skill 靠這套沙箱環境執行。</dd>
-              <dt>應用範圍</dt><dd>重複性高、有固定最佳實踐的任務——固定格式的報表、特定風格的簡報、企業內部規範文件。</dd>
+              <dt>如何使用</dt><dd>claude.ai：<code class="inline">Customize → Skills</code> 裡開關內建或上傳自訂 skill（前提是 Code execution 要先打開）。Claude Code：在 <code class="inline">.claude/skills/&lt;名字&gt;/SKILL.md</code> 建檔，開頭的 frontmatter 寫名稱與<strong>描述</strong>（描述寫得準，Claude 才會在對的時機自動載入）；可用 <code class="inline">allowed-tools</code> 限制它能碰的工具；大技能用「漸進式揭露」——主檔精簡、細節放參考檔與可執行腳本。沒觸發時用技能驗證工具或 <code class="inline">claude --debug</code> 查是描述不合、沒載入、還是優先順序衝突。</dd>
+              <dt>應用範圍</dt><dd>重複性高、有固定最佳實踐的任務——固定格式的報表、特定風格的簡報、部署步驟、企業內部規範。分享方式：專案 repo、打包成 plugin、企業管理設定。</dd>
             </dl>
           </div>
 
@@ -1388,6 +1550,26 @@ pip install anthropic</code></pre>
           </div>
 
           <div class="def-card">
+            <h4><span class="dot"></span>Enterprise Search 與 Research</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>兩種「幫你找東西」：<strong>Enterprise Search</strong> 搜的是公司內部知識（Team / Enterprise 方案）；<strong>Research</strong> 搜的是網路，做多來源的深度研究。</dd>
+              <dt>功能</dt><dd>Enterprise Search 讓你問「我們的差旅規定是什麼」它去翻內部文件回答並附出處；Research 針對一個題目自動查多個網頁、整合、附引用。</dd>
+              <dt>如何使用</dt><dd>Enterprise Search 由管理員接上公司知識來源後即可在對話裡直接問；Research 在對話裡開啟或直接說「幫我深入研究…」。</dd>
+              <dt>應用範圍</dt><dd>內部政策 / 流程 / 專案文件的查詢（Enterprise Search）；市場、競品、技術背景的即時彙整（Research）。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
+            <h4><span class="dot"></span>Claude for Microsoft 365</h4>
+            <dl class="def-list">
+              <dt>定義</dt><dd>Word / Excel / PowerPoint / Outlook 各自的 Claude 增益集，讓 Claude 直接在 Office 文件裡工作。</dd>
+              <dt>功能</dt><dd>Excel 寫公式、清資料、建模型；PowerPoint 把構想變投影片；Word 起草與潤稿；Outlook 整理信箱、草擬回信、跨行事曆找時間。背後都是「工具調用」接到對應軟體的操作介面。</dd>
+              <dt>如何使用</dt><dd>在各 Office 應用裡安裝 Claude 增益集並登入；Cowork 也能透過它們延伸到 Office 文件。</dd>
+              <dt>應用範圍</dt><dd>工作主要在 Office 裡發生、不想把檔案搬來搬去的人。</dd>
+            </dl>
+          </div>
+
+          <div class="def-card">
             <h4><span class="dot"></span>CLAUDE.md（專案記憶檔）— 完整教學</h4>
             <dl class="def-list">
               <dt>定義</dt><dd>Claude Code 的「專案記憶檔」，一個純 markdown 檔。每次開新 session 都是全新脈絡，Claude 會在開頭自動把 CLAUDE.md 讀進 context，當成你給它的持久性指示。</dd>
@@ -1423,7 +1605,7 @@ pip install anthropic</code></pre>
               <dt>定義</dt><dd>把一次工作階段「做了什麼」記錄下來的機制。可以用一個 <code class="inline">SessionEnd</code> hook 或一個 skill，自動產生 <code class="inline">SESSION_LOG.md</code>。</dd>
               <dt>功能</dt><dd>記錄日期時間、完成的任務、改動過的檔案、做過的決定、待解問題。<code class="inline">SessionEnd</code> hook 的 payload 會帶 <code class="inline">session_id</code> 與 <code class="inline">transcript_path</code>（該次完整逐字稿的檔案路徑），逐字稿本身也存在磁碟可回溯。</dd>
               <dt>如何使用</dt><dd>寫一個 <code class="inline">SessionEnd</code> hook 或 skill，把當次摘要 append 進 <code class="inline">SESSION_LOG.md</code>；需要時再從 transcript 逐字稿翻完整細節。</dd>
-              <dt>應用範圍</dt><dd>跨 session 交接、稽核 Claude 到底做過什麼、團隊回顧——跟本專案 <code class="inline">Claude Project</code> 裡每個資料夾的 <code class="inline">00_對話交接紀錄.md</code> 是同一個精神。</dd>
+              <dt>應用範圍</dt><dd>跨 session 交接、稽核 Claude 到底做過什麼、團隊回顧——跟本專案 <code class="inline">Claude instruction</code> 裡每個資料夾的 <code class="inline">00_對話交接紀錄.md</code> 是同一個精神。</dd>
             </dl>
           </div>
 
@@ -1502,6 +1684,26 @@ pip install anthropic</code></pre>
             </dl>
           </div>
         </div>
+
+        <h3>從「呼叫一次」到「做成產品」：進階開發模式</h3>
+        <p>在瀏覽器裡聊天，跟把 Claude 做進一個會出貨的東西，中間有一道鴻溝：聊天回答完就結束；應用程式要送結構化請求、交工具給它、讓它對真實系統動作、還要為一個或一百萬個使用者跑這個迴圈。以下是跨過這道鴻溝的關鍵模式（取自 Academy 的 Platform 101 與 API 大課）：</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>模式</th><th>一句話</th><th>什麼時候用</th></tr></thead>
+          <tbody>
+            <tr><td><strong>先手刻迴圈，再用 Tool Runner 收掉</strong></td><td>自己寫一次 <code class="inline">while stop_reason == "tool_use"</code> 搞懂它在做什麼，再交給 SDK 的 Tool Runner 幫你跑</td><td>所有要用工具的應用；懂原理才知道它幫你省了什麼</td></tr>
+            <tr><td><strong>用評估選模型</strong></td><td>別用猜的：拿你自己的例子跑一個小評估，比較 Fable / Opus / Sonnet / Haiku 的品質、成本、延遲</td><td>決定用哪個模型、要不要開 extended thinking</td></tr>
+            <tr><td><strong>提示評估工作流</strong></td><td>建測試資料集＋自動評分，改提示就重跑，用數字而非感覺判斷有沒有變好</td><td>提示要上線、會反覆調整時</td></tr>
+            <tr><td><strong>結構化輸出</strong></td><td>要它只回 JSON / 固定 schema，後端才好接</td><td>回應要餵給程式而不是給人看</td></tr>
+            <tr><td><strong>上下文管理四模式</strong></td><td>讓長跑 agent 到第十輪之後還在視窗內、還付得起：修剪舊工具結果、摘要壓縮、外部記憶、只帶需要的</td><td>多輪 agent、長任務</td></tr>
+            <tr><td><strong>RAG 檢索增強</strong></td><td>先檢索相關片段再回答：文本分塊 → 嵌入向量 → 混合搜尋（向量＋BM25）→ 重排序 → 上下文檢索</td><td>要它根據「你的資料」回答、減少編造</td></tr>
+            <tr><td><strong>Agent 架構模式</strong></td><td><em>平行化</em>（同時跑多個子任務）、<em>鏈接</em>（一步接一步）、<em>路由</em>（先分類再派給對的處理）</td><td>設計多步驟自動化系統</td></tr>
+            <tr><td><strong>Managed agents</strong></td><td>讓 Anthropic 幫你跑沙箱化的 agent 迴圈，你只消費它回報的事件流</td><td>不想自己管迴圈、狀態與長時間執行時</td></tr>
+            <tr><td><strong>Computer use</strong></td><td>讓 Claude 看螢幕、動滑鼠鍵盤操作 UI</td><td>沒有 API 的舊系統或純介面操作的自動化</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">配套的成本控制：Console 的 <strong>workspaces</strong>（分專案分帳）、<strong>用量上限</strong>、<strong>Playground</strong>（先在網頁上試提示再寫進程式）。另一個實用建議：用 Claude Code 來寫呼叫 API 的程式——但前提是你得看得懂好的程式碼長怎樣，才審得了它寫的東西。</p>
         <div class="closing-brace">}</div>
       </div>
     </section>
@@ -1714,6 +1916,7 @@ pip install anthropic</code></pre>
           <li><a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool" target="_blank" rel="noopener">Code execution 工具細節</a></li>
           <li><a href="https://code.claude.com/docs/en/overview" target="_blank" rel="noopener">Claude Code 文件</a></li>
           <li><a href="https://support.claude.com" target="_blank" rel="noopener">claude.ai 使用說明</a></li>
+          <li><a href="https://academy.claude.com/zh-TW" target="_blank" rel="noopener">Claude Academy</a> — Anthropic 官方免費課程：AI 流暢度、Claude 101、Claude Code 101 / 實戰、Cowork 簡介、Platform 101、API 大課、MCP、子代理、代理技能等，本指南多章內容取材自此</li>
         </ul>
         <div class="closing-brace">}</div>
       </div>
