@@ -560,6 +560,7 @@
       <a href="#claudeai"><span class="idx">[2]</span>claude_ai</a>
       <a href="#prompting"><span class="idx">[3]</span>prompting_basics</a>
       <a href="#aifluency"><span class="idx">[✦]</span>ai_fluency</a>
+      <a href="#pipeline"><span class="idx">[⟳]</span>message_pipeline</a>
       <div class="nav-divider">開發者</div>
       <a href="#api"><span class="idx">[4]</span>api_and_json</a>
       <a href="#tooluse"><span class="idx">[5]</span>tool_use</a>
@@ -576,7 +577,7 @@
       <a href="#resources"><span class="idx">[14]</span>resources</a>
     </nav>
     <div class="sidebar-foot">
-      整理時間 2026-06 · 內容以官方文件最新狀態為準
+      2026-06 建立 · 2026-09 更新 · 內容以官方文件最新狀態為準
     </div>
   </aside>
 
@@ -593,7 +594,7 @@
       </div>
       <h2>Claude 全貌指南<br><span class="b">{ 從產品到 JSON，從 JSON 到程式怎麼跑 }</span></h2>
       <p class="lead">一份分區介紹手冊。把 claude.ai、Claude API、Claude Code、Claude Design 這些「外殼」，跟底下那套 messages / tool_use / code_execution 的 JSON 機制，攤開來一次看完。</p>
-      <div class="meta">給開發者和一般使用者 · 8 個章節 · 含可複製的程式碼範例</div>
+      <div class="meta">給開發者和一般使用者 · 17 個章節 · 含可複製的程式碼範例</div>
       <div class="scroll-cue"><span class="arrow">↓</span> 往下捲動，從總覽開始</div>
     </section>
 
@@ -621,8 +622,8 @@
           <thead><tr><th>方案</th><th>適合誰</th></tr></thead>
           <tbody>
             <tr><td>Free</td><td>先試用看看；有「每 5 小時重置」的對話次數限制，會隨系統負載浮動</td></tr>
-            <tr><td>Pro</td><td>把 Claude 用在日常工作的個人，用量比免費版寬鬆很多，多數人從這裡開始</td></tr>
-            <tr><td>Max（5x / 20x）</td><td>整天活在 Claude 裡的重度使用者，比 Pro 再多幾倍用量、優先處理</td></tr>
+            <tr><td>Pro</td><td>把 Claude 用在日常工作的個人，用量比免費版寬鬆很多，多數人從這裡開始；Cowork 與 Claude Code 需付費方案</td></tr>
+            <tr><td>Max（5x / 20x）</td><td>整天活在 Claude 裡的重度使用者，比 Pro 再多幾倍用量、優先處理；2026/7/20 起永久包含 Fable 5（見第 1 章模型表）</td></tr>
             <tr><td>Team</td><td>團隊協作，多人共用工作區、共享設定</td></tr>
             <tr><td>Enterprise</td><td>組織級管理：admin console、集中式安全與權限控制</td></tr>
           </tbody>
@@ -695,7 +696,7 @@
           <li><strong>記憶（Memory）</strong> — 記住過去對話重點，自動帶入上下文</li>
           <li><strong>Projects（專案）</strong> — 把同一主題的多次對話、參考檔案、專屬指示收進同一個空間，跨對話保留上下文；免費帳號最多建立 5 個</li>
           <li><strong>網路搜尋 / 深度研究</strong> — 需要即時資訊時自動或手動觸發</li>
-          <li><strong>程式碼執行與檔案產生</strong> — 背後就是 <code class="inline">code_execution</code> 工具，見第 4 章</li>
+          <li><strong>程式碼執行與檔案產生</strong> — 背後就是 <code class="inline">code_execution</code> 工具，見第 6 章</li>
           <li><strong>周邊應用</strong> — Claude Code、Claude Design、Claude Tag、Claude in Chrome、Claude for Microsoft 365（Word / Excel / PowerPoint / Outlook）、Cowork</li>
         </ul>
 
@@ -749,7 +750,7 @@
         <h3>讓回答更準的幾個習慣</h3>
         <ul>
           <li><strong>給脈絡，不要只給結論式的問題</strong> ——「幫我寫信」不如「幫我寫一封信給客戶，說明出貨延遲一週，語氣要誠懇但不過度道歉」</li>
-          <li><strong>需要精確結果就直接說</strong> ——「幫我算」「幫我搜尋最新資料」「跑一下程式碼驗證」，這些關鍵字會讓 Claude 更傾向使用對應工具（見第 4、9 章）</li>
+          <li><strong>需要精確結果就直接說</strong> ——「幫我算」「幫我搜尋最新資料」「跑一下程式碼驗證」，這些關鍵字會讓 Claude 更傾向使用對應工具（見第 6、9 章）</li>
           <li><strong>覺得方向不對，直接打斷修正</strong>，不用等它講完整段才回應</li>
           <li><strong>長文件丟進來，先問它有沒有讀懂重點</strong>，再往下展開細節需求</li>
         </ul>
@@ -829,6 +830,107 @@
           <li><strong>恰當的資訊存取</strong>——給 AI 剛好夠用的資料與工具，不多不少。</li>
         </ul>
         <p class="note">本章框架取自 Anthropic <a href="https://academy.claude.com/zh-TW" target="_blank" rel="noopener">Claude Academy</a> 的「AI 流暢度：框架與基礎」「AI 能力與限制」與「Building Effective Human Agent Teams」課程（前兩門與 Joseph Feller、Rick Dakan 教授合作）。想深入可到 Academy 免費修課、取得完成徽章。</p>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <!-- ============ MESSAGE PIPELINE ============ -->
+    <section class="chapter" id="pipeline">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">message_pipeline</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">一則訊息的旅程 — 你打下一行字之後，整條鏈路是怎麼被驅動的</p>
+      <div class="content">
+        <p>前面每一章各講一個零件：LLM、context、工具、MCP、CLI、沙箱、記憶。這一章把它們<strong>串成一個循環</strong>——不管你是在 claude.ai 聊天、在 Cowork 派任務、在終端機跑 Claude Code、還是自己打 API，底下走的都是同一條路。看懂這條路，前面所有名詞就各就各位了。</p>
+
+        <div class="diagram-wrap">
+        <svg viewBox="0 0 720 600" role="img" aria-label="一則訊息從輸入到輸出的全鏈路流程圖" style="width:100%;height:auto;">
+          <defs>
+            <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-soft)"/>
+            </marker>
+          </defs>
+          <style>
+            .pb{fill:var(--bg-panel-2);stroke:var(--border);}
+            .pt{fill:var(--ink);font:600 12.5px system-ui,sans-serif;}
+            .ps{fill:var(--ink-soft);font:10.5px system-ui,sans-serif;}
+            .pl{stroke:var(--ink-soft);stroke-width:1.5;fill:none;}
+            .lane{font:600 10.5px system-ui,sans-serif;}
+            .pn{fill:var(--string-amber);font:700 12px system-ui,sans-serif;}
+            .lp{fill:var(--string-amber);font:600 11px system-ui,sans-serif;}
+          </style>
+          <!-- lane legend -->
+          <text class="lane" x="16" y="20" fill="var(--green)">● 你的裝置</text>
+          <text class="lane" x="110" y="20" fill="var(--type-violet)">● 介面組裝</text>
+          <text class="lane" x="204" y="20" fill="var(--key-blue)">● Anthropic 伺服器</text>
+          <text class="lane" x="340" y="20" fill="var(--string-amber)">● 外部服務 / 多處</text>
+          <!-- boxes: x=60 w=520 h=46 ; y: 40,106,172,238,304,370,436,502 -->
+          <rect class="pb" x="60" y="40" width="520" height="46" rx="8" stroke="var(--green)"/>
+          <text class="pn" x="72" y="68">1</text><text class="pt" x="92" y="60">你打字</text><text class="ps" x="92" y="76">在 claude.ai / Cowork / Claude Code / API 任一入口送出一則訊息</text>
+          <rect class="pb" x="60" y="106" width="520" height="46" rx="8" stroke="var(--type-violet)"/>
+          <text class="pn" x="72" y="134">2</text><text class="pt" x="92" y="126">介面組裝 context</text><text class="ps" x="92" y="142">系統提示 ＋ CLAUDE.md / Project 指示 ＋ 記憶 ＋ 對話歷史 ＋ 附件 ＋ 可用工具清單（含 MCP、Skills 描述）</text>
+          <rect class="pb" x="60" y="172" width="520" height="46" rx="8" stroke="var(--key-blue)"/>
+          <text class="pn" x="72" y="200">3</text><text class="pt" x="92" y="192">Tokenize → 送進模型</text><text class="ps" x="92" y="208">全部切成 token；context window 的上限在這裡生效，塞不下的就掉</text>
+          <rect class="pb" x="60" y="238" width="520" height="46" rx="8" stroke="var(--key-blue)"/>
+          <text class="pn" x="72" y="266">4</text><text class="pt" x="92" y="258">模型推理</text><text class="ps" x="92" y="274">下一個詞元預測；開 extended thinking 就先想一段再答；可操控性在此決定它多聽話</text>
+          <rect class="pb" x="60" y="304" width="520" height="46" rx="8" stroke="var(--key-blue)"/>
+          <text class="pn" x="72" y="332">5</text><text class="pt" x="92" y="324">決定：講話還是動手</text><text class="ps" x="92" y="340">回純文字（stop_reason: end_turn）→ 跳到 8；或發 tool_use 請求 → 進 6</text>
+          <rect class="pb" x="60" y="370" width="520" height="46" rx="8" stroke="var(--string-amber)"/>
+          <text class="pn" x="72" y="398">6</text><text class="pt" x="92" y="390">執行工具（模型自己不執行，是別人跑）</text><text class="ps" x="92" y="406">沙箱：搜尋 / 跑程式 ｜ MCP / Connectors：呼叫外部服務 ｜ 本機：Claude Code 讀寫檔、跑 shell ｜ Skill：載入指示</text>
+          <rect class="pb" x="60" y="436" width="520" height="46" rx="8" stroke="var(--string-amber)"/>
+          <text class="pn" x="72" y="464">7</text><text class="pt" x="92" y="456">結果包成 tool_result 餵回</text><text class="ps" x="92" y="472">連同完整歷史再送一次 → 回到 3；hooks 可在這些固定時點插入強制動作</text>
+          <rect class="pb" x="60" y="502" width="520" height="46" rx="8" stroke="var(--green)"/>
+          <text class="pn" x="72" y="530">8</text><text class="pt" x="92" y="522">輸出 ＋ 記錄 → 你辨別 → 再描述</text><text class="ps" x="92" y="538">文字 / Artifact / 檔案 / diff；session 存 ~/.claude、記憶更新、session log；下一輪從 1 開始</text>
+          <!-- down arrows -->
+          <line class="pl" x1="320" y1="86" x2="320" y2="102" marker-end="url(#ah2)"/>
+          <line class="pl" x1="320" y1="152" x2="320" y2="168" marker-end="url(#ah2)"/>
+          <line class="pl" x1="320" y1="218" x2="320" y2="234" marker-end="url(#ah2)"/>
+          <line class="pl" x1="320" y1="284" x2="320" y2="300" marker-end="url(#ah2)"/>
+          <line class="pl" x1="320" y1="350" x2="320" y2="366" marker-end="url(#ah2)"/>
+          <line class="pl" x1="320" y1="416" x2="320" y2="432" marker-end="url(#ah2)"/>
+          <line class="pl" x1="320" y1="482" x2="320" y2="498" marker-end="url(#ah2)"/>
+          <!-- loop 7 -> 3 on right -->
+          <path class="pl" d="M580,459 L640,459 L640,195 L584,195" marker-end="url(#ah2)"/>
+          <text class="lp" x="648" y="330" transform="rotate(90 648 330)" text-anchor="middle">有 tool_use 就繞回去</text>
+          <!-- skip 5 -> 8 on left -->
+          <path class="pl" d="M60,327 L36,327 L36,525 L56,525" marker-end="url(#ah2)"/>
+          <text class="ps" x="30" y="430" transform="rotate(-90 30 430)" text-anchor="middle" fill="var(--green)">end_turn 直接輸出</text>
+        </svg>
+        <p class="fig-cap">綠＝在你的裝置上發生；紫＝介面幫你組裝；藍＝Anthropic 伺服器上的模型；橘＝工具在沙箱、外部服務或你本機執行。只要模型還想用工具，就一直繞 3→7 的圈。</p>
+        </div>
+
+        <h3>九步各自對應前面哪一章</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>步驟</th><th>發生什麼</th><th>關鍵概念</th><th>深入</th></tr></thead>
+          <tbody>
+            <tr><td>1 打字</td><td>選一個入口送出訊息</td><td>四個入口差在「介面做什麼」不是「模型不同」</td><td><a href="#overview">01 選用表</a></td></tr>
+            <tr><td>2 組裝 context</td><td>介面把你沒打的東西一起塞進去：系統提示、Project／CLAUDE.md、記憶、歷史、工具清單</td><td>這就是為什麼 Projects、CLAUDE.md、Memory 能「讓它記住你」——它們都在這一步被注入</td><td><a href="#claudeai">02</a>、<a href="#features">10</a></td></tr>
+            <tr><td>3 Tokenize</td><td>全部切成 token 送進模型</td><td>token 計費、context window 硬上限、prompt caching 在這裡省錢</td><td><a href="#practical">09 成本與 Token</a></td></tr>
+            <tr><td>4 推理</td><td>下一個詞元預測；extended thinking 先想再答</td><td>四特性心智模型：預測、知識、工作記憶、可操控性</td><td><a href="#aifluency">✦ AI 素養</a></td></tr>
+            <tr><td>5 決定</td><td>回文字或發 tool_use</td><td><code class="inline">stop_reason</code> 是整個迴圈的開關</td><td><a href="#api">04</a>、<a href="#tooluse">05</a></td></tr>
+            <tr><td>6 執行工具</td><td>模型不執行，是別人執行——沙箱、MCP、本機、或載入 Skill</td><td>工具三類型；MCP 三元素；Claude Code 是「本機執行」那條路</td><td><a href="#tooluse">05</a>、<a href="#codeexec">06</a>、<a href="#claudecode">07</a>、<a href="#ecosystem">08</a></td></tr>
+            <tr><td>7 餵回</td><td>tool_result 連同歷史再送；hooks 在固定時點插入</td><td>API 無狀態，每輪都重送完整歷史；hooks 是強制、CLAUDE.md 是建議</td><td><a href="#tooluse">05</a>、<a href="#features">10 Hooks</a></td></tr>
+            <tr><td>8 輸出與記錄</td><td>文字／Artifact／檔案／diff；session 與記憶存下來</td><td>session 在 ~/.claude 共用、Memory 更新、session log 交接</td><td><a href="#claudecode">07</a>、<a href="#features">10</a></td></tr>
+            <tr><td>→ 你</td><td>辨別結果、再描述、下一輪</td><td>4D 的「描述→辨別」循環，人就是迴圈的最外圈</td><td><a href="#aifluency">✦</a></td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h3>同一則訊息，四個入口差在哪</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>入口</th><th>第 2 步多塞了什麼</th><th>第 6 步「本機」那條路</th><th>第 8 步輸出到哪</th></tr></thead>
+          <tbody>
+            <tr><td><strong>claude.ai</strong></td><td>Project 指示、Memory、Connectors 工具</td><td>沒有——只有沙箱與 MCP</td><td>對話、Artifact、可下載檔案</td></tr>
+            <tr><td><strong>Cowork</strong></td><td>全域指示、Project、連接的資料夾、Skills、Connectors</td><td>有——直接讀寫你連接的資料夾、操作應用</td><td>資料夾裡的真實檔案、artifacts</td></tr>
+            <tr><td><strong>Claude Code</strong></td><td>CLAUDE.md（四層）、auto memory、Skills、MCP、hooks</td><td>最完整——shell、檔案、git，全在你機器上跑</td><td>程式碼 diff、commit、終端機輸出</td></tr>
+            <tr><td><strong>API</strong></td><td>只有你自己在 <code class="inline">system</code> 與 <code class="inline">tools</code> 裡放的東西</td><td>你自己寫——client 端工具由你的程式執行</td><td>JSON 回應，之後怎麼用由你決定</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">一句話總結整個生態：<strong>模型只做兩件事——講話、或要求用工具</strong>。介面負責「餵進去什麼」（第 2 步），執行環境負責「工具在哪跑」（第 6 步），你負責「看完再說下一句」（第 8 步→1）。MCP 是第 6 步接外部的標準插座，CLI 是第 6 步跑在你本機的那條路，LLM 是第 4 步那顆會預測下一個字的引擎——它們是同一條鏈上不同位置的零件，不是三個互不相干的東西。</p>
         <div class="closing-brace">}</div>
       </div>
     </section>
@@ -1155,6 +1257,7 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
             <tr><td>排程與遠端</td><td>排程任務、<strong>Dispatch</strong> 從手機派任務給桌面</td><td>靠 cron / Routines</td></tr>
             <tr><td>自動化</td><td>不行</td><td><strong>唯一能腳本化的介面</strong>：<code class="inline">--print</code> 非互動輸出、Agent SDK、接進 cron / CI pipeline、把輸出餵給別的程式</td></tr>
             <tr><td>遠端主機</td><td>本機為主</td><td>SSH 進伺服器直接用</td></tr>
+            <tr><td>對話紀錄</td><td colspan="2"><strong>共用</strong>：都存本機 <code class="inline">~/.claude/</code>、按專案資料夾分、自動儲存。終端機開的 session 在 Desktop 打 <code class="inline">/resume</code> 就能接著用（完整對話、工具呼叫、模型、進行中的 agent 都還原）；Desktop 開的在 CLI 用 <code class="inline">claude --resume</code> 接。要在同一專案資料夾下才看得到彼此。</td></tr>
           </tbody>
         </table>
         </div>
@@ -1257,7 +1360,7 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
           </div>
           <div class="card">
             <span class="ck">Claude Agent SDK / Managed Agents</span>
-            <p>給開發者的高階封裝：不用自己手刻第 3 章那個 while 迴圈，Anthropic 幫你管整個 agent 的執行狀態與長時間運行任務。</p>
+            <p>給開發者的高階封裝：不用自己手刻第 5 章那個 while 迴圈，Anthropic 幫你管整個 agent 的執行狀態與長時間運行任務。</p>
           </div>
         </div>
         <div class="closing-brace">}</div>
@@ -1490,7 +1593,7 @@ pip install anthropic</code></pre>
             <h4><span class="dot"></span>Claude API（Messages API）</h4>
             <dl class="def-list">
               <dt>定義</dt><dd>Anthropic 提供的 REST 介面，讓開發者直接向 Claude 模型送請求、拿回應，核心端點是 <code class="inline">POST /v1/messages</code>。</dd>
-              <dt>功能</dt><dd>把對話歷史、系統提示、工具定義、檔案打包成 JSON 送出，換回文字、工具呼叫、或串流回應——第 2、3 章講的全部內容都是這個東西的細節。</dd>
+              <dt>功能</dt><dd>把對話歷史、系統提示、工具定義、檔案打包成 JSON 送出，換回文字、工具呼叫、或串流回應——第 4、5 章講的全部內容都是這個東西的細節。</dd>
               <dt>如何使用</dt><dd>platform.claude.com 申請 API key → 裝 SDK（<code class="inline">pip install anthropic</code> / <code class="inline">npm install @anthropic-ai/sdk</code>）或直接用 curl → 每個請求都要帶 <code class="inline">x-api-key</code> 與 <code class="inline">anthropic-version</code> 兩個 header。</dd>
               <dt>應用範圍</dt><dd>把 Claude 接進自己的產品/後端、寫自動化腳本、組 agent——任何「claude.ai 介面之外」要用 Claude 的場景。</dd>
             </dl>
@@ -1512,7 +1615,7 @@ pip install anthropic</code></pre>
               <dt>定義</dt><dd>讓 Claude 在隔離沙箱容器裡真的執行 Python / Bash、產生並回傳檔案的能力。底層是一個<strong>網路完全隔離的 Linux 容器</strong>；claude.ai 的開關與 API 的 <code class="inline">code_execution</code> 工具是同一套機制的兩種啟用方式。claude.ai 裡是 Capabilities 的總開關，Artifacts 跟 Skills 都依賴它才能運作。</dd>
               <dt>功能</dt><dd>精確計算、資料分析與視覺化、產生 Word / Excel / PPT / PDF 等檔案、處理你上傳的 CSV 等資料檔。</dd>
               <dt>如何使用</dt><dd>claude.ai：Capabilities → 打開 Code execution and file creation（Team / Enterprise 還能設定 network egress：完全關閉、或只開放套件管理員存取）；開了之後不用額外語法，直接自然語言要求即可。API：<code class="inline">tools</code> 加 <code class="inline">{"type":"code_execution_20250825","name":"code_execution"}</code>。</dd>
-              <dt>應用範圍</dt><dd>任何「不只是講出答案、還要真的算出來/做出一個檔案」的任務——財務模型、資料清理、報表、簡報產生，第 4 章的整套機制細節都在這裡。</dd>
+              <dt>應用範圍</dt><dd>任何「不只是講出答案、還要真的算出來/做出一個檔案」的任務——財務模型、資料清理、報表、簡報產生，第 6 章的整套機制細節都在這裡。</dd>
             </dl>
           </div>
 
@@ -1551,7 +1654,7 @@ pip install anthropic</code></pre>
             <dl class="def-list">
               <dt>定義</dt><dd>讓模型在給出答案前，先做一段額外的內部推理。Fable 5 / Opus 4.8 / Sonnet 4.6 支援，Haiku 4.5 不支援。</dd>
               <dt>功能</dt><dd>對數學、多步驟邏輯、複雜規劃這類難題，明顯提升正確率；可設定「思考預算」，複雜的多想、簡單的少想以省成本。</dd>
-              <dt>如何使用</dt><dd>claude.ai：難題直接要求「一步一步想再回答」，或用支援深度思考的模式。API：在請求開 <code class="inline">thinking</code> 並給 token 預算，回應會多一個 <code class="inline">thinking</code> 區塊（見第 4 章 content 型別表）。</dd>
+              <dt>如何使用</dt><dd>claude.ai：難題直接要求「一步一步想再回答」，或用支援深度思考的模式。API：在請求開 <code class="inline">thinking</code> 並給 token 預算，回應會多一個 <code class="inline">thinking</code> 區塊（見第 5 章 content 型別表）。</dd>
               <dt>應用範圍</dt><dd>會「想錯一步就全錯」的任務——複雜推理、架構決策、多步驟計算。單純問答、格式轉換不需要開，開了只是變慢變貴。</dd>
             </dl>
           </div>
@@ -1658,7 +1761,7 @@ pip install anthropic</code></pre>
       </div>
       <p class="chap-sub">給開發者的延伸介面 — IDE 外掛、瀏覽器擴充、CI/CD 整合</p>
       <div class="content">
-        <p>第 5 章講的是終端機裡的 <code class="inline">claude</code>。但同一個引擎還有好幾個「外殼」，把它接進你已經在用的工具裡，不用切視窗。底層都是同一套 Claude Code（同樣的模型、同樣的 <code class="inline">CLAUDE.md</code>、同樣的 hooks 跟 MCP），差別只在介面。</p>
+        <p>第 7 章講的是終端機裡的 <code class="inline">claude</code>。但同一個引擎還有好幾個「外殼」，把它接進你已經在用的工具裡，不用切視窗。底層都是同一套 Claude Code（同樣的模型、同樣的 <code class="inline">CLAUDE.md</code>、同樣的 hooks 跟 MCP），差別只在介面。</p>
 
         <div class="def-stack">
           <div class="def-card">
@@ -1684,7 +1787,7 @@ pip install anthropic</code></pre>
           <div class="def-card">
             <h4><span class="dot"></span>Claude in Chrome（瀏覽器擴充）</h4>
             <dl class="def-list">
-              <dt>定義</dt><dd>讓 Claude 直接操作你的 Chrome 瀏覽器的擴充功能——開分頁、點擊、填表單、讀 console log，本質是把第 4 章講的「工具調用」接到一個真正的瀏覽器上。</dd>
+              <dt>定義</dt><dd>讓 Claude 直接操作你的 Chrome 瀏覽器的擴充功能——開分頁、點擊、填表單、讀 console log，本質是把第 5 章講的「工具調用」接到一個真正的瀏覽器上。</dd>
               <dt>功能</dt><dd>測試自己做的網頁應用、debug 時讀瀏覽器 console 錯誤訊息、自動化重複性的網頁操作；送出表單、付款等有副作用的動作會先跟你確認才執行。</dd>
               <dt>如何使用</dt><dd>到 Chrome 線上應用程式商店安裝擴充套件；裝好後在 Claude Code（VS Code 版）裡打 <code class="inline">@browser</code> 加上指令，例如「<code class="inline">@browser go to localhost:3000 and check the console for errors</code>」，需要擴充套件版本 1.0.36 以上。</dd>
               <dt>應用範圍</dt><dd>本地網頁開發時的即時除錯、跑通某個操作流程要不要動到後端、不想自己一直切視窗手動點。</dd>
@@ -1704,7 +1807,7 @@ pip install anthropic</code></pre>
           <div class="def-card">
             <h4><span class="dot"></span>Claude Agent SDK</h4>
             <dl class="def-list">
-              <dt>定義</dt><dd>給開發者的高階封裝，把第 3 章那個要自己手刻的 <code class="inline">while stop_reason == "tool_use"</code> 迴圈、檔案系統存取、子代理調度等通通包好，讓你用程式碼建構「自己的 Claude Code」。</dd>
+              <dt>定義</dt><dd>給開發者的高階封裝，把第 5 章那個要自己手刻的 <code class="inline">while stop_reason == "tool_use"</code> 迴圈、檔案系統存取、子代理調度等通通包好，讓你用程式碼建構「自己的 Claude Code」。</dd>
               <dt>功能</dt><dd>提供跟 Claude Code 同樣的底層能力（檔案讀寫、shell 執行、MCP 串接）給你寫成獨立應用，而不是透過 CLI 互動。</dd>
               <dt>如何使用</dt><dd>TypeScript / Python 兩種語言的套件，匯入後用程式碼定義 agent 的行為、可用工具、權限規則，自己決定要包裝成什麼介面。</dd>
               <dt>應用範圍</dt><dd>要做「自己公司版的 Claude Code」、把 agentic coding 能力嵌進內部工具或產品裡的場景，而不是單純呼叫一次性問答的 Messages API。</dd>
@@ -1923,7 +2026,7 @@ pip install anthropic</code></pre>
             <tr><td>System prompt</td><td>給模型的「開場設定」——身份、任務框架、一律遵守的規則</td></tr>
             <tr><td>Temperature</td><td>取樣隨機度，低＝穩定保守，高＝多樣有創意</td></tr>
             <tr><td>Extended thinking</td><td>回答前先做一段內部推理，難題更準</td></tr>
-            <tr><td>Tool use / Function calling</td><td>模型請求呼叫外部工具，由你或伺服器執行後把結果餵回（第 4 章）</td></tr>
+            <tr><td>Tool use / Function calling</td><td>模型請求呼叫外部工具，由你或伺服器執行後把結果餵回（第 5 章）</td></tr>
             <tr><td>MCP</td><td>讓 Claude 標準化接外部工具/資料源的開放協定（第 8 章）</td></tr>
             <tr><td>Agent</td><td>模型在「呼叫工具→看結果→再決定」的迴圈裡自主完成多步任務</td></tr>
             <tr><td>RAG</td><td>先檢索相關資料、再讓模型根據它回答，減少編造</td></tr>
@@ -1950,7 +2053,7 @@ pip install anthropic</code></pre>
     </section>
 
     <footer>
-      claude.guide.json · 整理時間 2026-06，部分名稱與版本以官方文件最新狀態為準
+      claude.guide.json · 2026-06 建立 · 2026-09 更新，部分名稱與版本以官方文件最新狀態為準
       <div class="links">
         <span>配套可跑範例：claude_tool_use_demo.py</span>
       </div>
@@ -1990,7 +2093,7 @@ const ttLines = [
   '{',
   '  "name": "Claude",',
   '  "made_by": "Anthropic",',
-  '  "surfaces": ["claude.ai", "api", "claude_code"],',
+  '  "surfaces": ["claude.ai", "cowork", "claude_code", "api"],',
   '  "status": "reading guide..."',
   '}'
 ];
