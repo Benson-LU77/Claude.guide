@@ -854,7 +854,7 @@
           <style>
             .pb{fill:var(--bg-panel-2);stroke:var(--border);}
             .pt{fill:var(--ink);font:600 12.5px system-ui,sans-serif;}
-            .ps{fill:var(--ink-soft);font:10.5px system-ui,sans-serif;}
+            .ps{fill:var(--ink-soft);font:10px system-ui,sans-serif;}
             .pl{stroke:var(--ink-soft);stroke-width:1.5;fill:none;}
             .lane{font:600 10.5px system-ui,sans-serif;}
             .pn{fill:var(--string-amber);font:700 12px system-ui,sans-serif;}
@@ -869,19 +869,19 @@
           <rect class="pb" x="60" y="40" width="520" height="46" rx="8" stroke="var(--green)"/>
           <text class="pn" x="72" y="68">1</text><text class="pt" x="92" y="60">你打字</text><text class="ps" x="92" y="76">在 claude.ai / Cowork / Claude Code / API 任一入口送出一則訊息</text>
           <rect class="pb" x="60" y="106" width="520" height="46" rx="8" stroke="var(--type-violet)"/>
-          <text class="pn" x="72" y="134">2</text><text class="pt" x="92" y="126">介面組裝 context</text><text class="ps" x="92" y="142">系統提示 ＋ CLAUDE.md / Project 指示 ＋ 記憶 ＋ 對話歷史 ＋ 附件 ＋ 可用工具清單（含 MCP、Skills 描述）</text>
+          <text class="pn" x="72" y="134">2</text><text class="pt" x="92" y="126">介面組裝 context</text><text class="ps" x="92" y="142">系統提示＋CLAUDE.md/Project 指示＋記憶＋歷史＋附件＋工具清單（含 MCP、Skills）</text>
           <rect class="pb" x="60" y="172" width="520" height="46" rx="8" stroke="var(--key-blue)"/>
           <text class="pn" x="72" y="200">3</text><text class="pt" x="92" y="192">Tokenize → 送進模型</text><text class="ps" x="92" y="208">全部切成 token；context window 的上限在這裡生效，塞不下的就掉</text>
           <rect class="pb" x="60" y="238" width="520" height="46" rx="8" stroke="var(--key-blue)"/>
-          <text class="pn" x="72" y="266">4</text><text class="pt" x="92" y="258">模型推理</text><text class="ps" x="92" y="274">下一個詞元預測；開 extended thinking 就先想一段再答；可操控性在此決定它多聽話</text>
+          <text class="pn" x="72" y="266">4</text><text class="pt" x="92" y="258">模型推理</text><text class="ps" x="92" y="274">下一個詞元預測；開 extended thinking 先想再答；可操控性決定它多聽話</text>
           <rect class="pb" x="60" y="304" width="520" height="46" rx="8" stroke="var(--key-blue)"/>
           <text class="pn" x="72" y="332">5</text><text class="pt" x="92" y="324">決定：講話還是動手</text><text class="ps" x="92" y="340">回純文字（stop_reason: end_turn）→ 跳到 8；或發 tool_use 請求 → 進 6</text>
           <rect class="pb" x="60" y="370" width="520" height="46" rx="8" stroke="var(--string-amber)"/>
-          <text class="pn" x="72" y="398">6</text><text class="pt" x="92" y="390">執行工具（模型自己不執行，是別人跑）</text><text class="ps" x="92" y="406">沙箱：搜尋 / 跑程式 ｜ MCP / Connectors：呼叫外部服務 ｜ 本機：Claude Code 讀寫檔、跑 shell ｜ Skill：載入指示</text>
+          <text class="pn" x="72" y="398">6</text><text class="pt" x="92" y="390">執行工具（模型自己不執行，是別人跑）</text><text class="ps" x="92" y="406">沙箱：搜尋/跑程式 ｜ MCP：外部服務 ｜ 本機：讀寫檔、shell ｜ Skill：載入指示</text>
           <rect class="pb" x="60" y="436" width="520" height="46" rx="8" stroke="var(--string-amber)"/>
-          <text class="pn" x="72" y="464">7</text><text class="pt" x="92" y="456">結果包成 tool_result 餵回</text><text class="ps" x="92" y="472">連同完整歷史再送一次 → 回到 3；hooks 可在這些固定時點插入強制動作</text>
+          <text class="pn" x="72" y="464">7</text><text class="pt" x="92" y="456">結果包成 tool_result 餵回</text><text class="ps" x="92" y="472">連同完整歷史再送 → 回到 3；hooks 在固定時點插入強制動作</text>
           <rect class="pb" x="60" y="502" width="520" height="46" rx="8" stroke="var(--green)"/>
-          <text class="pn" x="72" y="530">8</text><text class="pt" x="92" y="522">輸出 ＋ 記錄 → 你辨別 → 再描述</text><text class="ps" x="92" y="538">文字 / Artifact / 檔案 / diff；session 存 ~/.claude、記憶更新、session log；下一輪從 1 開始</text>
+          <text class="pn" x="72" y="530">8</text><text class="pt" x="92" y="522">輸出 ＋ 記錄 → 你辨別 → 再描述</text><text class="ps" x="92" y="538">文字/Artifact/檔案/diff；存 session（~/.claude）、更新記憶；下一輪從 1 開始</text>
           <!-- down arrows -->
           <line class="pl" x1="320" y1="86" x2="320" y2="102" marker-end="url(#ah2)"/>
           <line class="pl" x1="320" y1="152" x2="320" y2="168" marker-end="url(#ah2)"/>
