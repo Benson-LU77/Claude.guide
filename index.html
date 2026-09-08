@@ -1140,7 +1140,34 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
         <p>Claude Code 本質上是一個 <strong>agentic coding CLI</strong>：把第 5 章講的「工具調用迴圈」包裝成完整的開發助理，差別在於工具是<strong>真的在你電腦上執行</strong>（讀寫檔案、跑 shell 指令、操作 git），而不是雲端沙箱。它跟聊天式 AI 的差別，不在於更會寫程式，而在於它<strong>會自己動手、自己看結果、再決定下一步</strong>。</p>
 
         <h3>它怎麼運作：agentic loop</h3>
-        <p>每個任務都在跑同一個迴圈：<strong>蒐集脈絡</strong>（讀檔案、grep、看 git）→ <strong>採取行動</strong>（改檔、跑指令）→ <strong>驗證結果</strong>（跑測試、看輸出）→ 再來一輪。四樣東西決定它能做什麼：<em>迴圈本身、context window（它一次能看多少）、工具（它能碰什麼）、權限（哪些動作要你點頭）</em>。可以裝在終端機、VS Code、JetBrains、Claude Desktop 或網頁版。</p>
+        <p>每個任務都在跑同一個迴圈：<strong>蒐集脈絡</strong>（讀檔案、grep、看 git）→ <strong>採取行動</strong>（改檔、跑指令）→ <strong>驗證結果</strong>（跑測試、看輸出）→ 再來一輪。四樣東西決定它能做什麼：<em>迴圈本身、context window（它一次能看多少）、工具（它能碰什麼）、權限（哪些動作要你點頭）</em>。</p>
+
+        <h3>在哪裡用它：Desktop App 還是終端機？</h3>
+        <p>先破除一個誤會：<strong>Claude Desktop 的「Code」分頁跟終端機的 CLI，跑的是同一套 Claude Code 引擎</strong>，共用 CLAUDE.md、設定、MCP、hooks、skills、plugins、權限規則與模型。差別不在「能力」，而在「介面讓你做什麼」：</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th></th><th>Desktop App（Code 分頁）</th><th>終端機（CLI）</th></tr></thead>
+          <tbody>
+            <tr><td>怎麼開始</td><td>開 App → Code 分頁 → 連一個專案資料夾，<strong>完全不用碰終端機</strong></td><td>終端機 <code class="inline">cd</code> 進專案 → 打 <code class="inline">claude</code></td></tr>
+            <tr><td>看得見什麼</td><td>側欄<strong>即時檔案樹</strong>，看它正在讀/改哪些檔；改動以<strong>視覺化 diff</strong> 呈現，一鍵接受或拒絕</td><td>純文字輸出，diff 用文字看</td></tr>
+            <tr><td>權限預設</td><td>新手預設「Ask permissions」逐步確認，比較安全</td><td>同樣可設，但要自己選模式</td></tr>
+            <tr><td>多工</td><td><strong>平行 session</strong>（自動開 worktree）、視窗並排、附件拖放</td><td>要開多個終端機分頁自己管</td></tr>
+            <tr><td>排程與遠端</td><td>排程任務、<strong>Dispatch</strong> 從手機派任務給桌面</td><td>靠 cron / Routines</td></tr>
+            <tr><td>自動化</td><td>不行</td><td><strong>唯一能腳本化的介面</strong>：<code class="inline">--print</code> 非互動輸出、Agent SDK、接進 cron / CI pipeline、把輸出餵給別的程式</td></tr>
+            <tr><td>遠端主機</td><td>本機為主</td><td>SSH 進伺服器直接用</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note"><strong>這不是二選一，是一條路：Desktop 上車，終端機是終點。</strong> Desktop 的功能是 CLI 的<em>子集</em>——所有真正拉開差距的東西都只在終端機：把輸出接給別的程式、Agent SDK、hooks 的精細控制、headless 進 CI／cron、SSH 上伺服器，還有「真正看懂它底下在做什麼」。用 Desktop 用到想自動化、想擴展的那天，一定會被逼回終端機——這也是多數重度使用者最後都住在 CLI 的原因。建議路徑：<strong>① Desktop 先上手、建立信任 → ② 補 <a href="#practical">第 9 章終端機基礎</a> → ③ 轉到 CLI 當主場</strong>，Desktop 留著看 diff、並排多 session。兩者設定共用，隨時能切。另有 VS Code / JetBrains 擴充與網頁版，見 <a href="#extensions">第 11 章</a>。</p>
+
+        <h4>論壇共識與重度使用者的實際配置</h4>
+        <ul>
+          <li><strong>社群怎麼定位</strong>：Desktop 是「有人盯著的 agentic 工作」的更好介面，不是 CLI 的替代品；一定要 CLI 的三種情況——多實例／agent team、自動化與排程（headless <code class="inline">claude -p "…"</code> 把輸出接給別的程式）、靠 CLAUDE.md＋CLI 旗標的進階框架。多數團隊兩者都用。</li>
+          <li><strong>重度使用者的日常</strong>：終端機＋<strong>tmux</strong>——分割窗格（Claude 一格、log 一格、測試一格）、<strong>session 持久化</strong>（斷線或關視窗後重新 attach 照樣接回，長任務不中斷）、fire-and-forget 平行 agent、用 pipe-pane 把每行推理與指令寫進 log。常見組合：Ghostty＋tmux。</li>
+          <li><strong>平行工作，兩邊都行</strong>：Desktop（2026/4 改版後）有多 session 側欄＋自動 worktree；CLI 用 <code class="inline">claude --worktree &lt;名稱&gt;</code>（或 <code class="inline">-w</code>）在不同終端機各開一個，各自在 <code class="inline">.claude/worktrees/</code> 下獨立分支，互不打架。舊文說「Desktop 不能平行」已過時。</li>
+          <li><strong>混用的正確姿勢</strong>：CLI 跑主 session、Desktop 的檔案樹與計畫側欄當<em>監看層</em>。注意：兩個 agent 同時動同一專案，務必分 branch／worktree，否則會互相覆蓋。</li>
+          <li><strong>Academy 的立場</strong>：把終端機／VS Code／JetBrains／Desktop／網頁當同一工具的不同安裝面，不明講偏好——但 Claude Code 101／實戰所有動手內容（hooks、headless、CLAUDE.md、<code class="inline">claude --debug</code>、<code class="inline">claude mcp add</code>、Routines）全在 CLI，等於用行動說了：深度在終端機。</li>
+        </ul>
 
         <h3>三種操作模式：你要多少監督</h3>
         <div class="table-wrap">
