@@ -1316,7 +1316,8 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
         <ul>
           <li><strong>Routines 例行任務</strong>：把提示排程成在 Anthropic 基礎設施上定期跑的例行工作。</li>
           <li><strong>Headless 無頭模式</strong>：不開互動介面、當作指令列工具塞進你自己的 pipeline。</li>
-          <li><strong>GitHub 整合</strong>：GitHub Action 與 managed code review，讓 Claude 直接參與 pull request。</li>
+          <li><strong>CI/CD 整合</strong>：GitHub Actions 或 GitLab CI/CD 自動做 PR 審查與 issue 分流；GitHub Code Review 讓每個 PR 自動被審。</li>
+          <li><strong>隨處工作</strong>（官方整合表）：<strong>Remote Control</strong>——從手機或另一台裝置接續本機正在跑的 session；<strong><code class="inline">claude --cloud</code></strong>——本機起頭、到 Claude 手機 App 繼續；<strong>Channels</strong>——把 Telegram、Discord、iMessage 或你自己的 webhook 事件推進 session（例如訊息一來就觸發任務）；<strong>Slack</strong>——把 bug 回報直接轉成 pull request。</li>
           <li><strong>打包成 Plugin</strong>：把你調好的一整套（CLAUDE.md、skills、hooks、MCP）包成外掛，全隊一鍵安裝。</li>
         </ul>
         <p class="note"><strong>驗證原則</strong>：你看得越少，事後要驗得越多——無人監督跑完的東西，驗證力度要跟監督程度成反比；能用 hooks 把「測試沒過就不算完成」寫死，就別靠肉眼。CLAUDE.md、hooks、plugins、session log 與 harness engineering 的完整定義見 <a href="#features">第 10 章</a>；終端機指令與斜線指令見 <a href="#practical">第 9 章</a>。</p>
@@ -1378,7 +1379,7 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
         <p>前面幾章講的是「機制」，這章講「手要怎麼動」：終端機裝完打什麼指令、claude.ai 裡設定藏在哪、API key 申請完第一行程式碼怎麼寫。</p>
 
         <h3>0. 終端機基礎（不熟終端機先看這個）</h3>
-        <p>不用怕，日常只會用到幾個。終端機就是「用打字叫電腦做事」的視窗。</p>
+        <p>先把三個常被混用的詞講清楚：<strong>終端機（Terminal）</strong>是那個黑黑的視窗程式；<strong>Shell</strong>是視窗裡真正在讀你指令的直譯器（macOS 預設 zsh）；<strong>CLI（Command Line Interface，指令列介面）</strong>是「用打字下指令」這種操作方式的統稱——跟用滑鼠點按鈕的 GUI（圖形介面）相對。所以「Claude Code CLI」就是「用打字操作的 Claude Code」，「MCP CLI」通常指的是「用 <code class="inline">claude mcp</code> 指令管理 MCP server」。不用怕，日常只會用到幾個。</p>
         <ul>
           <li><strong>開啟</strong>：按 <code class="inline">Cmd + 空白鍵</code> 叫出 Spotlight，打「終端機」或「Terminal」按 Enter。</li>
           <li><strong>三個最常用</strong>：<code class="inline">pwd</code>（我現在在哪個資料夾）、<code class="inline">ls</code>（這裡有什麼檔案）、<code class="inline">cd 資料夾</code>（進到某個資料夾）。<code class="inline">~</code> 代表你的個人資料夾。</li>
@@ -1397,6 +1398,8 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
           <tbody>
             <tr><td>原生安裝（macOS/Linux）</td><td><code class="inline">curl -fsSL https://claude.ai/install.sh | bash</code></td><td>大多數人，官方主推</td></tr>
             <tr><td>原生安裝（Windows PowerShell）</td><td><code class="inline">irm https://claude.ai/install.ps1 | iex</code></td><td>Windows 原生環境</td></tr>
+            <tr><td>Homebrew（macOS）</td><td><code class="inline">brew install --cask claude-code</code></td><td>習慣用 brew 管軟體的人</td></tr>
+            <tr><td>WinGet（Windows）</td><td><code class="inline">winget install Anthropic.ClaudeCode</code></td><td>Windows 用內建套件管理員</td></tr>
             <tr><td>npm</td><td><code class="inline">npm install -g @anthropic-ai/claude-code</code></td><td>已經在用 Node.js 工具鏈、要釘版本的人</td></tr>
           </tbody>
         </table>
@@ -1534,8 +1537,43 @@ pip install anthropic</code></pre>
         <p>第 8 章講了 MCP 是什麼，這裡講手怎麼動——兩個入口：</p>
         <ul>
           <li><strong>claude.ai / Cowork（給一般使用者）</strong>：<code class="inline">Settings → Connectors</code> → 選服務（Notion、Gmail、Google Drive…）→ 走該服務的 OAuth 授權。之後對話裡需要時 Claude 會主動用，或你直接指名「用我的 Notion 連接器查…」。</li>
-          <li><strong>Claude Code（給開發者）</strong>：終端機 <code class="inline">claude mcp add &lt;名字&gt; &lt;啟動指令&gt;</code> 掛上一個 server，<code class="inline">claude mcp list</code> 看已接哪些，互動模式裡用 <code class="inline">/mcp</code> 管理與除錯。</li>
+          <li><strong>Claude Code（給開發者）</strong>：用 <code class="inline">claude mcp</code> 這組指令管理——這就是大家說的「MCP CLI」。完整用法如下。</li>
         </ul>
+        <h4>「MCP CLI」：<code class="inline">claude mcp</code> 指令全覽</h4>
+        <div class="code-block" data-lang="bash">
+<div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>terminal</span><button class="copy-btn">複製</button></div>
+<pre><code># 掛一個本機 server（stdio：用指令啟動一個程序）
+claude mcp add my-server -- npx -y @some/mcp-server
+
+# 掛一個遠端 server（http）
+claude mcp add my-remote --transport http https://example.com/mcp
+
+# 從文件貼來的 JSON 設定直接加
+claude mcp add-json my-server '{"command":"node","args":["server.js"]}'
+
+# 看有哪些、看某一個的細節、移除
+claude mcp list
+claude mcp get my-server
+claude mcp remove my-server
+
+# 指定作用範圍（-s）：local 預設只有你這專案｜project 寫進 .mcp.json 給全隊｜user 你所有專案都有
+claude mcp add my-server -s project -- node server.js
+claude mcp add my-server -s user    -- node server.js
+
+# 互動模式裡：列出、看連線狀態、除錯
+/mcp</code></pre>
+        </div>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>作用範圍 <code class="inline">-s</code></th><th>存在哪</th><th>誰看得到</th><th>用途</th></tr></thead>
+          <tbody>
+            <tr><td><code class="inline">local</code>（預設）</td><td>你的個人設定，綁這個專案</td><td>只有你、只在這專案</td><td>自己試、還沒要分享</td></tr>
+            <tr><td><code class="inline">project</code></td><td>專案根目錄的 <code class="inline">.mcp.json</code>，可 commit</td><td>全隊（拉下 repo 就有）</td><td>團隊共用的工具，例如公司內部 API</td></tr>
+            <tr><td><code class="inline">user</code></td><td>你的使用者設定</td><td>只有你、但你所有專案都有</td><td>你個人常用的通用工具，例如筆記、日曆</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note"><strong>stdio vs http</strong>：<code class="inline">stdio</code> 是「在你電腦上啟動一個程序、用標準輸入輸出對話」，本機開發最簡單；<code class="inline">http</code> 是「連到一個網址」，遠端或多人共用的 server 用這個。掛好之後不用再做什麼——它們會出現在第 2 步（組裝 context）的工具清單裡，Claude 需要時自己呼叫。</p>
         <p class="note">授權外部服務等於把讀（有時可寫）的權限交給 Claude，第一次連會顯示要授權的範圍，看清楚再同意。</p>
         <h4>自己寫一個 MCP server（開發者）</h4>
         <ul>
@@ -1830,6 +1868,7 @@ pip install anthropic</code></pre>
             <tr><td><strong>Agent 架構模式</strong></td><td><em>平行化</em>（同時跑多個子任務）、<em>鏈接</em>（一步接一步）、<em>路由</em>（先分類再派給對的處理）</td><td>設計多步驟自動化系統</td></tr>
             <tr><td><strong>Managed agents</strong></td><td>讓 Anthropic 幫你跑沙箱化的 agent 迴圈，你只消費它回報的事件流</td><td>不想自己管迴圈、狀態與長時間執行時</td></tr>
             <tr><td><strong>Computer use</strong></td><td>讓 Claude 看螢幕、動滑鼠鍵盤操作 UI</td><td>沒有 API 的舊系統或純介面操作的自動化</td></tr>
+            <tr><td><strong>Citations 引用生成</strong></td><td>回答時標出每句話根據你給的哪份文件、哪一段</td><td>要可查證、可追溯來源的回答（法務、研究、客服知識庫）</td></tr>
           </tbody>
         </table>
         </div>
@@ -2021,6 +2060,8 @@ pip install anthropic</code></pre>
         <table>
           <thead><tr><th>名詞</th><th>白話解釋</th></tr></thead>
           <tbody>
+            <tr><td>CLI</td><td>Command Line Interface，指令列介面——「用打字下指令」的操作方式，跟用滑鼠點的 GUI 相對。Claude Code CLI＝用打字操作的 Claude Code；MCP CLI＝用 <code class="inline">claude mcp</code> 指令管 MCP server</td></tr>
+            <tr><td>終端機 / Shell</td><td>終端機（Terminal）是那個視窗程式；Shell 是裡面讀你指令的直譯器（macOS 預設 zsh）</td></tr>
             <tr><td>Token</td><td>模型處理文字的最小單位，計費就是按 token 算（約 1 token ≈ 英文 4 字元 / 中文 1～2 字）</td></tr>
             <tr><td>Context window</td><td>模型一次能看的 token 上限，對話越長越吃它</td></tr>
             <tr><td>System prompt</td><td>給模型的「開場設定」——身份、任務框架、一律遵守的規則</td></tr>
