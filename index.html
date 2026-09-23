@@ -568,6 +568,8 @@
       <a href="#claudecode"><span class="idx">[7]</span>claude_code</a>
       <a href="#ecosystem"><span class="idx">[8]</span>ecosystem</a>
       <a href="#practical"><span class="idx">[9]</span>practical_usage</a>
+      <a href="#gitflow"><span class="idx">[⑂]</span>git_and_github</a>
+      <a href="#deploy"><span class="idx">[↑]</span>deployment</a>
       <a href="#features"><span class="idx">[10]</span>feature_reference</a>
       <a href="#extensions"><span class="idx">[11]</span>developer_extensions</a>
       <div class="nav-divider">系統視角</div>
@@ -594,7 +596,7 @@
       </div>
       <h2>Claude 全貌指南<br><span class="b">{ 從產品到 JSON，從 JSON 到程式怎麼跑 }</span></h2>
       <p class="lead">一份分區介紹手冊。把 claude.ai、Claude API、Claude Code、Claude Design 這些「外殼」，跟底下那套 messages / tool_use / code_execution 的 JSON 機制，攤開來一次看完。</p>
-      <div class="meta">給開發者和一般使用者 · 17 個章節 · 含可複製的程式碼範例</div>
+      <div class="meta">給開發者和一般使用者 · 19 個章節 · 含可複製的程式碼範例</div>
       <div class="scroll-cue"><span class="arrow">↓</span> 往下捲動，從總覽開始</div>
     </section>
 
@@ -1320,6 +1322,7 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
           <li><strong>隨處工作</strong>（官方整合表）：<strong>Remote Control</strong>——從手機或另一台裝置接續本機正在跑的 session；<strong><code class="inline">claude --cloud</code></strong>——本機起頭、到 Claude 手機 App 繼續；<strong>Channels</strong>——把 Telegram、Discord、iMessage 或你自己的 webhook 事件推進 session（例如訊息一來就觸發任務）；<strong>Slack</strong>——把 bug 回報直接轉成 pull request。</li>
           <li><strong>打包成 Plugin</strong>：把你調好的一整套（CLAUDE.md、skills、hooks、MCP）包成外掛，全隊一鍵安裝。</li>
         </ul>
+        <p class="note">不熟 git、PR、CI、worktree 這些詞？它們是 Claude Code 的地基，<a href="#gitflow">Git 與 GitHub 章</a>有完整定義與情境。</p>
         <p class="note"><strong>驗證原則</strong>：你看得越少，事後要驗得越多——無人監督跑完的東西，驗證力度要跟監督程度成反比；能用 hooks 把「測試沒過就不算完成」寫死，就別靠肉眼。CLAUDE.md、hooks、plugins、session log 與 harness engineering 的完整定義見 <a href="#features">第 10 章</a>；終端機指令與斜線指令見 <a href="#practical">第 9 章</a>。</p>
         <div class="closing-brace">}</div>
       </div>
@@ -1612,6 +1615,226 @@ claude mcp add my-server -s user    -- node server.js
           <li><strong>延伸到瀏覽器與 Office</strong>：透過 <strong>Claude in Chrome</strong> 操作網頁工具，透過 <strong>Claude for Microsoft 365</strong> 在 Word / Excel / PowerPoint / Outlook 裡工作。</li>
         </ul>
         <p class="note">本指南從歸檔、寫文件到部署網站，全程就是在 Cowork 裡完成的——彙整資料夾 <code class="inline">Claude instruction</code> 就是「工作資料夾」，<code class="inline">README.md</code> 的規則就是「常駐脈絡」。</p>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <!-- ============ GIT & GITHUB ============ -->
+    <section class="chapter" id="gitflow">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">git_and_github</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">Git 與 GitHub — 為什麼 AI 寫程式之後，這件事反而更重要</p>
+      <div class="content">
+        <p>前面一直出現 git、commit、PR、CI、worktree 這些詞。它們不是 Claude 的功能，而是<strong>軟體世界的共同基礎設施</strong>——Claude Code 之所以敢大膽改你的檔案，正是因為有 git 當安全網。<strong>AI 寫得越快，你越需要 git</strong>：改動量變大、你沒有逐行盯，唯一能讓你「隨時退回去」「看清它到底改了什麼」的就是版本控制。</p>
+
+        <h3>先分清楚：Git ≠ GitHub</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th></th><th>是什麼</th><th>比喻</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Git</strong></td><td>跑在你電腦上的版本控制程式，記錄每次改動、可回溯、可分支</td><td>你電腦裡的「無限次回復鍵 + 平行時空」</td></tr>
+            <tr><td><strong>GitHub</strong></td><td>把 git 倉庫放到雲端的服務，加上協作功能（PR、審查、CI、Issues）</td><td>大家共用的雲端書庫 + 討論區 + 自動檢查員</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">本指南網站就是活例子：<code class="inline">deploy.command</code> 做的就是「git 記錄改動 → 推上 GitHub → GitHub Pages 自動發佈」。</p>
+
+        <h3>核心名詞：一句話定義 + 什麼時候會用到</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>名詞</th><th>白話定義</th><th>情境</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Repository（repo）</strong></td><td>一個被 git 管理的專案資料夾，含完整歷史</td><td>一個網站、一個 App＝一個 repo；設為 public 全世界可見、private 只有你邀請的人看得到</td></tr>
+            <tr><td><strong>Fork</strong></td><td>把別人的 repo 複製一整份到自己帳號下</td><td>想改開源專案、或以別人的專案為起點做自己的版本</td></tr>
+            <tr><td><strong>Commit</strong></td><td>一次「存檔點」，含改了什麼＋為什麼（訊息）</td><td>完成一小塊就存一次，訊息寫「為什麼」比「改了什麼」有用</td></tr>
+            <tr><td><strong>Branch 分支</strong></td><td>從主線拉出的平行版本，改壞不影響 main</td><td>每做一個新功能／修一個 bug 就開一條</td></tr>
+            <tr><td><strong>main</strong></td><td>主線分支，通常保持「隨時可上線」</td><td>別直接在上面亂改，透過 PR 合併進來</td></tr>
+            <tr><td><strong>Clone</strong></td><td>把雲端的 repo<strong>整包複製</strong>到你電腦（含完整歷史）</td><td>第一次拿到一個專案；換電腦；<code class="inline">git clone &lt;網址&gt;</code></td></tr>
+            <tr><td><strong>Push / Pull</strong></td><td>把本機 commit 推上遠端／把遠端更新拉下來</td><td>推之前先拉，避免跟別人的改動打架</td></tr>
+            <tr><td><strong>Merge 合併</strong></td><td>把一條分支的改動併回另一條</td><td>功能做完，合回 main</td></tr>
+            <tr><td><strong>Conflict 衝突</strong></td><td>兩邊改到同一行，git 不知道要誰的</td><td>手動選擇保留哪一版，或請 Claude 幫你判讀</td></tr>
+            <tr><td><strong>PR（Pull Request）</strong></td><td>「我想把這條分支合進 main，請看一下」的正式提案，可討論、可留行內意見</td><td>團隊協作的核心；也是 CI 自動檢查的觸發點</td></tr>
+            <tr><td><strong>Code Review</strong></td><td>合併前由人（或 Claude）逐行審查</td><td>抓 bug、確保風格一致、知識共享</td></tr>
+            <tr><td><strong>CI（持續整合）</strong></td><td>每次 push / 開 PR 就自動跑測試、lint、建置</td><td>沒過就不准合併——自動把關</td></tr>
+            <tr><td><strong>CD（持續部署）</strong></td><td>通過後自動發佈上線</td><td>本站的 GitHub Pages 自動部署就是</td></tr>
+            <tr><td><strong>Worktree</strong></td><td>同一個 repo 同時簽出多個分支到<strong>不同資料夾</strong>，各自獨立</td><td>手上功能做到一半，臨時要修 hotfix 或審 PR，不用 stash 切來切去</td></tr>
+            <tr><td><strong>Stash</strong></td><td>把未完成的改動暫時收起來</td><td>worktree 的輕量替代，臨時切一下用</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h3>最常見的工作流：Feature Branch（含 Claude 的位置）</h3>
+        <div class="steps">
+          <div class="step"><span class="sn">1</span><div>從 main 開新分支：<code class="inline">git switch -c fix-login</code>（<em>Claude 可代勞</em>）</div></div>
+          <div class="step"><span class="sn">2</span><div>做事、分次 commit：<code class="inline">git add -A &amp;&amp; git commit -m "修正登入逾時"</code>（<em>請 Claude 寫 commit 訊息很好用</em>）</div></div>
+          <div class="step"><span class="sn">3</span><div>推上去：<code class="inline">git push -u origin fix-login</code></div></div>
+          <div class="step"><span class="sn">4</span><div>在 GitHub 開 <strong>PR</strong> → <strong>CI 自動跑</strong>測試與 lint → <strong>Code Review</strong>（可用 Claude 的 managed code review 自動審）</div></div>
+          <div class="step"><span class="sn">5</span><div>綠燈後 <strong>Merge 進 main</strong> → CD 自動部署 → 刪掉分支</div></div>
+        </div>
+        <p class="note">團隊策略兩大流派：<strong>GitHub Flow</strong>（每個改動開分支 → PR → 合回 main，main 永遠可上線，最通用）與 <strong>Trunk-Based</strong>（大家直接往 main 提交、分支極短命、未完成功能用 feature flag 藏起來，要求 CI 快又可靠）。個人專案用 GitHub Flow 就夠。</p>
+
+        <h3>別人怎麼參與我的專案：Fork、PR、Collaborator</h3>
+        <p>最常見的誤解：以為「開 PR ＝ 把專案分享出去給人用」。其實<strong>開 PR 這個動作本身不會讓任何人拿到你的程式</strong>——PR 是「我改好了，請你審核後合進 main」的提案，對象是有權限的協作者。別人能不能拿到你的程式，只取決於 <strong>repo 是 public 還是 private</strong>：public 的話任何人都能 <code class="inline">git clone</code> 下來跑，private 只有你邀請的人看得到。</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>方式</th><th>白話</th><th>怎麼做</th><th>誰能合併進 main</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Clone</strong></td><td>拿一份下來自己跑</td><td><code class="inline">git clone &lt;網址&gt;</code>（public 即可）</td><td>不涉及合併，純使用</td></tr>
+            <tr><td><strong>Fork</strong></td><td>複製一整份到<strong>他自己的帳號</strong>下，愛怎麼改都行</td><td>GitHub 頁面右上角 Fork 鈕</td><td>他改他自己那份，動不到你的</td></tr>
+            <tr><td><strong>Fork ＋ PR</strong></td><td>他改完後「把改動送回來請你收」</td><td>在他的 fork 改好 → 對你的 repo 開 PR</td><td><strong>只有你</strong>——你可以審查、要求修改、或直接拒絕</td></tr>
+            <tr><td><strong>Collaborator</strong></td><td>給他一把直接進來的鑰匙</td><td>repo Settings → Collaborators 邀請</td><td>他能直接推分支、開 PR（可設規則要求審查才准合）</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">一句話記法：<strong>Fork 是「拿走一份自己玩」，PR 是「把改動送回來請你收」，Collaborator 是「給他鑰匙」。</strong> 不管哪一種，<strong>main 的控制權永遠在你手上</strong>——這正是開源專案敢公開程式碼的原因：全世界都能改自己那份，但要進官方版得過你這關。</p>
+
+        <h3>重要：git 不是 Google Docs 式的即時共編</h3>
+        <p>很多人以為「共編一份 App」像 Google Docs 那樣多人同時打同一份檔案、即時看到對方游標——<strong>git 完全不是這樣</strong>。</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th></th><th>Google Docs</th><th>Git / GitHub</th></tr></thead>
+          <tbody>
+            <tr><td>同時編輯</td><td>即時，馬上看到對方打字</td><td>各自在<strong>自己的分支與電腦</strong>上改，看不到對方當下在做什麼</td></tr>
+            <tr><td>怎麼合併</td><td>自動即時合併</td><td>改完 push、開 PR、<strong>明確地 merge</strong> 才會合在一起</td></tr>
+            <tr><td>改到同一處</td><td>系統自動處理</td><td>產生 <strong>conflict</strong>，要人決定留誰的版本</td></tr>
+            <tr><td>版本紀錄</td><td>有，但較難逐行追溯</td><td>每次 commit 都是明確存檔點，可精準回溯任一版本</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">這個「非即時」的設計不是缺點，而是<strong>刻意的</strong>：它讓每個改動都經過「提案 → 檢查 → 合併」，程式才不會被不小心改壞。也正因為這樣，才需要分支、PR、code review、CI 這一整套。想降低 conflict 的實務做法：一人一個明確任務、盡量別同時改同一批檔案（這也是 <a href="#gitflow">worktree 與多個 Claude session 平行</a>時的同一條原則）。</p>
+
+        <h3>Worktree：為什麼它跟 AI 特別搭</h3>
+        <p>傳統痛點：你正在改功能，同事請你審 PR，或線上出事要 hotfix——得先 stash、切分支、重裝套件，回來還得想「我剛做到哪」，一次切換成本 10–15 分鐘還打斷專注。<strong>Worktree 讓每條分支待在各自的資料夾</strong>，直接 <code class="inline">cd</code> 過去就好，不用 stash。</p>
+        <div class="code-block" data-lang="bash">
+<div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>terminal</span><button class="copy-btn">複製</button></div>
+<pre><code># 開一個新 worktree（新資料夾 + 新分支），本機功能原封不動
+git worktree add ../hotfix -b hotfix-urgent
+
+# 看有哪些、用完移除
+git worktree list
+git worktree remove ../hotfix
+
+# Claude Code 內建支援：直接在隔離 worktree 裡開一個 session
+claude --worktree feature-a</code></pre>
+        </div>
+        <p class="note">跟 AI 搭的原因：你可以<strong>讓多個 Claude session 平行做事互不打架</strong>——一個在 <code class="inline">feature-a</code> 蓋功能、一個在 <code class="inline">hotfix</code> 修 bug。Desktop 的平行 session 就是自動幫你開 worktree（見 <a href="#claudecode">第 7 章</a>）。注意：適合<strong>彼此獨立、30 分鐘以上</strong>的大任務；小修 bug 或兩個任務會改到同一批檔案時，反而別用。</p>
+
+        <h3>CI 實際長什麼樣</h3>
+        <p>CI 檔放在 repo 的 <code class="inline">.github/workflows/</code> 底下，用 YAML 描述「什麼時候觸發、在哪跑、做哪些事」。下面是最典型的「PR 一開就自動測試」：</p>
+        <div class="code-block" data-lang="bash">
+<div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>.github/workflows/ci.yml</span><button class="copy-btn">複製</button></div>
+<pre><code>name: CI
+on:                      # 觸發時機
+  push: { branches: [main] }
+  pull_request: { branches: [main] }
+jobs:
+  test:
+    runs-on: ubuntu-latest      # 在 GitHub 提供的機器上跑
+    steps:
+      - uses: actions/checkout@v4       # 把程式碼抓下來
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -r requirements.txt
+      - run: ruff check .               # lint：檢查風格
+      - run: pytest                     # test：跑測試</code></pre>
+        </div>
+        <p class="note">CI 常跑的四件事：<strong>lint</strong>（風格）、<strong>test</strong>（功能對不對）、<strong>build</strong>（能不能順利建置）、<strong>security scan</strong>（有無已知漏洞）。價值在於「沒過就不能合併」——把人不會每次都記得做的檢查變成強制。這跟 <a href="#features">第 10 章的 hooks</a> 是同一個精神，只是一個在雲端管 PR、一個在本機管每一步。</p>
+
+        <h3>AI 把程式改壞了，怎麼救</h3>
+        <p>這是非技術背景用 AI 寫程式最該先學的一件事。<strong>先問自己：改動存過 commit 了嗎？</strong> 答案決定用哪招：</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>狀況</th><th>怎麼救</th><th>指令</th></tr></thead>
+          <tbody>
+            <tr><td>還沒 commit，想丟掉某個檔的改動</td><td>把該檔還原成上次 commit 的樣子</td><td><code class="inline">git restore &lt;檔案&gt;</code></td></tr>
+            <tr><td>還沒 commit，全部都不要了</td><td>整個工作區還原</td><td><code class="inline">git restore .</code></td></tr>
+            <tr><td>已經 commit，想撤銷某一次改動</td><td>產生一個「反向」commit，歷史保留、最安全</td><td><code class="inline">git revert &lt;commit 代號&gt;</code></td></tr>
+            <tr><td>想看回到某個時間點長怎樣</td><td>先查歷史拿代號，再切過去看（不會動到 main）</td><td><code class="inline">git log --oneline</code> → <code class="inline">git switch -d &lt;代號&gt;</code></td></tr>
+            <tr><td>已經 push 上去了</td><td>一樣用 revert 再 push，別用強制覆蓋</td><td><code class="inline">git revert &lt;代號&gt; &amp;&amp; git push</code></td></tr>
+            <tr><td>完全搞不清楚現在什麼狀態</td><td>先看狀態與差異，再決定</td><td><code class="inline">git status</code>、<code class="inline">git diff</code></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note"><strong>最好的保險是「常 commit」</strong>：每完成一小塊就存一次，出事時損失最多就是那一小塊。反過來說，讓 AI 連續改兩小時都沒 commit，才是真正的風險。另外少用 <code class="inline">git reset --hard</code>——它會真的刪掉東西且難以挽回，<code class="inline">revert</code> 幾乎都能達到目的又保留歷史。</p>
+
+        <h3>給非工程背景的最小可用組合</h3>
+        <ul>
+          <li><strong>只要三件事</strong>：改完 → <code class="inline">git add -A &amp;&amp; git commit -m "說明"</code> → <code class="inline">git push</code>。你的 <code class="inline">deploy.command</code> 就是把這三步包成按一下。</li>
+          <li><strong>拿到別人的專案</strong>：<code class="inline">git clone &lt;網址&gt;</code> 複製下來 → 之後用 <code class="inline">git pull</code> 保持最新。</li>
+          <li><strong>不確定就問 Claude</strong>：把終端機的錯誤訊息整段貼給它，比自己猜快得多——你之前遇到的 <code class="inline">index.lock</code> 就是這樣解掉的。</li>
+        </ul>
+        <div class="closing-brace">}</div>
+      </div>
+    </section>
+
+    <!-- ============ DEPLOYMENT ============ -->
+    <section class="chapter" id="deploy">
+      <div class="chap-head">
+        <span class="brace">{</span>
+        <h2><span class="quote">"</span><span class="key">deployment</span><span class="quote">"</span>:</h2>
+      </div>
+      <p class="chap-sub">部署上線 — 東西做好了，怎麼讓別人也打得開</p>
+      <div class="content">
+        <p>用 AI 做出小工具之後，把網址傳給朋友，對方回你「<strong>打不開</strong>」——幾乎每個人都踩過這個坑。<strong>停在這一步的專案，比寫壞的程式還多。</strong></p>
+
+        <h3>為什麼 localhost 別人打不開</h3>
+        <p><code class="inline">localhost</code>（或 <code class="inline">127.0.0.1:3000</code>）的意思就是「<strong>這台電腦自己</strong>」。你把這個網址傳給朋友，他的瀏覽器會去找<em>他自己</em>的電腦，當然什麼都沒有。而且你的程式是跑在你開著的終端機裡，你一關視窗、電腦一睡，它就停了。</p>
+        <p>所以<strong>部署</strong>要解決三件事——用開店比喻最好懂：</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>開店</th><th>對應到部署</th><th>為什麼需要</th></tr></thead>
+          <tbody>
+            <tr><td>租一間不打烊的店面</td><td>找一台 24 小時開著的伺服器</td><td>你的電腦會關機，它不會</td></tr>
+            <tr><td>把整套廚房搬過去</td><td>把程式碼與執行環境（套件、版本）搬上去</td><td>只搬程式碼、沒搬環境，一樣跑不起來</td></tr>
+            <tr><td>門口掛招牌</td><td>綁一個網址（網域）＋ HTTPS 憑證</td><td>別人要有路可以找到你、而且連線是加密的</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h3>三個問題，決定你該用哪個平台</h3>
+        <div class="steps">
+          <div class="step"><span class="sn">1</span><div><strong>你的東西需不需要「後端」？</strong>只有畫面、資料寫死在檔案裡＝<em>靜態</em>；要登入、存資料、呼叫 API 金鑰＝<em>要後端</em>。</div></div>
+          <div class="step"><span class="sn">2</span><div><strong>要不要存資料？</strong>要存使用者資料就得配資料庫（見 <a href="#aicoding">第 12 章「記憶積木」</a>）。</div></div>
+          <div class="step"><span class="sn">3</span><div><strong>有沒有長時間執行的工作？</strong>排程、背景任務、WebSocket 即時連線——有的話不能只用 serverless。</div></div>
+        </div>
+
+        <h3>平台分類與推薦</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>類型</th><th>適合</th><th>代表平台</th><th>費用感</th></tr></thead>
+          <tbody>
+            <tr><td><strong>靜態託管</strong></td><td>純畫面：作品集、說明頁、文件站、AI 生的 landing page</td><td>GitHub Pages（本站用的）、Cloudflare Pages、Netlify</td><td>幾乎都免費</td></tr>
+            <tr><td><strong>Serverless / 前端優先</strong></td><td>前端為主、少量 API；Next.js 類專案</td><td>Vercel、Netlify、Cloudflare</td><td>免費額度夠個人用</td></tr>
+            <tr><td><strong>真正的伺服器 / 容器</strong></td><td>要長時間執行、WebSocket、背景工作、自訂環境、SQLite 或本機檔案</td><td>Render、Railway</td><td>多半要付費</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">最常見的誤判：以為 serverless 什麼都能跑。<strong>serverless 上「SQLite 與寫入本機檔案」不會正常運作</strong>（每次請求的環境是臨時的），需要這些就得選真正的伺服器型平台，或改用雲端資料庫。不確定就把你的專案描述給 Claude，請它判斷屬於哪一類。</p>
+
+        <h3>交給 AI 做，但你要看得懂後台</h3>
+        <p>部署本身可以整段交給 Claude Code（「幫我把這個專案部署到 Vercel」），但上線後<strong>你得自己看得懂四個地方</strong>：</p>
+        <ul>
+          <li><strong>Deployments（部署紀錄）</strong>——每次推送都會產生一筆，綠勾＝成功、紅叉＝失敗。你在 GitHub Pages 遇過的那次紅叉就是這個。</li>
+          <li><strong>Build logs（建置紀錄）</strong>——失敗時點進去看，錯誤訊息整段貼給 Claude 最快。</li>
+          <li><strong>Environment Variables（環境變數）</strong>——API 金鑰放這裡，<strong>不是寫在程式碼裡</strong>。</li>
+          <li><strong>Domains（網域）</strong>——預設會給你一個免費網址，也可以綁自己買的網域。</li>
+        </ul>
+
+        <h3>上線前的資安檢查</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>風險</th><th>正確做法</th></tr></thead>
+          <tbody>
+            <tr><td><strong>API 金鑰寫死在程式碼裡</strong>，推上公開 repo</td><td>放進平台的環境變數；本機用 <code class="inline">.env</code> 檔並把 <code class="inline">.env</code> 加進 <code class="inline">.gitignore</code></td></tr>
+            <tr><td>金鑰已經不小心推上去了</td><td><strong>立刻到服務商後台撤銷該金鑰重發</strong>——光把它從程式碼刪掉沒用，git 歷史裡還留著</td></tr>
+            <tr><td>前端程式碼裡放金鑰</td><td>前端的東西使用者都看得到。需要金鑰的呼叫一律走後端</td></tr>
+            <tr><td>測試資料、後台頁面忘了拿掉</td><td>上線前自己用無痕視窗走一遍，看看沒登入的人看得到什麼</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">被盜用的金鑰不只是資料外洩——真實案例是有人拿去開礦機、帳單記在你頭上。這也是 <a href="#practical">第 9 章</a>說「API key 存環境變數、不要寫死」的原因。部署與 CI/CD 的關係見 <a href="#gitflow">Git 與 GitHub 章</a>：push 觸發 CI 檢查、通過後自動部署，就是本站 <code class="inline">deploy.command</code> 按一下會發生的事。</p>
         <div class="closing-brace">}</div>
       </div>
     </section>
@@ -2087,6 +2310,8 @@ claude mcp add my-server -s user    -- node server.js
           <li><a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool" target="_blank" rel="noopener">Code execution 工具細節</a></li>
           <li><a href="https://code.claude.com/docs/en/overview" target="_blank" rel="noopener">Claude Code 文件</a></li>
           <li><a href="https://support.claude.com" target="_blank" rel="noopener">claude.ai 使用說明</a></li>
+          <li><a href="https://www.youtube.com/watch?v=atqcAb7MFAM" target="_blank" rel="noopener">給非技術人員的 GitHub 教學（Gary Chen，中文）</a> — 19 分鐘影片，白話講 Git/GitHub、commit、branch、worktree、PR 與「改壞怎麼救」，對應本站 <a href="#gitflow">Git 與 GitHub 章</a></li>
+          <li><a href="https://www.youtube.com/watch?v=6bvEcpm72W0" target="_blank" rel="noopener">給非技術人員的部署教學（Gary Chen，中文）</a> — 同系列，用開餐廳比喻講部署、三個問題選平台、看懂後台與資安提醒，對應本站 <a href="#deploy">部署上線章</a></li>
           <li><a href="https://academy.claude.com/zh-TW" target="_blank" rel="noopener">Claude Academy</a> — Anthropic 官方免費課程：AI 流暢度、Claude 101、Claude Code 101 / 實戰、Cowork 簡介、Platform 101、API 大課、MCP、子代理、代理技能等，本指南多章內容取材自此</li>
         </ul>
         <div class="closing-brace">}</div>
