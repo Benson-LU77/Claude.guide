@@ -1690,6 +1690,52 @@ claude mcp add my-server -s user    -- node server.js
         </div>
         <p class="note">一句話記法：<strong>Fork 是「拿走一份自己玩」，PR 是「把改動送回來請你收」，Collaborator 是「給他鑰匙」。</strong> 不管哪一種，<strong>main 的控制權永遠在你手上</strong>——這正是開源專案敢公開程式碼的原因：全世界都能改自己那份，但要進官方版得過你這關。</p>
 
+        <h3>實際操作：在哪個程式、點哪裡</h3>
+        <p>上面講的是概念，這裡講手怎麼動。先建立最重要的分工觀念——<strong>兩個地方各做各的事</strong>：</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>在哪裡</th><th>做什麼</th><th>為什麼在這</th></tr></thead>
+          <tbody>
+            <tr><td><strong>終端機</strong>（你的電腦）</td><td>clone、開分支、改檔、commit、push</td><td>程式碼在你電腦上，這些動作都是在動本機檔案</td></tr>
+            <tr><td><strong>瀏覽器</strong>（github.com）</td><td>Fork、開 PR、審查、合併、邀請協作者、改 public/private</td><td>這些是「跟別人互動」的事，發生在雲端那份</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">記法：<strong>「改東西在終端機，談事情在網頁」</strong>。唯一例外是 GitHub CLI（<code class="inline">gh</code>），它讓你在終端機也能開 PR，但不裝也完全沒問題。</p>
+
+        <h4>情境 A：我要開一個 PR（改自己或有權限的 repo）</h4>
+        <div class="steps">
+          <div class="step"><span class="sn">1</span><div><strong>終端機</strong>：開分支並改東西 → <code class="inline">git switch -c fix-login</code>，改完 <code class="inline">git add -A &amp;&amp; git commit -m "修正登入"</code></div></div>
+          <div class="step"><span class="sn">2</span><div><strong>終端機</strong>：推上去 → <code class="inline">git push -u origin fix-login</code>。推完終端機會印一行 <code class="inline">https://github.com/…/pull/new/fix-login</code> 的網址</div></div>
+          <div class="step"><span class="sn">3</span><div><strong>瀏覽器</strong>：點那行網址（或到 repo 頁面，會看到黃色橫幅「<em>Compare &amp; pull request</em>」按鈕）</div></div>
+          <div class="step"><span class="sn">4</span><div><strong>瀏覽器</strong>：填標題與說明 → 按綠色 <strong>Create pull request</strong>。這時 CI 會自動開始跑</div></div>
+          <div class="step"><span class="sn">5</span><div><strong>瀏覽器</strong>：等綠勾 → 按 <strong>Merge pull request</strong> → <strong>Confirm merge</strong> → 按 <strong>Delete branch</strong> 清掉分支</div></div>
+          <div class="step"><span class="sn">6</span><div><strong>終端機</strong>：回到主線拿最新版 → <code class="inline">git switch main &amp;&amp; git pull</code></div></div>
+        </div>
+
+        <h4>情境 B：我要改別人的開源專案</h4>
+        <div class="steps">
+          <div class="step"><span class="sn">1</span><div><strong>瀏覽器</strong>：到對方 repo 頁面，右上角按 <strong>Fork</strong> → 複製一份到你帳號下</div></div>
+          <div class="step"><span class="sn">2</span><div><strong>終端機</strong>：clone <em>你自己那份</em>（網址是 <code class="inline">github.com/你的帳號/專案名</code>）→ 開分支 → 改 → commit → push</div></div>
+          <div class="step"><span class="sn">3</span><div><strong>瀏覽器</strong>：回到<em>你的 fork</em> 頁面 → 按 <strong>Contribute</strong> → <strong>Open pull request</strong>（目標會自動指向原作者的 repo）</div></div>
+          <div class="step"><span class="sn">4</span><div>等原作者審查。他可能留言要求修改——你只要在同一條分支繼續 commit + push，PR 會<strong>自動更新</strong>，不用重開</div></div>
+        </div>
+
+        <h4>情境 C：我要找人一起做（邀請協作者）</h4>
+        <div class="steps">
+          <div class="step"><span class="sn">1</span><div><strong>瀏覽器</strong>：repo 頁面 → 上方 <strong>Settings</strong> → 左側 <strong>Collaborators</strong> → <strong>Add people</strong> → 輸入對方 GitHub 帳號</div></div>
+          <div class="step"><span class="sn">2</span><div>對方收到邀請信、點接受後，就能 clone 並直接推分支</div></div>
+          <div class="step"><span class="sn">3</span><div>（建議）<strong>Settings → Branches → Add branch protection rule</strong>，保護 <code class="inline">main</code>：要求「經過 PR 才能改」「CI 通過才能合併」，避免有人直接推壞主線</div></div>
+        </div>
+
+        <h4>情境 D：改 public / private、看有誰在用</h4>
+        <ul>
+          <li><strong>切換公開/私有</strong>：repo → <strong>Settings</strong> → 最下方 <strong>Danger Zone</strong> → <em>Change repository visibility</em></li>
+          <li><strong>看誰 fork 或 star</strong>：repo 頁面右上角的 <strong>Fork</strong> / <strong>Star</strong> 數字，點下去看得到名單</li>
+          <li><strong>讓別人知道怎麼用</strong>：在 repo 根目錄放一個 <code class="inline">README.md</code>，GitHub 會自動顯示在首頁——這是別人第一眼會看到的東西</li>
+        </ul>
+        <p class="note">全程都可以交給 Claude Code：直接說「幫我開一條分支修這個 bug，改完 commit 並 push」它會代打終端機那幾步；裝了 <code class="inline">gh</code> 的話連「幫我開 PR」都能做。但<strong>合併那一下建議自己在瀏覽器按</strong>——那是最後一道人工確認。</p>
+
         <h3>重要：git 不是 Google Docs 式的即時共編</h3>
         <p>很多人以為「共編一份 App」像 Google Docs 那樣多人同時打同一份檔案、即時看到對方游標——<strong>git 完全不是這樣</strong>。</p>
         <div class="table-wrap">
