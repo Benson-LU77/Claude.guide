@@ -102,6 +102,12 @@
     text-overflow:ellipsis;
   }
   nav.tree a .idx{color:var(--type-violet);flex-shrink:0;}
+  nav.tree a .nl{display:flex;flex-direction:column;line-height:1.25;min-width:0;}
+  nav.tree a .nl .zh{font-family:system-ui,-apple-system,"PingFang TC","Noto Sans TC",sans-serif;font-size:.86rem;color:var(--ink);}
+  nav.tree a .nl small{font-size:.68rem;color:var(--ink-faint);overflow:hidden;text-overflow:ellipsis;}
+  nav.tree a.active .nl .zh{color:var(--string-amber);}
+  .content > p.eli5{color:var(--ink);background:var(--bg-panel);border:1px solid var(--border);border-left:3px solid var(--green);padding:.85rem 1.1rem;border-radius:0 8px 8px 0;font-size:1rem;margin-bottom:1.4rem;}
+  .eli5-tag{display:inline-block;font:700 .72rem system-ui,sans-serif;color:var(--bg-deep);background:var(--green);border-radius:4px;padding:.08rem .45rem;margin-right:.55rem;vertical-align:.1em;}
   nav.tree a:hover{background:var(--bg-panel-2);color:var(--ink);}
   nav.tree a.active{
     background:var(--bg-panel-2);
@@ -553,30 +559,30 @@
       <h1>claude<span class="b">.</span>guide<span class="b">.json</span></h1>
     </div>
     <nav class="tree">
-      <a href="#hero"><span class="idx">[*]</span>intro</a>
+      <a href="#hero"><span class="idx">[*]</span><span class="nl"><span class="zh">前言</span><small>intro</small></span></a>
       <div class="nav-divider">一般使用者</div>
-      <a href="#getting-started"><span class="idx">[0]</span>getting_started</a>
-      <a href="#overview"><span class="idx">[1]</span>overview</a>
-      <a href="#claudeai"><span class="idx">[2]</span>claude_ai</a>
-      <a href="#prompting"><span class="idx">[3]</span>prompting_basics</a>
-      <a href="#aifluency"><span class="idx">[✦]</span>ai_fluency</a>
-      <a href="#pipeline"><span class="idx">[⟳]</span>message_pipeline</a>
+      <a href="#getting-started"><span class="idx">[0]</span><span class="nl"><span class="zh">新手入門</span><small>getting_started</small></span></a>
+      <a href="#overview"><span class="idx">[1]</span><span class="nl"><span class="zh">總覽與選擇</span><small>overview</small></span></a>
+      <a href="#claudeai"><span class="idx">[2]</span><span class="nl"><span class="zh">claude.ai 功能</span><small>claude_ai</small></span></a>
+      <a href="#prompting"><span class="idx">[3]</span><span class="nl"><span class="zh">怎麼問問題</span><small>prompting_basics</small></span></a>
+      <a href="#aifluency"><span class="idx">[✦]</span><span class="nl"><span class="zh">AI 素養</span><small>ai_fluency</small></span></a>
+      <a href="#pipeline"><span class="idx">[⟳]</span><span class="nl"><span class="zh">一則訊息的旅程</span><small>message_pipeline</small></span></a>
       <div class="nav-divider">開發者</div>
-      <a href="#api"><span class="idx">[4]</span>api_and_json</a>
-      <a href="#tooluse"><span class="idx">[5]</span>tool_use</a>
-      <a href="#codeexec"><span class="idx">[6]</span>code_execution</a>
-      <a href="#claudecode"><span class="idx">[7]</span>claude_code</a>
-      <a href="#ecosystem"><span class="idx">[8]</span>ecosystem</a>
-      <a href="#practical"><span class="idx">[9]</span>practical_usage</a>
-      <a href="#gitflow"><span class="idx">[⑂]</span>git_and_github</a>
-      <a href="#deploy"><span class="idx">[↑]</span>deployment</a>
-      <a href="#features"><span class="idx">[10]</span>feature_reference</a>
-      <a href="#extensions"><span class="idx">[11]</span>developer_extensions</a>
+      <a href="#api"><span class="idx">[4]</span><span class="nl"><span class="zh">API 與 JSON</span><small>api_and_json</small></span></a>
+      <a href="#tooluse"><span class="idx">[5]</span><span class="nl"><span class="zh">工具調用</span><small>tool_use</small></span></a>
+      <a href="#codeexec"><span class="idx">[6]</span><span class="nl"><span class="zh">程式碼執行</span><small>code_execution</small></span></a>
+      <a href="#claudecode"><span class="idx">[7]</span><span class="nl"><span class="zh">Claude Code</span><small>claude_code</small></span></a>
+      <a href="#ecosystem"><span class="idx">[8]</span><span class="nl"><span class="zh">周邊生態</span><small>ecosystem</small></span></a>
+      <a href="#practical"><span class="idx">[9]</span><span class="nl"><span class="zh">實際操作</span><small>practical_usage</small></span></a>
+      <a href="#gitflow"><span class="idx">[⑂]</span><span class="nl"><span class="zh">Git 與 GitHub</span><small>git_and_github</small></span></a>
+      <a href="#deploy"><span class="idx">[↑]</span><span class="nl"><span class="zh">部署上線</span><small>deployment</small></span></a>
+      <a href="#features"><span class="idx">[10]</span><span class="nl"><span class="zh">功能字典</span><small>feature_reference</small></span></a>
+      <a href="#extensions"><span class="idx">[11]</span><span class="nl"><span class="zh">開發者延伸</span><small>developer_extensions</small></span></a>
       <div class="nav-divider">系統視角</div>
-      <a href="#aicoding"><span class="idx">[12]</span>ai_coding_map</a>
+      <a href="#aicoding"><span class="idx">[12]</span><span class="nl"><span class="zh">AI coding 地圖</span><small>ai_coding_map</small></span></a>
       <div class="nav-divider">其他</div>
-      <a href="#safety"><span class="idx">[13]</span>safety_and_limits</a>
-      <a href="#resources"><span class="idx">[14]</span>resources</a>
+      <a href="#safety"><span class="idx">[13]</span><span class="nl"><span class="zh">安全與限制</span><small>safety_and_limits</small></span></a>
+      <a href="#resources"><span class="idx">[14]</span><span class="nl"><span class="zh">術語表與延伸閱讀</span><small>resources</small></span></a>
     </nav>
     <div class="sidebar-foot">
       2026-06 建立 · 2026-09 更新 · 內容以官方文件最新狀態為準
@@ -594,10 +600,10 @@
       <div class="hero-term">
         <div class="tt-line" id="typeLine"></div>
       </div>
-      <h2>Claude 全貌指南<br><span class="b">{ 從產品到 JSON，從 JSON 到程式怎麼跑 }</span></h2>
-      <p class="lead">一份分區介紹手冊。把 claude.ai、Claude API、Claude Code、Claude Design 這些「外殼」，跟底下那套 messages / tool_use / code_execution 的 JSON 機制，攤開來一次看完。</p>
-      <div class="meta">給開發者和一般使用者 · 19 個章節 · 含可複製的程式碼範例</div>
-      <div class="scroll-cue"><span class="arrow">↓</span> 往下捲動，從總覽開始</div>
+      <h2>Claude 全貌指南<br><span class="b">{ 從「Claude 是什麼」到「做出東西、放上網路」 }</span></h2>
+      <p class="lead">一份給所有人的 Claude 說明書。不管你只是想跟它聊天、想請它幫你做小工具，還是要把它接進自己的程式——這裡從最白話的地方講起，再一路往深處走。每章開頭都有一句「白話一句」，看不懂的名詞隨時到 <a href="#glossary">術語表</a> 查。</p>
+      <div class="meta">給一般使用者與開發者 · 19 個章節 · 含可複製的指令與程式碼</div>
+      <div class="scroll-cue"><span class="arrow">↓</span> 不知道從哪讀？先看 <a href="#getting-started">新手入門</a> 的閱讀路線</div>
     </section>
 
     <!-- ============ 0. GETTING STARTED ============ -->
@@ -608,7 +614,25 @@
       </div>
       <p class="chap-sub">新手第一步 — 帳號、方案、限額</p>
       <div class="content">
+        <p class="eli5"><span class="eli5-tag">白話一句</span>先搞清楚三件事：Claude 是什麼、要不要付錢、以及<strong>你該從哪一章開始讀</strong>（下面有閱讀路線）。</p>
         <p>在談任何技術細節之前，先把最基本的事情講清楚：怎麼開始用、要不要付錢、免費版卡在哪。</p>
+
+        <h3>30 秒搞懂：Claude 是什麼</h3>
+        <p>Claude 是 Anthropic 公司做的 AI 助手。你用打字跟它說話，它能回答問題、寫東西、分析資料；如果你給它權限，它還能<strong>動手做事</strong>——整理你電腦裡的檔案、幫你寫程式和修程式、上網查資料。</p>
+        <p>同一個 Claude 有好幾個「入口」，就像同一家店有門市、外送和企業訂購：<strong>網頁／App 聊天</strong>（最常用）、<strong>Cowork</strong>（桌面上幫你跨檔案做事）、<strong>Claude Code</strong>（幫你寫程式）、<strong>API</strong>（讓工程師把 Claude 接進自己的程式）。</p>
+
+        <h3>你是誰？從這裡開始讀</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>你是</th><th>建議路線</th><th>可以先跳過</th></tr></thead>
+          <tbody>
+            <tr><td><strong>一般使用者</strong><br>想用它聊天、寫東西、整理資料</td><td>新手入門 → <a href="#overview">總覽</a> → <a href="#claudeai">claude.ai 功能</a> → <a href="#prompting">怎麼問問題</a> → <a href="#aifluency">AI 素養</a> → <a href="#safety">安全與限制</a></td><td>API、工具調用、程式碼執行等開發章</td></tr>
+            <tr><td><strong>想做小工具、網站的人</strong><br>（所謂 vibe coding）</td><td>上一條 ＋ <a href="#pipeline">一則訊息的旅程</a> → <a href="#claudecode">Claude Code</a>（先看 Desktop vs 終端機）→ <a href="#practical">實際操作</a>的終端機基礎 → <a href="#gitflow">Git 與 GitHub</a> → <a href="#deploy">部署上線</a> → <a href="#aicoding">AI coding 地圖</a></td><td>API 與 JSON、工具調用的 JSON 細節</td></tr>
+            <tr><td><strong>工程師</strong><br>要把 Claude 接進自己的產品</td><td><a href="#overview">總覽</a> → <a href="#pipeline">一則訊息的旅程</a> → <a href="#api">API</a> → <a href="#tooluse">工具調用</a> → <a href="#codeexec">程式碼執行</a> → <a href="#claudecode">Claude Code</a> → <a href="#extensions">開發者延伸</a> → <a href="#features">功能字典</a></td><td>新手入門、claude.ai 功能</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">讀到看不懂的名詞，不用硬撐——到 <a href="#glossary">術語表</a> 查，每個詞都有一句白話解釋和「在哪章詳細講」。每章開頭的綠色「白話一句」可以先讀，決定要不要往下看。</p>
 
         <h3>怎麼開始</h3>
         <ul>
@@ -647,6 +671,7 @@
       </div>
       <p class="chap-sub">Claude 不是一個東西，是一個產品家族</p>
       <div class="content">
+        <p class="eli5"><span class="eli5-tag">白話一句</span>Claude 是一個「家族」：同一顆大腦，有聊天、桌面助理、寫程式、給工程師接程式等不同入口；模型也有大有小——難的事交給聰明的，簡單大量的事交給便宜快的。</p>
         <p>「Claude」這個名字底下，其實涵蓋三個彼此獨立、但互相串接的產品層：<strong>claude.ai / App</strong>（聊天介面，一般使用者用）、<strong>Claude API</strong>（開發者直接呼叫模型，走 JSON）、<strong>Claude Code</strong>（終端機裡跑的 agentic coding 工具，本身是 API 的重度應用）。這三層共用同一套底層模型，但「怎麼用」「JSON 長什麼樣」「程式碼怎麼跑」是完全不同的問題，所以這份指南分開講。</p>
 
         <h3>模型家族：哪種任務用哪個</h3>
@@ -691,6 +716,7 @@
       </div>
       <p class="chap-sub">一般使用者怎麼用 — 你現在用的就是這層</p>
       <div class="content">
+        <p class="eli5"><span class="eli5-tag">白話一句</span>這是大部分人用 Claude 的地方：打開網頁或 App 跟它聊天。除了回答問題，它還能做出文件、上網查資料、記住你的偏好、接上你的 Gmail 或 Notion。</p>
         <p>這一層對使用者來說是「黑盒子」——不需要懂 JSON，Claude 在背後幫你組好所有 API 請求。重點功能分區：</p>
         <ul>
           <li><strong>對話本體</strong> — 純文字、圖片、檔案上傳都能丟進來問</li>
@@ -737,6 +763,7 @@
       </div>
       <p class="chap-sub">怎麼跟 Claude 講話 — 在學 JSON 之前，先學會「問」</p>
       <div class="content">
+        <p class="eli5"><span class="eli5-tag">白話一句</span>跟 Claude 說話，就像交代工作給一個很聰明、但還不認識你的新同事：講清楚背景、要什麼、做成什麼樣子，結果就會好很多。</p>
         <p>後面幾章會講 API 怎麼打、JSON 怎麼組，但這些都建立在一個更根本的能力上：知道怎麼把需求講清楚。這件事跟懂不懂技術無關。</p>
 
         <h3>基本心態</h3>
@@ -780,6 +807,7 @@
       </div>
       <p class="chap-sub">AI 素養 — 跟 AI 好好協作的思維，模型再怎麼變都適用</p>
       <div class="content">
+        <p class="eli5"><span class="eli5-tag">白話一句</span>會用 AI 不只是會按按鈕，而是知道<strong>什麼事交給它、怎麼講清楚、怎麼檢查它做得對不對、出了事誰負責</strong>——這套思維不管 AI 怎麼升級都用得上。</p>
         <p>前面講「怎麼用」，這章講「怎麼用得好」。這套框架來自 Anthropic 的 Claude Academy，重點不是某個按鈕，而是<strong>與 AI 協作的心智模型</strong>——就算模型和功能一直換，這套思路依然成立。目標是四件事：有效、高效、合乎道德、安全。</p>
 
         <h3>先分清楚：三種互動方式</h3>
@@ -844,6 +872,7 @@
       </div>
       <p class="chap-sub">一則訊息的旅程 — 你打下一行字之後，整條鏈路是怎麼被驅動的</p>
       <div class="content">
+        <p class="eli5"><span class="eli5-tag">白話一句</span>你打一行字按送出之後，背後跑了一整條流水線：先把你的資料打包、交給模型去想，它決定要直接回答還是先去用工具，用完工具再回來想，直到做完為止。</p>
         <p>前面每一章各講一個零件：LLM、context、工具、MCP、CLI、沙箱、記憶。這一章把它們<strong>串成一個循環</strong>——不管你是在 claude.ai 聊天、在 Cowork 派任務、在終端機跑 Claude Code、還是自己打 API，底下走的都是同一條路。看懂這條路，前面所有名詞就各就各位了。</p>
 
         <div class="diagram-wrap">
@@ -945,6 +974,7 @@
       </div>
       <p class="chap-sub">開發者怎麼跟 Claude「對話」— 核心只有一個端點</p>
       <div class="content">
+        <p class="eli5"><span class="eli5-tag">白話一句</span>API 是「讓程式跟 Claude 對話的窗口」：你的程式把問題用固定格式（JSON）寄過去，Claude 用同樣的格式寄回答案——聊天介面背後做的也是同一件事。</p>
         <p>自己寫程式呼叫 Claude，核心只有一個端點：<code class="inline">POST /v1/messages</code>。理解這個端點的 JSON 結構，基本上就理解了 Claude API 的全貌。</p>
 
         <h3>最基本的請求 / 回應</h3>
@@ -1011,6 +1041,7 @@
       </div>
       <p class="chap-sub">Claude 怎麼「做事」而不只是「講話」— 完整 JSON 定義</p>
       <div class="content">
+        <p class="eli5"><span class="eli5-tag">白話一句</span>Claude 本身只會「講話」。要它「做事」（查天氣、查資料庫），它會開一張「請幫我做這件事」的單子，由你的程式或伺服器去執行，再把結果交回給它。</p>
         <p class="note"><strong>Claude 本身永遠不會執行任何東西。</strong> 它只會吐出結構化請求（<code class="inline">tool_use</code> 區塊），告訴你想呼叫什麼工具、帶什麼參數。真正「跑」這件事的，是你的程式碼，或者 Anthropic 的伺服器——取決於工具種類。</p>
 
         <h3>工具的三種類型</h3>
@@ -1196,6 +1227,7 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
       </div>
       <p class="chap-sub">程式碼到底怎麼「跑」起來的</p>
       <div class="content">
+        <p class="eli5"><span class="eli5-tag">白話一句</span>有些事光用想的會算錯，所以 Claude 可以在一台隔離的小電腦（沙箱）裡真的寫程式、跑程式，把算出來的結果或做好的檔案交給你。</p>
         <p>啟用方式很單純，JSON 裡加一個工具宣告，不需要額外參數：</p>
         <div class="code-block" data-lang="json">
 <div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>enable.json</span><button class="copy-btn">複製</button></div>
@@ -1241,6 +1273,7 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
       </div>
       <p class="chap-sub">給工程師的「在終端機裡跑的 Claude」</p>
       <div class="content">
+        <p class="eli5"><span class="eli5-tag">白話一句</span>Claude Code 是會「親自動手」的寫程式助手：讀你的專案、改檔案、跑指令、存版本。可以在終端機、桌面 App 用，也可以丟到雲端跑——電腦關機也不影響。</p>
         <p>Claude Code 本質上是一個 <strong>agentic coding CLI</strong>：把第 5 章講的「工具調用迴圈」包裝成完整的開發助理，差別在於工具是<strong>真的在你電腦上執行</strong>（讀寫檔案、跑 shell 指令、操作 git），而不是雲端沙箱。它跟聊天式 AI 的差別，不在於更會寫程式，而在於它<strong>會自己動手、自己看結果、再決定下一步</strong>。</p>
 
         <h3>它怎麼運作：agentic loop</h3>
@@ -1273,6 +1306,32 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
           <li><strong>混用的正確姿勢</strong>：CLI 跑主 session、Desktop 的檔案樹與計畫側欄當<em>監看層</em>。注意：兩個 agent 同時動同一專案，務必分 branch／worktree，否則會互相覆蓋。</li>
           <li><strong>Academy 的立場</strong>：把終端機／VS Code／JetBrains／Desktop／網頁當同一工具的不同安裝面，不明講偏好——但 Claude Code 101／實戰所有動手內容（hooks、headless、CLAUDE.md、<code class="inline">claude --debug</code>、<code class="inline">claude mcp add</code>、Routines）全在 CLI，等於用行動說了：深度在終端機。</li>
         </ul>
+
+        <h3>電腦關機也能繼續做：雲端工作階段</h3>
+        <p>前面講的終端機、Desktop，程式都跑在<strong>你自己的電腦</strong>上——電腦一關，工作就停。<strong>雲端工作階段</strong>（Claude Code on the web）換個做法：把任務交給 Anthropic 雲端上的<strong>一台臨時電腦</strong>去跑，跟你的電腦沒關係，所以你關機、出門都不影響。</p>
+        <p>最容易搞混的是它跟「遠端桌面」的差別。白話比喻：</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th></th><th>在自己電腦上跑<br>（終端機 / Desktop 選 Local）</th><th>Remote Control<br>（像遠端桌面）</th><th>雲端工作階段<br>（Desktop 選 Cloud / 網頁 / 手機）</th></tr></thead>
+          <tbody>
+            <tr><td>比喻</td><td>自己在家做</td><td>出門在外，用手機<strong>遙控</strong>家裡那台電腦</td><td>把工作<strong>外包</strong>給雲端工作室的臨時工</td></tr>
+            <tr><td>程式跑在哪</td><td>你的電腦</td><td>還是你的電腦</td><td>Anthropic 雲端的臨時電腦（虛擬機）</td></tr>
+            <tr><td>你的電腦能關嗎</td><td>不行</td><td><strong>不行</strong>——你只是遠端看著它</td><td><strong>可以</strong></td></tr>
+            <tr><td>碰得到什麼</td><td>你電腦上的檔案</td><td>同左</td><td><strong>只有放在 GitHub 上的那個專案</strong>，碰不到你電腦裡的其他檔案</td></tr>
+            <tr><td>成果存在哪</td><td>你的電腦</td><td>你的電腦</td><td>要 <strong>push 到 GitHub</strong>（一條分支或一個 PR）才會留下來</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <h4>實際用起來</h4>
+        <div class="steps">
+          <div class="step"><span class="sn">1</span><div><strong>先把程式碼推上 GitHub</strong>。雲端那台電腦是從 GitHub 把專案抓下來（clone），你電腦上還沒 push 的改動它看不到。第一次用要先連 GitHub 帳號。</div></div>
+          <div class="step"><span class="sn">2</span><div><strong>交代任務</strong>，例如「幫我修好登入頁的 bug」。入口任選：網頁 <code class="inline">claude.ai/code</code>、Claude 手機 App 的 <strong>Code</strong> 分頁、Desktop 開 session 時選 <strong>Cloud</strong>（不是 Local），或終端機打 <code class="inline">claude --cloud "修好登入頁的 bug"</code>。</div></div>
+          <div class="step"><span class="sn">3</span><div><strong>關電腦去做別的事</strong>。它在雲端改程式、跑測試，做完推到一條新分支。</div></div>
+          <div class="step"><span class="sn">4</span><div><strong>回來看結果</strong>：用手機或電腦打開 Claude App 或 <code class="inline">claude.ai/code</code>，會看到它改了多少（例如 <code class="inline">+42 -18</code>），點開看 diff、在某一行留言叫它改、滿意就一鍵開 PR。</div></div>
+          <div class="step"><span class="sn">5</span><div>（選用）想接回自己電腦繼續做：終端機打 <code class="inline">claude --teleport</code>，它會把那條分支和整段對話拉回本機。</div></div>
+        </div>
+        <p class="note"><strong>兩個一定要記得</strong>：① 它<strong>只碰得到 GitHub 上的專案</strong>，碰不到你電腦裡的其他檔案（這也是一種安全保障）。② 做好的東西<strong>一定要 push 到 GitHub 才會保存</strong>——那台雲端電腦閒置一陣子就會被收回刪掉；對話紀錄會留著、重開時會配一台新的，但當時跑到一半的背景工作不會回來。</p>
+        <p class="note">其他值得知道的：可以同時丟好幾個任務，各自開一台雲端電腦平行跑；可以開 <strong>Auto-fix</strong>，讓它盯著你的 PR，CI 沒過或有人留審查意見就自動去修；Pro、Max、Team、Enterprise 方案可用，跟你其他 Claude 用量共用額度，雲端電腦本身不另外收費。</p>
 
         <h3>三種操作模式：你要多少監督</h3>
         <div class="table-wrap">
@@ -1319,7 +1378,7 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
           <li><strong>Routines 例行任務</strong>：把提示排程成在 Anthropic 基礎設施上定期跑的例行工作。</li>
           <li><strong>Headless 無頭模式</strong>：不開互動介面、當作指令列工具塞進你自己的 pipeline。</li>
           <li><strong>CI/CD 整合</strong>：GitHub Actions 或 GitLab CI/CD 自動做 PR 審查與 issue 分流；GitHub Code Review 讓每個 PR 自動被審。</li>
-          <li><strong>隨處工作</strong>（官方整合表）：<strong>Remote Control</strong>——從手機或另一台裝置接續本機正在跑的 session；<strong><code class="inline">claude --cloud</code></strong>——本機起頭、到 Claude 手機 App 繼續；<strong>Channels</strong>——把 Telegram、Discord、iMessage 或你自己的 webhook 事件推進 session（例如訊息一來就觸發任務）；<strong>Slack</strong>——把 bug 回報直接轉成 pull request。</li>
+          <li><strong>隨處工作</strong>（官方整合表）：<strong>Remote Control</strong>——用手機遙控你電腦上正在跑的 session（電腦要開著）；<strong>雲端工作階段</strong>——任務交給雲端的臨時電腦跑，你的電腦可以關機（見下方專節）；<strong>Channels</strong>——把 Telegram、Discord、iMessage 或你自己的 webhook 事件推進 session（例如訊息一來就觸發任務）；<strong>Slack</strong>——把 bug 回報直接轉成 pull request。</li>
           <li><strong>打包成 Plugin</strong>：把你調好的一整套（CLAUDE.md、skills、hooks、MCP）包成外掛，全隊一鍵安裝。</li>
         </ul>
         <p class="note">不熟 git、PR、CI、worktree 這些詞？它們是 Claude Code 的地基，<a href="#gitflow">Git 與 GitHub 章</a>有完整定義與情境。</p>
@@ -1336,6 +1395,7 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
       </div>
       <p class="chap-sub">其他周邊與生態 — 從「賣模型」到「賣垂直應用」</p>
       <div class="content">
+        <p class="eli5"><span class="eli5-tag">白話一句</span>Claude 不只在聊天視窗裡：它延伸到設計、瀏覽器、Office、Slack；而 MCP 是讓它能「接上」各種外部工具的萬用插座。</p>
         <div class="card-grid">
           <div class="card feature">
             <span class="ck">Claude Design</span>
@@ -1379,6 +1439,7 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
       </div>
       <p class="chap-sub">實務層面 — 終端機指令、介面操作、API 怎麼真的打一輪</p>
       <div class="content">
+        <p class="eli5"><span class="eli5-tag">白話一句</span>前面講原理，這章講手怎麼動：終端機怎麼開、指令怎麼打、設定藏在哪、API 金鑰怎麼申請、錢怎麼省。</p>
         <p>前面幾章講的是「機制」，這章講「手要怎麼動」：終端機裝完打什麼指令、claude.ai 裡設定藏在哪、API key 申請完第一行程式碼怎麼寫。</p>
 
         <h3>0. 終端機基礎（不熟終端機先看這個）</h3>
@@ -1627,6 +1688,7 @@ claude mcp add my-server -s user    -- node server.js
       </div>
       <p class="chap-sub">Git 與 GitHub — 為什麼 AI 寫程式之後，這件事反而更重要</p>
       <div class="content">
+        <p class="eli5"><span class="eli5-tag">白話一句</span>Git 就像寫程式用的「無限次存檔＋平行時空」，GitHub 是把存檔放上雲端、讓大家一起合作的地方——AI 改得越快，你越需要它當安全網。</p>
         <p>前面一直出現 git、commit、PR、CI、worktree 這些詞。它們不是 Claude 的功能，而是<strong>軟體世界的共同基礎設施</strong>——Claude Code 之所以敢大膽改你的檔案，正是因為有 git 當安全網。<strong>AI 寫得越快，你越需要 git</strong>：改動量變大、你沒有逐行盯，唯一能讓你「隨時退回去」「看清它到底改了什麼」的就是版本控制。</p>
 
         <h3>先分清楚：Git ≠ GitHub</h3>
@@ -1823,6 +1885,7 @@ jobs:
       </div>
       <p class="chap-sub">部署上線 — 東西做好了，怎麼讓別人也打得開</p>
       <div class="content">
+        <p class="eli5"><span class="eli5-tag">白話一句</span>在你電腦上跑得起來，不代表別人打得開。部署就是把作品搬到一台 24 小時開著的電腦上、再給它一個網址，讓全世界都連得到。</p>
         <p>用 AI 做出小工具之後，把網址傳給朋友，對方回你「<strong>打不開</strong>」——幾乎每個人都踩過這個坑。<strong>停在這一步的專案，比寫壞的程式還多。</strong></p>
 
         <h3>為什麼 localhost 別人打不開</h3>
@@ -1893,6 +1956,7 @@ jobs:
       </div>
       <p class="chap-sub">API 與 Settings 各項功能定義 — 定義 / 功能 / 如何使用 / 應用範圍</p>
       <div class="content">
+        <p class="eli5"><span class="eli5-tag">白話一句</span>這章是「功能字典」：每個功能都用同樣四格拆開——它是什麼、能做什麼、在哪裡打開、什麼時候用。遇到不熟的功能名稱回來查。</p>
         <p>每一項都用同一個格式拆開：這是什麼、它具體做什麼、怎麼按出來、適合用在哪。Settings 裡的開關大多集中在 <code class="inline">Settings → Capabilities</code>（Team / Enterprise 是 <code class="inline">Organization settings → Capabilities</code>）。</p>
 
         <div class="def-stack">
@@ -2068,6 +2132,7 @@ jobs:
       </div>
       <p class="chap-sub">給開發者的延伸介面 — IDE 外掛、瀏覽器擴充、CI/CD 整合</p>
       <div class="content">
+        <p class="eli5"><span class="eli5-tag">白話一句</span>同一個 Claude Code，也能裝進你本來就在用的工具裡——程式編輯器（VS Code、JetBrains）、Chrome 瀏覽器、GitHub——不用一直切換視窗。</p>
         <p>第 7 章講的是終端機裡的 <code class="inline">claude</code>。但同一個引擎還有好幾個「外殼」，把它接進你已經在用的工具裡，不用切視窗。底層都是同一套 Claude Code（同樣的模型、同樣的 <code class="inline">CLAUDE.md</code>、同樣的 hooks 跟 MCP），差別只在介面。</p>
 
         <div class="def-stack">
@@ -2154,6 +2219,7 @@ jobs:
       </div>
       <p class="chap-sub">一個系統的 12 塊積木 — 換個視角：用 AI 打造系統，需要哪些零件</p>
       <div class="content">
+        <p class="eli5"><span class="eli5-tag">白話一句</span>任何「會自己動的系統」都是用幾種積木拼出來的：畫面、觸發、判斷、帳號、連線、AI、通知、記憶、檔案、存檔、上線。看懂積木，就知道要請 AI 做什麼。</p>
         <p>前面幾章講「怎麼用 Claude」。這一章換個視角：如果要用 AI 幫你打造一個<strong>會自己動的系統</strong>，那個系統由哪些零件組成？把它拆成 12 塊積木、分成 4 個分區，像蓋房子——先有地基，中間有大腦調度，四周接工具，最外層是使用者碰得到的介面。（工具名稱以 2026 年主流狀態整理。）</p>
 
         <h3>4 分區（先記這個骨架）</h3>
@@ -2282,6 +2348,7 @@ jobs:
       </div>
       <p class="chap-sub">Claude 不是萬能的 — 幾個新手容易誤踩的點</p>
       <div class="content">
+        <p class="eli5"><span class="eli5-tag">白話一句</span>Claude 很強但不是萬能：它的知識有截止日、有時會自信地講錯、不能取代醫師律師，而且你貼給它的東西要留意隱私。</p>
         <p>前面講了一堆能做什麼，這章講幾個「不是這樣」的地方，避免用錯期待。</p>
 
         <h3>知識截止日（Knowledge Cutoff）</h3>
@@ -2324,25 +2391,122 @@ jobs:
       </div>
       <p class="chap-sub">術語表 + 延伸閱讀，官方文件最新狀態以連結為準</p>
       <div class="content">
-        <h3>術語表：一分鐘看懂常見名詞</h3>
+        <p class="eli5"><span class="eli5-tag">白話一句</span>看不懂的名詞都在這裡查；想深入學的官方文件、課程與中文影片也整理在下面。</p>
+        <h3 id="glossary">術語表：一句話看懂 76 個常見名詞</h3>
+        <p>依主題分組。每個詞一句白話，右欄點下去可以跳到詳細講解的章節。</p>
+        <h4>基本概念</h4>
         <div class="table-wrap">
         <table>
-          <thead><tr><th>名詞</th><th>白話解釋</th></tr></thead>
+          <thead><tr><th>名詞</th><th>白話解釋</th><th>詳見</th></tr></thead>
           <tbody>
-            <tr><td>CLI</td><td>Command Line Interface，指令列介面——「用打字下指令」的操作方式，跟用滑鼠點的 GUI 相對。Claude Code CLI＝用打字操作的 Claude Code；MCP CLI＝用 <code class="inline">claude mcp</code> 指令管 MCP server</td></tr>
-            <tr><td>終端機 / Shell</td><td>終端機（Terminal）是那個視窗程式；Shell 是裡面讀你指令的直譯器（macOS 預設 zsh）</td></tr>
-            <tr><td>Token</td><td>模型處理文字的最小單位，計費就是按 token 算（約 1 token ≈ 英文 4 字元 / 中文 1～2 字）</td></tr>
-            <tr><td>Context window</td><td>模型一次能看的 token 上限，對話越長越吃它</td></tr>
-            <tr><td>System prompt</td><td>給模型的「開場設定」——身份、任務框架、一律遵守的規則</td></tr>
-            <tr><td>Temperature</td><td>取樣隨機度，低＝穩定保守，高＝多樣有創意</td></tr>
-            <tr><td>Extended thinking</td><td>回答前先做一段內部推理，難題更準</td></tr>
-            <tr><td>Tool use / Function calling</td><td>模型請求呼叫外部工具，由你或伺服器執行後把結果餵回（第 5 章）</td></tr>
-            <tr><td>MCP</td><td>讓 Claude 標準化接外部工具/資料源的開放協定（第 8 章）</td></tr>
-            <tr><td>Agent</td><td>模型在「呼叫工具→看結果→再決定」的迴圈裡自主完成多步任務</td></tr>
-            <tr><td>RAG</td><td>先檢索相關資料、再讓模型根據它回答，減少編造</td></tr>
-            <tr><td>Hallucination</td><td>模型自信地講出聽起來合理但其實錯誤/編造的內容</td></tr>
-            <tr><td>Prompt caching</td><td>把重複的長前綴快取起來，重複命中最多省 90% 輸入費用</td></tr>
-            <tr><td>CLAUDE.md</td><td>Claude Code 的專案記憶檔，開 session 自動載入（第 10 章）</td></tr>
+            <tr><td><strong>AI / LLM（大型語言模型）</strong></td><td>讀過大量文字、學會「接下一個字」的程式；Claude 就是一個 LLM</td><td><a href="#aifluency">AI 素養</a></td></tr>
+            <tr><td><strong>模型</strong></td><td>AI 的「大腦」本身；Fable、Opus、Sonnet、Haiku 是不同大小與速度的模型</td><td><a href="#overview">總覽</a></td></tr>
+            <tr><td><strong>Prompt（提示）</strong></td><td>你打給 AI 的指令或問題</td><td><a href="#prompting">怎麼問問題</a></td></tr>
+            <tr><td><strong>System prompt</strong></td><td>給 AI 的「開場設定」：身份、任務、一律遵守的規則</td><td><a href="#prompting">怎麼問問題</a></td></tr>
+            <tr><td><strong>Token</strong></td><td>AI 讀寫文字的最小單位，也是計費單位（約 1 token ≈ 英文 4 字母／中文 1～2 字）</td><td><a href="#practical">實際操作</a></td></tr>
+            <tr><td><strong>Context window</strong></td><td>AI 一次能「看到」的文字量上限，像工作記憶；太長會忘掉前面</td><td><a href="#aifluency">AI 素養</a></td></tr>
+            <tr><td><strong>Hallucination（幻覺）</strong></td><td>AI 自信地講出聽起來合理、其實是錯的或編造的內容</td><td><a href="#safety">安全與限制</a></td></tr>
+            <tr><td><strong>知識截止日</strong></td><td>模型訓練資料的最後日期，之後的事它不知道，要靠搜尋</td><td><a href="#safety">安全與限制</a></td></tr>
+            <tr><td><strong>預訓練 / 微調</strong></td><td>先讀海量文字學會語言（預訓練），再訓練成有禮貌、有幫助的助手（微調）</td><td><a href="#aifluency">AI 素養</a></td></tr>
+            <tr><td><strong>Extended thinking</strong></td><td>讓 AI 回答前先「多想一段」，難題更準</td><td><a href="#features">功能字典</a></td></tr>
+            <tr><td><strong>Temperature</strong></td><td>回答的隨機程度：低＝穩定保守，高＝多變有創意</td><td><a href="#api">API</a></td></tr>
+            <tr><td><strong>Agent（代理）</strong></td><td>AI 在「用工具→看結果→再決定」的循環裡，自己完成多步驟任務</td><td><a href="#pipeline">一則訊息的旅程</a></td></tr>
+            <tr><td><strong>RAG / 嵌入</strong></td><td>先從你的資料裡找出相關段落（用「嵌入」把文字變成可比較相似度的數字），再讓 AI 根據它回答，減少亂編</td><td><a href="#extensions">開發者延伸</a></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <h4>Claude 產品與功能</h4>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>名詞</th><th>白話解釋</th><th>詳見</th></tr></thead>
+          <tbody>
+            <tr><td><strong>claude.ai</strong></td><td>Claude 的網頁版／App，最常用的聊天入口</td><td><a href="#claudeai">claude.ai 功能</a></td></tr>
+            <tr><td><strong>Cowork</strong></td><td>桌面 App 裡的分頁：連你的資料夾，幫你跨檔案、多步驟做事</td><td><a href="#claudeai">claude.ai 功能</a></td></tr>
+            <tr><td><strong>Claude Code</strong></td><td>會親自讀寫檔案、跑指令的寫程式助手</td><td><a href="#claudecode">Claude Code</a></td></tr>
+            <tr><td><strong>雲端工作階段</strong></td><td>把 Claude Code 任務交給雲端的臨時電腦跑，你的電腦可以關機</td><td><a href="#claudecode">Claude Code</a></td></tr>
+            <tr><td><strong>Remote Control</strong></td><td>用手機遙控你電腦上正在跑的 Claude Code（電腦要開著）</td><td><a href="#claudecode">Claude Code</a></td></tr>
+            <tr><td><strong>Artifacts</strong></td><td>Claude 做出來、放在側邊面板的成品（文件、網頁、圖表），可下載可分享</td><td><a href="#features">功能字典</a></td></tr>
+            <tr><td><strong>Projects</strong></td><td>把同一主題的對話、參考檔、規則收在一起的空間</td><td><a href="#features">功能字典</a></td></tr>
+            <tr><td><strong>Memory（記憶）</strong></td><td>讓 Claude 記住你過去說過的偏好與背景</td><td><a href="#features">功能字典</a></td></tr>
+            <tr><td><strong>Skills（技能）</strong></td><td>一包寫好的「固定做法」，符合任務時 Claude 自動套用</td><td><a href="#features">功能字典</a></td></tr>
+            <tr><td><strong>Connectors（連接器）</strong></td><td>讓 Claude 讀你的 Gmail、Notion、Google Drive 等服務</td><td><a href="#features">功能字典</a></td></tr>
+            <tr><td><strong>Research</strong></td><td>讓 Claude 上網做多來源的深度研究並附出處</td><td><a href="#features">功能字典</a></td></tr>
+            <tr><td><strong>Plugins（外掛）</strong></td><td>把技能、指令、hooks、MCP 打包成一包，一鍵安裝</td><td><a href="#features">功能字典</a></td></tr>
+            <tr><td><strong>Routines / 排程</strong></td><td>讓任務定時自動執行</td><td><a href="#claudecode">Claude Code</a></td></tr>
+            <tr><td><strong>Dispatch</strong></td><td>從手機派任務給桌面上的 Cowork</td><td><a href="#practical">實際操作</a></td></tr>
+            <tr><td><strong>Plan Mode</strong></td><td>只讀不改、先提計畫給你看，同意後才動手</td><td><a href="#claudecode">Claude Code</a></td></tr>
+            <tr><td><strong>CLAUDE.md</strong></td><td>Claude Code 的「專案備忘錄」，每次開工自動讀</td><td><a href="#features">功能字典</a></td></tr>
+            <tr><td><strong>Hooks</strong></td><td>在固定時間點「一定會執行」的指令，例如存檔前自動檢查</td><td><a href="#features">功能字典</a></td></tr>
+            <tr><td><strong>Subagent（子代理）</strong></td><td>分出去獨立做一件事、做完只回報摘要的小幫手</td><td><a href="#claudecode">Claude Code</a></td></tr>
+            <tr><td><strong>MCP</strong></td><td>讓 Claude 接上外部工具與資料的「萬用插座」標準</td><td><a href="#ecosystem">周邊生態</a></td></tr>
+            <tr><td><strong>Harness</strong></td><td>包在模型外面的那一整圈：工具、規則、檢查、記憶</td><td><a href="#features">功能字典</a></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <h4>程式與介面</h4>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>名詞</th><th>白話解釋</th><th>詳見</th></tr></thead>
+          <tbody>
+            <tr><td><strong>API</strong></td><td>讓程式跟另一個程式溝通的窗口</td><td><a href="#api">API</a></td></tr>
+            <tr><td><strong>JSON</strong></td><td>一種資料格式，用大括號和「名稱: 值」排好資料，人和程式都讀得懂</td><td><a href="#api">API</a></td></tr>
+            <tr><td><strong>CLI</strong></td><td>用打字下指令的操作方式（相對於用滑鼠點的 GUI）</td><td><a href="#practical">實際操作</a></td></tr>
+            <tr><td><strong>終端機 / Shell</strong></td><td>終端機是那個打指令的視窗；Shell 是裡面讀懂指令的程式</td><td><a href="#practical">實際操作</a></td></tr>
+            <tr><td><strong>SDK</strong></td><td>官方做好的程式工具包，讓你少寫很多重複的程式</td><td><a href="#api">API</a></td></tr>
+            <tr><td><strong>API key（金鑰）</strong></td><td>證明「是你在用」的密碼字串，外洩等於別人拿你的帳號付錢</td><td><a href="#practical">實際操作</a></td></tr>
+            <tr><td><strong>環境變數 / .env</strong></td><td>把金鑰等設定放在程式碼以外的地方，避免外洩</td><td><a href="#deploy">部署上線</a></td></tr>
+            <tr><td><strong>HTTP / HTTPS</strong></td><td>網頁傳資料的規則；HTTPS 是加密版</td><td><a href="#deploy">部署上線</a></td></tr>
+            <tr><td><strong>Endpoint / Header</strong></td><td>Endpoint 是 API 的網址；Header 是每次請求附帶的「信封資訊」（例如金鑰）</td><td><a href="#api">API</a></td></tr>
+            <tr><td><strong>OAuth</strong></td><td>「用某帳號登入並授權」的標準流程，例如授權 Claude 讀你的 Gmail</td><td><a href="#practical">實際操作</a></td></tr>
+            <tr><td><strong>Webhook</strong></td><td>「事情發生時主動通知你」的網址</td><td><a href="#aicoding">AI coding 地圖</a></td></tr>
+            <tr><td><strong>cron</strong></td><td>讓電腦「每天幾點做某件事」的排程寫法</td><td><a href="#aicoding">AI coding 地圖</a></td></tr>
+            <tr><td><strong>Headless</strong></td><td>不開互動畫面、當成指令直接執行（適合自動化）</td><td><a href="#claudecode">Claude Code</a></td></tr>
+            <tr><td><strong>沙箱 / 容器 / 虛擬機</strong></td><td>隔離的「小電腦」，在裡面怎麼搞都不會弄壞外面</td><td><a href="#codeexec">程式碼執行</a></td></tr>
+            <tr><td><strong>npm / pip</strong></td><td>下載程式套件的工具：npm 給 JavaScript、pip 給 Python</td><td><a href="#practical">實際操作</a></td></tr>
+            <tr><td><strong>Markdown</strong></td><td>用 # 和 * 等符號排版的純文字格式（.md 檔）</td><td><a href="#features">功能字典</a></td></tr>
+            <tr><td><strong>YAML</strong></td><td>設定檔常用的格式，用縮排表示層級</td><td><a href="#gitflow">Git 與 GitHub</a></td></tr>
+            <tr><td><strong>Tool use / stop_reason</strong></td><td>AI 請求用工具的機制；stop_reason 告訴你它停下來是講完了還是要用工具</td><td><a href="#tooluse">工具調用</a></td></tr>
+            <tr><td><strong>Streaming</strong></td><td>答案一個字一個字即時傳過來，而不是全部寫完才給</td><td><a href="#tooluse">工具調用</a></td></tr>
+            <tr><td><strong>Prompt caching</strong></td><td>把重複的長內容存起來，下次重用最多省 90% 費用</td><td><a href="#practical">實際操作</a></td></tr>
+            <tr><td><strong>Batch API</strong></td><td>不急的大量請求打包送出，半價</td><td><a href="#practical">實際操作</a></td></tr>
+            <tr><td><strong>Rate limit</strong></td><td>單位時間內能用的次數上限，超過會被擋（錯誤碼 429）</td><td><a href="#practical">實際操作</a></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <h4>Git 與協作</h4>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>名詞</th><th>白話解釋</th><th>詳見</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Git</strong></td><td>記錄每次改動、可隨時回到過去的版本控制程式</td><td><a href="#gitflow">Git 與 GitHub</a></td></tr>
+            <tr><td><strong>GitHub</strong></td><td>放 Git 專案的雲端網站，加上合作功能</td><td><a href="#gitflow">Git 與 GitHub</a></td></tr>
+            <tr><td><strong>Repo</strong></td><td>被 Git 管理的一個專案資料夾</td><td><a href="#gitflow">Git 與 GitHub</a></td></tr>
+            <tr><td><strong>Clone</strong></td><td>把雲端專案整包複製到你電腦</td><td><a href="#gitflow">Git 與 GitHub</a></td></tr>
+            <tr><td><strong>Commit</strong></td><td>一次「存檔點」</td><td><a href="#gitflow">Git 與 GitHub</a></td></tr>
+            <tr><td><strong>Branch（分支）</strong></td><td>從主線拉出的平行版本，改壞不影響主線</td><td><a href="#gitflow">Git 與 GitHub</a></td></tr>
+            <tr><td><strong>Push / Pull</strong></td><td>把存檔推上雲端／把雲端最新版拉下來</td><td><a href="#gitflow">Git 與 GitHub</a></td></tr>
+            <tr><td><strong>Merge / Conflict</strong></td><td>把分支合併回去／兩邊改到同一行、要人決定留誰</td><td><a href="#gitflow">Git 與 GitHub</a></td></tr>
+            <tr><td><strong>PR（Pull Request）</strong></td><td>「我改好了，請審核後合併」的提案</td><td><a href="#gitflow">Git 與 GitHub</a></td></tr>
+            <tr><td><strong>Fork</strong></td><td>把別人的專案複製一份到自己帳號</td><td><a href="#gitflow">Git 與 GitHub</a></td></tr>
+            <tr><td><strong>Code review</strong></td><td>合併前逐行檢查改動</td><td><a href="#gitflow">Git 與 GitHub</a></td></tr>
+            <tr><td><strong>Diff</strong></td><td>新舊版本的差異對照（加了什麼、刪了什麼）</td><td><a href="#gitflow">Git 與 GitHub</a></td></tr>
+            <tr><td><strong>Worktree</strong></td><td>同一個專案同時開好幾個分支在不同資料夾，平行做事</td><td><a href="#gitflow">Git 與 GitHub</a></td></tr>
+            <tr><td><strong>CI / CD</strong></td><td>每次推送自動檢查（CI），通過就自動上線（CD）</td><td><a href="#gitflow">Git 與 GitHub</a></td></tr>
+            <tr><td><strong>Lint</strong></td><td>自動檢查程式寫法、風格有沒有問題</td><td><a href="#gitflow">Git 與 GitHub</a></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <h4>部署上線</h4>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>名詞</th><th>白話解釋</th><th>詳見</th></tr></thead>
+          <tbody>
+            <tr><td><strong>部署</strong></td><td>把作品搬到 24 小時開著的電腦上、給它網址，讓別人連得到</td><td><a href="#deploy">部署上線</a></td></tr>
+            <tr><td><strong>localhost</strong></td><td>「這台電腦自己」；別人連不到你的 localhost</td><td><a href="#deploy">部署上線</a></td></tr>
+            <tr><td><strong>靜態網站</strong></td><td>只有畫面、不需要後端伺服器的網站（本指南就是）</td><td><a href="#deploy">部署上線</a></td></tr>
+            <tr><td><strong>Serverless</strong></td><td>不用自己管伺服器、有請求才執行的託管方式</td><td><a href="#deploy">部署上線</a></td></tr>
+            <tr><td><strong>網域 / Domain</strong></td><td>網址的名字，例如 example.com</td><td><a href="#deploy">部署上線</a></td></tr>
+            <tr><td><strong>GitHub Pages</strong></td><td>GitHub 免費幫你把靜態網站放上網（本指南用的）</td><td><a href="#deploy">部署上線</a></td></tr>
           </tbody>
         </table>
         </div>
