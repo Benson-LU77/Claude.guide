@@ -1307,6 +1307,38 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
           <li><strong>Academy 的立場</strong>：把終端機／VS Code／JetBrains／Desktop／網頁當同一工具的不同安裝面，不明講偏好——但 Claude Code 101／實戰所有動手內容（hooks、headless、CLAUDE.md、<code class="inline">claude --debug</code>、<code class="inline">claude mcp add</code>、Routines）全在 CLI，等於用行動說了：深度在終端機。</li>
         </ul>
 
+        <h3>Desktop Code 分頁：輸入框下面每顆按鈕是什麼</h3>
+        <p>打開 Claude Desktop → 左上切到 <strong>Code</strong> 分頁，輸入框下方有一排小按鈕。送出第一句話之前，官方建議先設好四件事：<strong>在哪台電腦跑、改哪個專案、用哪個模型、給它多少自主權</strong>。由左到右：</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>位置</th><th>畫面上長這樣</th><th>是什麼</th></tr></thead>
+          <tbody>
+            <tr><td>第一排最左</td><td>☁ <strong>Default</strong> 或 💻 Local</td><td><strong>環境選單</strong>：這次工作在哪台電腦上跑（見下表）。顯示「Default」代表你選了 Cloud，Default 是雲端環境的名字</td></tr>
+            <tr><td>第一排</td><td><code class="inline">&lt;/&gt;</code> 專案名</td><td>要改哪個<strong>專案</strong>（資料夾或 GitHub repo）；雲端可以按旁邊 <strong>+</strong> 一次加好幾個</td></tr>
+            <tr><td>第一排</td><td>分支圖示＋分支名</td><td>從哪條<strong>分支</strong>開始做（例如 <code class="inline">design/rating-panel</code>）</td></tr>
+            <tr><td>輸入框</td><td>Describe a task or ask a question</td><td>打任務，按 Enter 送出；做到一半也能再打字修正方向，不用先停</td></tr>
+            <tr><td>第二排 <strong>+</strong></td><td>＋</td><td>附加檔案／截圖、Skills、Connectors、Plugins（Connectors 與 Plugins 只有 Local、SSH 有）；打 <code class="inline">@檔名</code> 可以指定檔案（雲端不支援）</td></tr>
+            <tr><td>第二排</td><td>🎤</td><td>語音輸入</td></tr>
+            <tr><td>第二排</td><td><strong>Auto</strong> ▾</td><td><strong>權限模式</strong>：Manual（每步問你）／Accept edits（改檔不問、跑指令會問）／Plan（先給計畫）／Auto（背景安全檢查代替你把關）。快捷鍵 <code class="inline">Cmd+Shift+M</code>。雲端沒有 Manual</td></tr>
+            <tr><td>右下</td><td><strong>Opus 5.5</strong>　<strong>Medium</strong></td><td><strong>模型</strong>與<strong>思考力道</strong>（effort，越高想越久、越花額度）。快捷鍵 <code class="inline">Cmd+Shift+E</code></td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h4>環境選單的四個選項：Local · Cloud · Remote Control · SSH</h4>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>選項</th><th>程式跑在哪</th><th>適合什麼時候</th><th>怎麼開始</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Local</strong></td><td>你眼前這台電腦</td><td>平常開發；需要用到你電腦上的設定、工具、檔案</td><td>直接選，再選專案資料夾</td></tr>
+            <tr><td><strong>Cloud</strong></td><td>Anthropic 雲端的臨時電腦</td><td>長任務、想同時跑好幾個、<strong>要關電腦或出門</strong></td><td>選 Cloud → 選環境（通常就是 Default）；專案要在 GitHub 上。詳見下一節</td></tr>
+            <tr><td><strong>Remote Control</strong></td><td><strong>另一台你的電腦</strong>上正在跑的 Claude Code</td><td>人在外面，想操作家裡或公司那台電腦上的工作（那台要開著）</td><td>在那台電腦的終端機打 <code class="inline">claude rc</code>，它就會出現在這個選單裡</td></tr>
+            <tr><td><strong>SSH</strong></td><td>你管理的遠端主機（自己的伺服器、雲端主機、開發容器）</td><td>專案本來就放在伺服器上，或需要特定硬體、特定環境</td><td>選 <strong>+ Add SSH connection</strong>，填主機（<code class="inline">帳號@主機位址</code>）、埠號（空白＝22）、金鑰檔（空白＝用預設）。主機要是 Linux 或 macOS，第一次連會自動幫你裝好 Claude Code</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">白話區分：<strong>Local＝在家做</strong>；<strong>Cloud＝外包給雲端臨時工，你可以關機</strong>；<strong>Remote Control＝用這台遙控家裡那台</strong>；<strong>SSH＝連到你自己租的那台伺服器上做</strong>。已經在 Local 開始的工作，也可以從工作畫面工具列右下的 VS Code 圖示打開 <strong>Continue in</strong> 選單，送上雲端繼續（需要先把改動 commit 乾淨；SSH 工作不能這樣送）。</p>
+
         <h3>電腦關機也能繼續做：雲端工作階段</h3>
         <p>前面講的終端機、Desktop，程式都跑在<strong>你自己的電腦</strong>上——電腦一關，工作就停。<strong>雲端工作階段</strong>（Claude Code on the web）換個做法：把任務交給 Anthropic 雲端上的<strong>一台臨時電腦</strong>去跑，跟你的電腦沒關係，所以你關機、出門都不影響。</p>
         <p>最容易搞混的是它跟「遠端桌面」的差別。白話比喻：</p>
@@ -1322,13 +1354,106 @@ data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"outpu
           </tbody>
         </table>
         </div>
-        <h4>實際用起來</h4>
+        <h4>流程一覽</h4>
+        <p>程式碼放上 GitHub → 在網頁或手機交辦任務 → 關電腦 → 雲端電腦改程式、跑測試、推一條新分支 → 回來看改動、留言修正、開 PR。下面把每一步拆成你實際要點的地方和要打的字。</p>
+
+        <h4>第一次設定（只要做一次，約 5 分鐘）</h4>
         <div class="steps">
-          <div class="step"><span class="sn">1</span><div><strong>先把程式碼推上 GitHub</strong>。雲端那台電腦是從 GitHub 把專案抓下來（clone），你電腦上還沒 push 的改動它看不到。第一次用要先連 GitHub 帳號。</div></div>
-          <div class="step"><span class="sn">2</span><div><strong>交代任務</strong>，例如「幫我修好登入頁的 bug」。入口任選：網頁 <code class="inline">claude.ai/code</code>、Claude 手機 App 的 <strong>Code</strong> 分頁、Desktop 開 session 時選 <strong>Cloud</strong>（不是 Local），或終端機打 <code class="inline">claude --cloud "修好登入頁的 bug"</code>。</div></div>
-          <div class="step"><span class="sn">3</span><div><strong>關電腦去做別的事</strong>。它在雲端改程式、跑測試，做完推到一條新分支。</div></div>
-          <div class="step"><span class="sn">4</span><div><strong>回來看結果</strong>：用手機或電腦打開 Claude App 或 <code class="inline">claude.ai/code</code>，會看到它改了多少（例如 <code class="inline">+42 -18</code>），點開看 diff、在某一行留言叫它改、滿意就一鍵開 PR。</div></div>
-          <div class="step"><span class="sn">5</span><div>（選用）想接回自己電腦繼續做：終端機打 <code class="inline">claude --teleport</code>，它會把那條分支和整段對話拉回本機。</div></div>
+          <div class="step"><span class="sn">1</span><div><strong>瀏覽器</strong>打開 <code class="inline">claude.ai/code</code>，用你的 Claude 帳號登入。</div></div>
+          <div class="step"><span class="sn">2</span><div>畫面會請你<strong>連接 GitHub</strong> → 跳到 GitHub 授權頁 → 按 <strong>Authorize</strong> → 自動跳回來。</div></div>
+          <div class="step"><span class="sn">3</span><div>如果要改的是<strong>私人（private）專案</strong>，它會請你安裝 <strong>Claude GitHub App</strong>，在安裝頁勾選要給它碰的 repo。公開專案不用裝。暫時不想裝可以按 Skip。</div></div>
+          <div class="step"><span class="sn">4</span><div>Pro / Max 會<strong>自動建好一個叫 Default 的環境</strong>，不用動；Team / Enterprise 會出現表單，名稱和網路設定都不用改，直接按 <strong>Create &amp; finish</strong>。</div></div>
+        </div>
+        <p class="note">還沒有專案？先到 GitHub 按 <strong>New repository</strong> 建一個空的，雲端才有地方動手。已經習慣用終端機的人，也可以改走終端機設定：先 <code class="inline">gh auth login</code>，再進 <code class="inline">claude</code> 打 <code class="inline">/web-setup</code>，一次完成。</p>
+
+        <h4>每次交辦：三個動作</h4>
+        <div class="steps">
+          <div class="step"><span class="sn">1</span><div><strong>選專案</strong>：點輸入框下方的<strong>倉庫選單</strong>，選要改的 repo；旁邊可以選分支，不選就用預設的 main。</div></div>
+          <div class="step"><span class="sn">2</span><div><strong>選模式</strong>：輸入框旁的下拉選單——<strong>Plan</strong>（先提計畫、你同意才動手，新手建議用這個）、<strong>Accept edits</strong>（直接做完、推上分支，不中途問你）、<strong>Auto</strong>（由自動審核代替你把關，視方案與設定才會出現）。</div></div>
+          <div class="step"><span class="sn">3</span><div><strong>打任務、按 Enter</strong>。怎麼寫見下一段——這是整件事成敗的關鍵。</div></div>
+        </div>
+        <p class="note">手機一樣：Claude App → 下方 <strong>Code</strong> 分頁 → 選專案、選模式、打任務。Desktop App 則是開新 session 時把 <strong>Local</strong> 切成 <strong>Cloud</strong>。</p>
+
+        <h4>交辦內容怎麼寫（最關鍵）</h4>
+        <p>雲端任務的特性是「你交出去就走了」，它中途問不到你，所以要<strong>一次講清楚</strong>。照這六格寫，缺的格子它就只能自己猜：</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>格子</th><th>要回答的問題</th><th>範例</th></tr></thead>
+          <tbody>
+            <tr><td><strong>做什麼</strong></td><td>一句話講目標</td><td>修好登入失敗時按鈕一直轉圈的問題</td></tr>
+            <tr><td><strong>在哪裡</strong></td><td>哪個檔案、哪一頁、哪個功能</td><td><code class="inline">src/pages/login.tsx</code></td></tr>
+            <tr><td><strong>現在怎樣</strong></td><td>目前的症狀；有錯誤訊息整段貼上</td><td>輸入錯密碼後，按鈕一直轉圈、不會恢復</td></tr>
+            <tr><td><strong>做好的樣子</strong></td><td>你預期看到什麼（不只是「修好」）</td><td>顯示「帳號或密碼錯誤」，按鈕恢復可按</td></tr>
+            <tr><td><strong>怎麼確認</strong></td><td>它做完要跑什麼驗證</td><td>改完跑 <code class="inline">npm test</code> 確定全部通過</td></tr>
+            <tr><td><strong>不要動什麼</strong></td><td>範圍邊界</td><td>不要改到註冊頁和 API</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p>三個對照範例（左邊是常見寫法，右邊是會做對的寫法）：</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>❌ 太模糊</th><th>✅ 會做對</th></tr></thead>
+          <tbody>
+            <tr><td>修 bug</td><td>登入頁 <code class="inline">src/pages/login.tsx</code> 輸入錯密碼後按鈕一直轉圈。預期顯示「帳號或密碼錯誤」並讓按鈕恢復可按。錯誤訊息：（貼上）。修完跑 <code class="inline">npm test</code>，不要改到註冊頁。</td></tr>
+            <tr><td>網站加一段說明</td><td>在 <code class="inline">index.html</code> 第 9 章最後新增一節「常見錯誤」表格，欄位是「錯誤訊息／意思／怎麼解」，樣式照同頁其他表格。改完檢查 HTML 標籤是否成對。</td></tr>
+            <tr><td>看一下這個專案</td><td><strong>先不要改任何檔案。</strong>說明這個專案怎麼啟動、入口檔在哪、有哪些頁面，最後列出你覺得最該修的三個問題。</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">不確定需求就選 <strong>Plan 模式</strong>：它先交一份計畫給你看，你在計畫階段糾正方向，比做完再改便宜得多。任務很大就拆小，一個任務一件事——雲端可以同時開好幾個，一次丟三個小任務比一個大雜燴好。</p>
+
+        <h4>交辦之後：可以走了，但要知道三件事</h4>
+        <ul>
+          <li><strong>關分頁、關電腦都不會停</strong>——這是刻意的設計。它做完當前任務就會停下來等你。</li>
+          <li><strong>中途想補充</strong>：直接在同一個對話打字送出，訊息會排隊等它讀；它還沒讀到之前，可以按訊息上的 <strong>✕</strong> 收回修改。</li>
+          <li><strong>它有問題會停下來問</strong>：回來看到問題就回答，它會接著做（放太久沒回，那台雲端電腦會被收回，重開時對話還在、但要重新配電腦）。</li>
+        </ul>
+
+        <h4>驗收：看改動、留言、開 PR</h4>
+        <div class="steps">
+          <div class="step"><span class="sn">1</span><div>點畫面上的改動數字（例如 <code class="inline">+42 -18</code>），打開 <strong>diff 檢視</strong>：左邊是改了哪些檔案，右邊是紅（刪掉）綠（新增）對照。</div></div>
+          <div class="step"><span class="sn">2</span><div><strong>在某一行留言</strong>：點那一行、打意見（例如「這裡不要把錯誤吞掉」）、按 Enter。留言會先存著，跟你下一則訊息一起送出——它會知道你指的是哪個檔案第幾行。</div></div>
+          <div class="step"><span class="sn">3</span><div>滿意了按上方 <strong>Create PR</strong>，可選正式 PR 或草稿（draft）。</div></div>
+          <div class="step"><span class="sn">4</span><div>開完 PR 對話還在：CI 沒過就把錯誤貼進來叫它修，或打開 <strong>Auto-fix</strong> 讓它自己盯著 PR 修；合併那一下建議你自己到 GitHub 按（見 <a href="#gitflow">Git 與 GitHub 章</a>）。</div></div>
+        </div>
+
+        <h4>用終端機交辦：指令一覽</h4>
+        <div class="code-block" data-lang="bash">
+<div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>terminal</span><button class="copy-btn">複製</button></div>
+<pre><code># 先 push！雲端抓的是 GitHub 上目前這條分支，不是你電腦上的檔案
+git push
+
+# 開一個新的雲端任務（在專案資料夾裡打）
+claude --cloud "修好 src/pages/login.tsx 輸入錯密碼時按鈕一直轉圈的問題，改完跑 npm test"
+
+# 同時丟好幾個，各自一台雲端電腦平行跑
+claude --cloud "修 auth.spec.ts 裡時好時壞的測試"
+claude --cloud "更新 API 說明文件"
+
+# 對正在跑的任務補一句（session ID 在 claude.ai/code 側欄或網址裡）
+claude -p "順便把錯誤訊息改成中文" --cloud session_xxxxx
+
+# 看背景任務、把雲端任務拉回本機繼續做
+/tasks
+claude --teleport
+
+# 進階：先在本機用 Plan 模式討論好計畫，存成檔案 push，再交給雲端照做
+claude --permission-mode plan
+claude --cloud "照 docs/plan.md 的計畫執行"</code></pre>
+        </div>
+
+        <h4>卡住時</h4>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>狀況</th><th>原因與解法</th></tr></thead>
+          <tbody>
+            <tr><td>倉庫選單裡找不到我的私人專案</td><td>那個 repo 還沒裝 Claude GitHub App——到 GitHub 裝，並在安裝設定裡勾選該 repo</td></tr>
+            <tr><td>畫面只有一個 GitHub 登入按鈕</td><td>還沒連 GitHub，照「第一次設定」做</td></tr>
+            <tr><td>它改的不是我最新的版本</td><td>你本機的改動還沒 push，雲端看不到；先 <code class="inline">git push</code> 再交辦</td></tr>
+            <tr><td>關掉分頁它還在跑</td><td>正常，設計就是這樣；不想要就在側欄把 session 封存或刪除</td></tr>
+            <tr><td>終端機說 <code class="inline">/web-setup</code> 找不到</td><td>要在 <code class="inline">claude</code> 裡面打（不是一般終端機）；還是找不到就先 <code class="inline">/login</code> 用 claude.ai 帳號登入</td></tr>
+          </tbody>
+        </table>
         </div>
         <p class="note"><strong>兩個一定要記得</strong>：① 它<strong>只碰得到 GitHub 上的專案</strong>，碰不到你電腦裡的其他檔案（這也是一種安全保障）。② 做好的東西<strong>一定要 push 到 GitHub 才會保存</strong>——那台雲端電腦閒置一陣子就會被收回刪掉；對話紀錄會留著、重開時會配一台新的，但當時跑到一半的背景工作不會回來。</p>
         <p class="note">其他值得知道的：可以同時丟好幾個任務，各自開一台雲端電腦平行跑；可以開 <strong>Auto-fix</strong>，讓它盯著你的 PR，CI 沒過或有人留審查意見就自動去修；Pro、Max、Team、Enterprise 方案可用，跟你其他 Claude 用量共用額度，雲端電腦本身不另外收費。</p>
@@ -2392,7 +2517,7 @@ jobs:
       <p class="chap-sub">術語表 + 延伸閱讀，官方文件最新狀態以連結為準</p>
       <div class="content">
         <p class="eli5"><span class="eli5-tag">白話一句</span>看不懂的名詞都在這裡查；想深入學的官方文件、課程與中文影片也整理在下面。</p>
-        <h3 id="glossary">術語表：一句話看懂 76 個常見名詞</h3>
+        <h3 id="glossary">術語表：一句話看懂 79 個常見名詞</h3>
         <p>依主題分組。每個詞一句白話，右欄點下去可以跳到詳細講解的章節。</p>
         <h4>基本概念</h4>
         <div class="table-wrap">
@@ -2424,6 +2549,9 @@ jobs:
             <tr><td><strong>Cowork</strong></td><td>桌面 App 裡的分頁：連你的資料夾，幫你跨檔案、多步驟做事</td><td><a href="#claudeai">claude.ai 功能</a></td></tr>
             <tr><td><strong>Claude Code</strong></td><td>會親自讀寫檔案、跑指令的寫程式助手</td><td><a href="#claudecode">Claude Code</a></td></tr>
             <tr><td><strong>雲端工作階段</strong></td><td>把 Claude Code 任務交給雲端的臨時電腦跑，你的電腦可以關機</td><td><a href="#claudecode">Claude Code</a></td></tr>
+            <tr><td><strong>SSH</strong></td><td>安全地連到另一台遠端電腦並操作它的方式；Desktop 可用它在你的伺服器上跑 Claude Code</td><td><a href="#claudecode">Claude Code</a></td></tr>
+            <tr><td><strong>權限模式 / Effort</strong></td><td>權限模式＝給 Claude 多少自主權（每步問你、改檔不問、先給計畫、自動把關）；Effort＝思考力道，越高想越久、越花額度</td><td><a href="#claudecode">Claude Code</a></td></tr>
+            <tr><td><strong>雲端環境（Default）</strong></td><td>雲端工作階段用的預設設定（網路權限、環境變數）；Desktop 環境選單顯示「Default」就代表選了 Cloud</td><td><a href="#claudecode">Claude Code</a></td></tr>
             <tr><td><strong>Remote Control</strong></td><td>用手機遙控你電腦上正在跑的 Claude Code（電腦要開著）</td><td><a href="#claudecode">Claude Code</a></td></tr>
             <tr><td><strong>Artifacts</strong></td><td>Claude 做出來、放在側邊面板的成品（文件、網頁、圖表），可下載可分享</td><td><a href="#features">功能字典</a></td></tr>
             <tr><td><strong>Projects</strong></td><td>把同一主題的對話、參考檔、規則收在一起的空間</td><td><a href="#features">功能字典</a></td></tr>
