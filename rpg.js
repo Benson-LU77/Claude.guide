@@ -237,7 +237,7 @@ async function init3D(){
 
   // ---------- Q 版模型（KayKit glTF）：載入、描邊、動作 ----------
   const ASSET = 'assets/kaykit/';
-  const TPL = {}, WEAP = {}, TEX = {}, CLIPS = {};
+  const TPL = {}, WEAP = {}, TEX = {}, CLIPS = {}, ENV = {};
   // 描邊：沿法線外推的背面網格；w = 粗細（模型單位，KayKit 預設 0.028）
   const OLM = {};
   const outlineMat = (skin, w) => { const k = (skin?'s':'m')+w; if(OLM[k]) return OLM[k];
@@ -275,9 +275,14 @@ async function init3D(){
     })));
     weaps.forEach(w=>jobs.push(load(ASSET+w+'.glb').then(g=>{ WEAP[w] = g.scene; })));
     texs.forEach(t=>jobs.push(new Promise((res,rej)=>tl.load(ASSET+'tex/'+t+'.png', tx=>{ tx.flipY = false; tx.encoding = T.LinearEncoding; TEX[t] = tx; res(); }, undefined, rej))));
+    // 場景素材（KayKit Medieval Hexagon／Halloween Bits 合併檔，每個模型一個具名節點）；載入失敗就沿用程式繪製的造型
+    ['nature','spooky'].forEach(pk=>jobs.push(load(ASSET+'env/'+pk+'.glb').then(g=>{
+      g.scene.updateMatrixWorld(true);
+      g.scene.children.forEach(n=>{ const parts = []; n.traverse(o=>{ if(o.isMesh){ const geo = o.geometry.clone(); geo.applyMatrix4(o.matrixWorld); if(!geo.attributes.normal) geo.computeVertexNormals(); parts.push({geo, map:o.material.map}); } }); ENV[n.name] = parts; });
+    }).catch(e=>console.warn('場景素材載入失敗', pk, e))));
     let done = 0; jobs.forEach(j=>j.then(()=>onProg && onProg(++done, jobs.length)));
     await Promise.all(jobs);
-    window.__rpgDebug = {TPL, CLIPS, WEAP};
+    window.__rpgDebug = {TPL, CLIPS, WEAP, ENV, renderer};
     return true;
   }
   // 由模板做出一個可動的角色：show = 要顯示的配件名稱
@@ -358,6 +363,39 @@ async function init3D(){
     M.mats.forEach(mm=>{ mm.userData.e = mm.emissive.getHex(); mm.userData.ei = mm.emissiveIntensity; });
     return M;
   }
+
+  // ---------- 場景素材：同一個模型大量擺放（InstancedMesh＋描邊） ----------
+  const ENVM = {};
+  const envMat = map => { const k = map ? map.uuid : 'none'; if(!ENVM[k]){ if(map) map.encoding = T.LinearEncoding; ENVM[k] = new T.MeshToonMaterial({map, color:0xffffff, gradientMap:grad}); } return ENVM[k]; };
+  // list：[x, y, z, 縮放, 旋轉 y]；opt.ol=false 不描邊、opt.shadow=false 不投影、opt.tint=顏色、opt.fog=false 不受霧影響
+  // opt.chunk = 區塊邊長：散布很廣時切成多塊，每塊有自己的包圍球（three r128 的 InstancedMesh 只用單一模型的包圍球做剔除）
+  function envInst(parent, name, list, opt){
+    opt = opt || {}; const parts = ENV[name]; if(!parts || !list.length) return false;
+    if(opt.chunk){
+      const cells = {};
+      list.forEach(d=>{ const k = Math.floor(d[0]/opt.chunk)+','+Math.floor(d[2]/opt.chunk); (cells[k] = cells[k] || []).push(d); });
+      Object.values(cells).forEach(cl=>envInst(parent, name, cl, Object.assign({}, opt, {chunk:0, cull:true})));
+      return true;
+    }
+    const dm = new T.Object3D();
+    const setM = im => { im.frustumCulled = !!bs; list.forEach((d,i)=>{ dm.position.set(d[0],d[1],d[2]); dm.scale.setScalar(d[3]); dm.rotation.set(0,d[4]||0,0); dm.updateMatrix(); im.setMatrixAt(i, dm.matrix); }); im.instanceMatrix.needsUpdate = true; return im; };
+    let bs = null;
+    if(opt.cull){   // 這一塊的包圍球：所有實例的位置＋模型半徑×縮放
+      parts.forEach(pt=>{ if(!pt.geo.boundingSphere) pt.geo.computeBoundingSphere(); });
+      const pr = Math.max(...parts.map(pt=>pt.geo.boundingSphere.center.length()+pt.geo.boundingSphere.radius));
+      const box = new T.Box3(); let ms = 0; list.forEach(d=>{ box.expandByPoint(new T.Vector3(d[0],d[1],d[2])); ms = Math.max(ms, d[3]); });
+      bs = new T.Sphere(); box.getBoundingSphere(bs); bs.radius += pr*ms;
+    }
+    const geoOf = g => { if(!bs) return g; const n = new T.BufferGeometry(); for(const k in g.attributes) n.setAttribute(k, g.attributes[k]); n.setIndex(g.index); n.boundingSphere = bs.clone(); return n; };
+    parts.forEach(pt0=>{
+      const pt = {geo:geoOf(pt0.geo), map:pt0.map};
+      let m = envMat(pt.map); if(opt.tint || opt.fog===false){ m = m.clone(); if(opt.tint) m.color.set(opt.tint); if(opt.fog===false) m.fog = false; }
+      const im = setM(new T.InstancedMesh(pt.geo, m, list.length)); im.castShadow = opt.shadow!==false; im.receiveShadow = !!opt.recv; parent.add(im);
+      if(opt.ol!==false) parent.add(setM(new T.InstancedMesh(pt.geo, outlineMat(false, opt.ow||.02), list.length)));
+    });
+    return true;
+  }
+  const hasEnv = () => !!ENV.tree_single_A;
 
   // ---------- 角色 ----------
   function makeChar(m){
@@ -625,7 +663,7 @@ async function init3D(){
     {g:0x1f5a43, x:560,  y:1700, a:0x8fe3b8},
     {g:0x3a2a6a, x:1650, y:1700, a:0xc9a7ff},
     {g:0x1b4166, x:2720, y:1420, a:0x8fc7ff},
-    {g:0x5a4618, x:1880, y:620,  a:0xf3d28b},
+    {g:0x52571f, x:1880, y:620,  a:0xf3d28b},
     {g:0x2e3756, x:700,  y:620,  a:0xe6e0ff}];
   const POS = [[220,1950],[430,1740],[300,1490],[610,1400],[830,1620],[1010,1880],
     [1250,1960],[1460,1720],[1350,1460],[1660,1380],[1880,1620],[2070,1880],
@@ -651,7 +689,7 @@ async function init3D(){
   }catch(e){ console.warn('模型載入失敗，改用簡化造型', e); for(const k in TPL) delete TPL[k]; }
 
   // ---------- 大地圖場景 ----------
-  const W = new T.Scene();
+  const W = new T.Scene(); window.__rpgDebug.W = W;
   W.background = new T.Color(0x0b1a26); W.fog = new T.Fog(0x0b1a26, 34, 80);
   W.add(new T.HemisphereLight(0xcfe2ff, 0x1a2a20, .8));
   const sun = new T.DirectionalLight(0xfff0d0, .75); sun.position.set(30,60,25); W.add(sun); W.add(sun.target);
@@ -701,50 +739,117 @@ async function init3D(){
     const sp = toW(SPAWN.x, SPAWN.y);
     P(W, GEO.ring, glow(0x8fe3b8,.7), sp.x,.08,sp.z, 1.6, {rx:Math.PI/2, ol:false});
   }
-  // 裝飾（InstancedMesh）
+  const PONDS = [];   // 水池（角色不能走進去）
+  // 裝飾（InstancedMesh）：有 KayKit 場景素材就用模型，沒有就用程式繪製的簡化造型
   {
-    const L = {trunk:[], canopy:[], cone:[], stem:[], cap:[], crystal:[], rune:[], pillar:[], pole:[], lamp:[], flower:[]};
+    const L = {trunk:[], canopy:[], cone:[], stem:[], cap:[], crystal:[], rune:[], pillar:[], pole:[], lamp:[], flower:[], grass:[]};
+    const K = {};   // 模型名稱 → [[x,y,z,縮放,旋轉], …]
+    const put = (name, x, z, s, ry, y) => (K[name] = K[name] || []).push([x, y||0, z, s, ry===undefined ? rnd()*6.28 : ry]);
+    const env = hasEnv();
     const CAN = [0x2f8a62,0x5b4a9a,0x2f6a9a,0xa8862e,0x8a93b8], ACC = REALM.map(r=>r.a);
-    const KINDS = [['tree','tree','mush','flower','tree'],['crystal','rune','crystal','mush','tree'],['pine','pine','flower','crystal'],['tree','pillar','flower','tree'],['tree','lantern','flower','pine']];
+    const KINDS = env
+      ? [['oak','oak','pine','grove','mush','flower','rock'],
+         ['crystal','crystal','rune','rune','rock','candles','lamp','mush'],
+         ['pine','pine','grove2','rock','flower','crystal'],
+         ['gold','gold','amber','pillar','flower','lamp'],
+         ['dead','dead','amber','lamp','candles','flower','rock']]
+      : [['tree','tree','mush','flower','tree'],['crystal','rune','crystal','mush','tree'],['pine','pine','flower','crystal'],['tree','pillar','flower','tree'],['tree','lantern','flower','pine']];
+    const ROCKS = ['rock_single_A','rock_single_C','rock_single_D','rock_single_E'];
     function add(kind, px, py, r, s){
       const w = toW(px,py), ry = rnd()*6.28, cv = (rnd()-.5)*.08;
       const tint = (h)=> new T.Color(h).offsetHSL(0,0,cv);
       switch(kind){
+        // KayKit 模型（尺寸已換算成角色約 2 單位高的比例）
+        case 'oak':    put('tree_single_B', w.x, w.z, 2.4*s); break;
+        case 'pine':   put('tree_single_A', w.x, w.z, 2.6*s); break;
+        case 'grove':  put('trees_A_medium', w.x, w.z, 2.2*s); break;
+        case 'grove2': put('trees_B_small', w.x, w.z, 2.4*s); break;
+        case 'rock':   put(ROCKS[Math.floor(rnd()*4)], w.x, w.z, 2.6*s+rnd()*1.5); break;
+        case 'gold':   put('tree_pine_yellow_large', w.x, w.z, .45*s); break;
+        case 'amber':  put('tree_pine_orange_medium', w.x, w.z, .5*s); break;
+        case 'dead':   put(['tree_dead_large','tree_dead_medium','tree_dead_small'][Math.floor(rnd()*3)], w.x, w.z, .7*s); break;
+        case 'lamp':   put('lantern_standing', w.x, w.z, 1.7); L.lamp.push([w.x,.95,w.z,.32,.32,.32,0,0xffc46b]); break;
+        case 'candles':put('shrine_candles', w.x, w.z, .9); break;
+        // 程式繪製
         case 'tree': L.trunk.push([w.x,.7*s,w.z,.2*s,1.4*s,.2*s,ry,0x4a3424]); L.canopy.push([w.x,2.1*s,w.z,1.25*s,1.15*s,1.25*s,ry,tint(CAN[r])]); L.canopy.push([w.x+.4*s,2.8*s,w.z-.2*s,.8*s,.75*s,.8*s,ry,tint(CAN[r]).offsetHSL(0,0,.06)]); break;
-        case 'pine': L.trunk.push([w.x,.4*s,w.z,.15*s,.8*s,.15*s,ry,0x3a2a1c]); L.cone.push([w.x,1.5*s,w.z,1*s,1.8*s,1*s,ry,tint(CAN[r])]); L.cone.push([w.x,2.5*s,w.z,.7*s,1.4*s,.7*s,ry,tint(CAN[r]).offsetHSL(0,0,.06)]); break;
+        case 'pine0': L.trunk.push([w.x,.4*s,w.z,.15*s,.8*s,.15*s,ry,0x3a2a1c]); L.cone.push([w.x,1.5*s,w.z,1*s,1.8*s,1*s,ry,tint(CAN[r])]); L.cone.push([w.x,2.5*s,w.z,.7*s,1.4*s,.7*s,ry,tint(CAN[r]).offsetHSL(0,0,.06)]); break;
         case 'mush': L.stem.push([w.x,.25*s,w.z,.14*s,.5*s,.14*s,ry,0xf2e6d0]); L.cap.push([w.x,.48*s,w.z,.45*s,.35*s,.45*s,ry,r===1?0xa374e6:0xe0606f]); break;
         case 'crystal': L.crystal.push([w.x,.9*s,w.z,.35*s,1*s,.35*s,ry,ACC[r]]); L.crystal.push([w.x+.5*s,.5*s,w.z+.2*s,.2*s,.55*s,.2*s,ry+1,ACC[r]]); break;
         case 'rune': L.rune.push([w.x,.7*s,w.z,.55*s,1.4*s,.32*s,ry,0x4a4560]); break;
-        case 'pillar': L.pillar.push([w.x,1.3*s,w.z,.32*s,2.6*s,.32*s,0,0xd9cfb4]); break;
+        case 'pillar': if(env) put('pillar', w.x, w.z, .6*s, 0); else L.pillar.push([w.x,1.3*s,w.z,.32*s,2.6*s,.32*s,0,0xd9cfb4]); break;
         case 'lantern': L.pole.push([w.x,.9*s,w.z,.05,1.8*s,.05,0,0x3b3f52]); L.lamp.push([w.x,1.85*s,w.z,.2,.2,.2,0,0xfff3c4]); break;
         case 'flower': for(let i=0;i<4;i++) L.flower.push([w.x+(rnd()-.5)*1.4,.18,w.z+(rnd()-.5)*1.4,.13,.13,.13,0,[0xffd6e0,0xe6d2ff,0x9fd8ff,0xffe6a0,0xffffff][r]]); break;
       }
     }
-    for(let k=0;k<900 && (L.trunk.length+L.crystal.length+L.rune.length+L.pillar.length+L.pole.length+L.flower.length/4)<520;k++){
+    if(!env){ KINDS.forEach(k=>k.forEach((x,i)=>{ if(x==='pine') k[i] = 'pine0'; })); }
+    // 水池（晨露森林、星橋山谷）：先決定位置，裝飾避開
+    const ponds = PONDS;
+    if(env) for(let k=0;k<400 && ponds.length<7;k++){
+      const x = 120+rnd()*2960, y = 120+rnd()*1960, r = realmAtPx(x,y), rad = 2.2+rnd()*1.6;
+      if(r!==0 && r!==2) continue;
+      if(pathPx.some(p=>(p.x-x)**2+(p.y-y)**2 < (110+rad*20)**2)) continue;
+      if(POS.some(p=>(p[0]-x)**2+(p[1]-y)**2 < 200*200) || ponds.some(p=>(p.x-x)**2+(p.y-y)**2 < 300*300)) continue;
+      if((SPAWN.x-x)**2+(SPAWN.y-y)**2 < 200*200) continue;
+      const pw = toW(x,y); ponds.push({x, y, rad, wx:pw.x, wz:pw.z});
+    }
+    const inPond = (x,y,m) => ponds.some(p=>(p.x-x)**2+(p.y-y)**2 < (p.rad*20+(m||30))**2);
+    for(let k=0;k<1600 && (L.trunk.length+L.crystal.length+L.rune.length+L.pillar.length+L.pole.length+L.flower.length/4+Object.values(K).reduce((a,v)=>a+v.length,0))<780;k++){
       const x = 30+rnd()*3140, y = 40+rnd()*2120;
       if(pathPx.some(p=>(p.x-x)**2+(p.y-y)**2 < 90*90)) continue;
       if(POS.some(p=>(p[0]-x)**2+(p[1]-y)**2 < 150*150)) continue;
-      if((SPAWN.x-x)**2+(SPAWN.y-y)**2 < 130*130) continue;
+      if((SPAWN.x-x)**2+(SPAWN.y-y)**2 < 130*130 || inPond(x,y)) continue;
       const r = realmAtPx(x,y), ks = KINDS[r];
       add(ks[Math.floor(rnd()*ks.length)], x, y, r, .8+rnd()*.6);
     }
-    for(let x=-20;x<=3220;x+=70){ add('pine', x+rnd()*30, -30-rnd()*60, realmAtPx(x,0), 1+rnd()*.5); add('pine', x+rnd()*30, 2230+rnd()*60, realmAtPx(x,2200), 1+rnd()*.5); }
-    for(let y=-20;y<=2220;y+=70){ add('pine', -30-rnd()*60, y+rnd()*30, realmAtPx(0,y), 1+rnd()*.5); add('pine', 3230+rnd()*60, y+rnd()*30, realmAtPx(3200,y), 1+rnd()*.5); }
+    // 外圍：一圈山（月光書塔附近用光禿的岩山），內側再補一排樹
+    if(env){
+      const MT = ['mountain_A_grass_trees','mountain_B_grass_trees','mountain_C_grass_trees'];
+      const edge = (x,y,out)=>{ const r = realmAtPx(Math.max(0,Math.min(3200,x)), Math.max(0,Math.min(2200,y))), w = toW(x,y);
+        if(out) put(r===4 ? ['mountain_A','mountain_C'][Math.floor(rnd()*2)] : MT[Math.floor(rnd()*3)], w.x, w.z, 6+rnd()*3, Math.floor(rnd()*6)*Math.PI/3);
+        else add(r===4 ? 'dead' : (r===3 ? 'gold' : 'pine'), x, y, r, 1+rnd()*.4); };
+      for(let x=-60;x<=3260;x+=200){ edge(x+rnd()*60, -170-rnd()*80, true); edge(x+rnd()*60, 2370+rnd()*80, true); }
+      for(let y=40;y<=2160;y+=200){ edge(-170-rnd()*80, y+rnd()*60, true); edge(3370+rnd()*80, y+rnd()*60, true); }
+      for(let x=-20;x<=3220;x+=90){ edge(x+rnd()*40, -30-rnd()*50); edge(x+rnd()*40, 2230+rnd()*50); }
+      for(let y=-20;y<=2220;y+=90){ edge(-30-rnd()*50, y+rnd()*40); edge(3230+rnd()*50, y+rnd()*40); }
+    } else {
+      for(let x=-20;x<=3220;x+=70){ add('pine0', x+rnd()*30, -30-rnd()*60, realmAtPx(x,0), 1+rnd()*.5); add('pine0', x+rnd()*30, 2230+rnd()*60, realmAtPx(x,2200), 1+rnd()*.5); }
+      for(let y=-20;y<=2220;y+=70){ add('pine0', -30-rnd()*60, y+rnd()*30, realmAtPx(0,y), 1+rnd()*.5); add('pine0', 3230+rnd()*60, y+rnd()*30, realmAtPx(3200,y), 1+rnd()*.5); }
+    }
+    // 水池本體＋睡蓮、水草、岸邊石頭
+    ponds.forEach(p=>{
+      const w = toW(p.x, p.y);
+      const wm = new T.Mesh(GEO.disk, new T.MeshPhongMaterial({color:0x2f86b0, emissive:0x0d2a40, shininess:90, specular:0x9fd8ff, transparent:true, opacity:.88}));
+      wm.rotation.x = -Math.PI/2; wm.position.set(w.x,.07,w.z); wm.scale.set(p.rad, p.rad*.8, 1); wm.receiveShadow = true; W.add(wm);
+      const rim = new T.Mesh(GEO.disk, new T.MeshToonMaterial({color:0x6b5a3a, gradientMap:grad})); rim.rotation.x = -Math.PI/2; rim.position.set(w.x,.055,w.z); rim.scale.set(p.rad+.45, (p.rad+.45)*.8, 1); W.add(rim);
+      for(let i=0;i<4;i++){ const a = rnd()*6.28, d = rnd()*.6; put(rnd()<.5?'waterlily_A':'waterlily_B', w.x+Math.cos(a)*p.rad*d, w.z+Math.sin(a)*p.rad*.8*d, 3, undefined, .08); }
+      for(let i=0;i<7;i++){ const a = i/7*6.28+rnd()*.4; const ex = Math.cos(a)*(p.rad+.3), ez = Math.sin(a)*(p.rad+.3)*.8;
+        if(i%2) put(ROCKS[Math.floor(rnd()*4)], w.x+ex, w.z+ez, 2.2+rnd()*1.2); else put(rnd()<.5?'waterplant_A':'waterplant_C', w.x+ex*.92, w.z+ez*.92, 4); }
+    });
+    // 草叢（小圓錐，顏色跟著地面秘境色）
+    for(let k=0;k<2600 && L.grass.length<1500;k++){
+      const x = rnd()*3200, y = rnd()*2200;
+      if(pathPx.some(p=>(p.x-x)**2+(p.y-y)**2 < 60*60) || inPond(x,y,10)) continue;
+      const w = toW(x,y), r = realmAtPx(x,y), c = new T.Color(REALM[r].g).offsetHSL(0,.05,.1+rnd()*.08);
+      for(let i=0;i<3;i++) L.grass.push([w.x+(rnd()-.5)*.6, .1, w.z+(rnd()-.5)*.6, .13, .2+rnd()*.12, .13, rnd()*6.28, c]);
+    }
+    for(const name in K) envInst(W, name, K[name], name.startsWith('mountain') ? {ow:.012, tint:0xa9c9b4, chunk:40} : {chunk:32});
     const dummy = new T.Object3D(), cc = new T.Color();
-    function inst(list, geo, material){
+    function inst(list, geo, material, shadow){
       if(!list.length) return;
       const im = new T.InstancedMesh(geo, material, list.length);
       list.forEach((d,i)=>{ dummy.position.set(d[0],d[1],d[2]); dummy.scale.set(d[3],d[4],d[5]); dummy.rotation.set(0,d[6],0); dummy.updateMatrix(); im.setMatrixAt(i, dummy.matrix); cc.set(d[7]); im.setColorAt(i, cc); });
       im.instanceMatrix.needsUpdate = true; if(im.instanceColor) im.instanceColor.needsUpdate = true;
-      im.castShadow = !(material.transparent || material.isMeshBasicMaterial); im.receiveShadow = false;
+      im.castShadow = shadow!==false && !(material.transparent || material.isMeshBasicMaterial); im.receiveShadow = false; im.frustumCulled = false;
       W.add(im);
     }
     const tw = ()=> new T.MeshToonMaterial({color:0xffffff, gradientMap:grad});
     inst(L.trunk, GEO.cyl, tw()); inst(L.canopy, GEO.ico, tw()); inst(L.cone, GEO.cone, tw());
     inst(L.stem, GEO.cyl, tw()); inst(L.cap, GEO.hemi, tw()); inst(L.rune, GEO.box, tw()); inst(L.pillar, GEO.cyl, tw()); inst(L.pole, GEO.cyl, tw());
+    inst(L.grass, new T.ConeGeometry(1,1,5), tw(), false);
     inst(L.crystal, GEO.oct, new T.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:.82}));
-    inst(L.lamp, GEO.sph, new T.MeshBasicMaterial({color:0xffffff}));
-    inst(L.flower, GEO.sph, new T.MeshBasicMaterial({color:0xffffff}));
+    const lowSph = new T.IcosahedronGeometry(1,1);
+    inst(L.lamp, lowSph, new T.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:.55, blending:T.AdditiveBlending, depthWrite:false}));
+    inst(L.flower, lowSph, new T.MeshBasicMaterial({color:0xffffff}));
   }
   // 螢火蟲
   const FF = 280, ffGeo = new T.BufferGeometry(), ffBase = new Float32Array(FF*3), ffPos = new Float32Array(FF*3);
@@ -837,6 +942,7 @@ async function init3D(){
     if(m){
       dx/=m; dz/=m;
       hero.x = Math.max(-78,Math.min(78, hero.x+dx*SPEED*dt)); hero.z = Math.max(-52,Math.min(54, hero.z+dz*SPEED*dt));
+      PONDS.forEach(p=>{ const ex = (hero.x-p.wx)/(p.rad+.5), ez = (hero.z-p.wz)/((p.rad+.5)*.8), d = Math.hypot(ex,ez); if(d<1){ hero.x = p.wx + ex/d*(p.rad+.5); hero.z = p.wz + ez/d*(p.rad+.5)*.8; } });
       hero.face = Math.atan2(dx,dz); idle = 0;
       const lt = trail[trail.length-1]; if(Math.hypot(hero.x-lt.x, hero.z-lt.z)>.22){ trail.push({x:hero.x, z:hero.z}); if(trail.length>400) trail.shift(); }
     } else idle += dt;
@@ -962,7 +1068,7 @@ async function init3D(){
     const g = x.createLinearGradient(0,0,0,256); g.addColorStop(0,top); g.addColorStop(.55,bottom); g.addColorStop(1,'#05080f'); x.fillStyle = g; x.fillRect(0,0,4,256);
     return new T.CanvasTexture(c);
   }
-  function placeBattleCam(){ if(!bCam) return; if(vw<vh){ bCam.position.set(.6,6.5,16.5); } else { bCam.position.set(1.4,5.6,13.4); } bCam.lookAt(1.1,.6,0); if(camBase){ camBase.p = bCam.position.clone(); camBase.l.set(1.1,.6,0); } camLook.set(1.1,.6,0); }
+  function placeBattleCam(){ if(!bCam) return; if(vw<vh){ bCam.position.set(.6,6.5,16.5); } else { bCam.position.set(1.4,4.4,13.6); } bCam.lookAt(1.1,1.25,0); if(camBase){ camBase.p = bCam.position.clone(); camBase.l.set(1.1,1.25,0); } camLook.set(1.1,1.25,0); }
   function buildBattle(realm, monSpec){
     bScene = new T.Scene(); const rc = REALM[realm];
     bScene.background = new T.Color(0x070d18); bScene.fog = new T.Fog(0x070d18, 22, 60);
@@ -977,7 +1083,51 @@ async function init3D(){
     P(bScene, GEO.cyl, mat(new T.Color(rc.g).offsetHSL(0,0,.04).getHex()), 0,-.2,0,[17,.4,17],{ol:false}).receiveShadow = true;
     P(bScene, GEO.ring, glow(rc.a,.35), 0,.03,0,7,{rx:Math.PI/2,ol:false});
     // 背景景物
-    for(let i=0;i<18;i++){
+    const horizon = new T.Color(rc.g).multiplyScalar(.6);
+    if(hasEnv()){
+      bScene.fog.color.copy(horizon); bScene.fog.near = 22; bScene.fog.far = 62;   // 遠景融進天色
+      const R = (a,b)=>a+Math.random()*(b-a), K = {}, put = (n,x,z,sc,ry,y)=>(K[n]=K[n]||[]).push([x,y||0,z,sc,ry===undefined?R(0,6.28):ry]);
+      // 星星與月亮（不受霧影響）
+      const sv = []; for(let i=0;i<260;i++){ const th = R(Math.PI*.95, Math.PI*2.05), ph = R(.02,.5); sv.push(Math.cos(th)*48*Math.cos(ph), 2+Math.sin(ph)*48, Math.sin(th)*48*Math.cos(ph)); }
+      const sg = new T.BufferGeometry(); sg.setAttribute('position', new T.Float32BufferAttribute(sv,3));
+      bScene.add(new T.Points(sg, new T.PointsMaterial({color:0xffffff, size:.55, map:DOT, transparent:true, depthWrite:false, opacity:.85, fog:false})));
+      const moon = new T.Sprite(new T.SpriteMaterial({map:DOT, color:0xfff3d6, transparent:true, depthWrite:false, fog:false, blending:T.AdditiveBlending})); moon.position.set(-16,9.5,-44); moon.scale.setScalar(13); bScene.add(moon);
+      const md = new T.Mesh(GEO.disk, new T.MeshBasicMaterial({color:0xfff6e0, fog:false})); md.position.set(-16,9.5,-44.5); md.scale.setScalar(1.6); md.lookAt(1.4,4.4,13.6); bScene.add(md);
+      // 遠山（各秘境色調）
+      const MT = realm===4 ? ['mountain_A','mountain_C','mountain_B'] : ['mountain_A_grass_trees','mountain_B_grass_trees','mountain_C_grass_trees','mountain_B_grass'];
+      for(let i=0;i<16;i++){ const a = Math.PI*1.0 + i/15*Math.PI, r = R(40,47); put(MT[i%MT.length], Math.cos(a)*r, Math.sin(a)*r*.85-6, R(4.5,6.5), Math.floor(R(0,6))*Math.PI/3, -1.2); }
+      // 中景：各秘境的樹木與擺設
+      const KS = [['tree_single_B','tree_single_A','trees_A_medium','rock'],
+                  ['crystal','rune','lantern_standing','shrine_candles','rock'],
+                  ['tree_single_A','trees_B_small','tree_single_A','crystal','rock'],
+                  ['tree_pine_yellow_large','tree_pine_orange_medium','pillar','tree_pine_yellow_medium'],
+                  ['tree_dead_large','tree_dead_medium','lantern_standing','shrine_candles','tree_pine_orange_medium']][realm];
+      const SC = {tree_single_B:2.6, tree_single_A:2.9, trees_A_medium:2.6, trees_B_small:2.8, tree_pine_yellow_large:.5, tree_pine_yellow_medium:.55, tree_pine_orange_medium:.55, pillar:.65, tree_dead_large:.75, tree_dead_medium:.8, lantern_standing:1.8, shrine_candles:1};
+      const ROCKS = ['rock_single_A','rock_single_C','rock_single_D','rock_single_E'];
+      for(let i=0;i<26;i++){
+        const a = Math.PI*.92 + i/25*Math.PI*1.2, r = 11 + (i%3)*2.6 + R(-.6,.6), x = Math.cos(a)*r, z = Math.sin(a)*r*.75 - 2;
+        if(z>2.5) continue;
+        const k = KS[i%KS.length], sc = (.85+R(0,.35));
+        if(k==='crystal'){ P(bScene, GEO.oct, glow(rc.a,.8), x,1.3*sc,z,[.5*sc,1.4*sc,.5*sc],{ry:i,ol:false}); P(bScene, GEO.oct, glow(rc.a,.6), x+.6,.7*sc,z+.3,[.28*sc,.75*sc,.28*sc],{ry:i+1,ol:false}); }
+        else if(k==='rune') P(bScene, GEO.box, mat(0x4a4560), x,.9*sc,z,[.7*sc,1.8*sc,.4*sc],{ry:a});
+        else if(k==='rock') put('r'+ROCKS[i%4], x, z, R(3.5,5.5));
+        else put(k, x, z, SC[k]*sc, k==='pillar'?0:undefined);
+      }
+      if(realm===3) put('arch', 0, -11.5, 1.15, 0);   // 王庭：魔物身後的拱門
+      if(realm===4) for(let i=0;i<5;i++) put('fence', -8+i*4.1, -10.5, 1, 0);
+      // 場地邊緣：小石頭、草叢、石板路
+      for(let i=0;i<16;i++){ const a = R(0,6.28), r = R(7.6,9.5); if(Math.sin(a)*r>4) continue; put('r'+ROCKS[i%4], Math.cos(a)*r, Math.sin(a)*r*.9, R(1.6,2.8)); }
+      if(realm===3 || realm===4) for(let i=0;i<4;i++) put(i%2?'rpath_A':'rpath_C', -6+i*3.2+R(-.4,.4), -6.5+R(-.5,.5), .9);
+      for(const n in K){ if(n[0]==='r' && n[1]==='r') envInst(bScene, n.slice(1), K[n], {tint:new T.Color(rc.g).lerp(new T.Color(0x9098a8),.7), chunk:200}); else envInst(bScene, n, K[n], n.startsWith('mountain') ? {ow:.012, tint:realm===4?0x8a90b8:0xa9c9b4, chunk:200} : {chunk:200}); }
+      const gl = [], gd = new T.Object3D(), gc = new T.Color(rc.g).offsetHSL(0,.05,.14);
+      for(let i=0;i<220;i++){ const a = R(0,6.28), r = R(2,9); gl.push([Math.cos(a)*r, Math.sin(a)*r*.9]); }
+      const gi = new T.InstancedMesh(GEO.cone, new T.MeshToonMaterial({color:gc, gradientMap:grad}), gl.length);
+      gl.forEach((p,i)=>{ gd.position.set(p[0],.1,p[1]); gd.scale.set(.13,.2+Math.random()*.14,.13); gd.rotation.y = Math.random()*6; gd.updateMatrix(); gi.setMatrixAt(i, gd.matrix); }); bScene.add(gi);
+      // 雲（慢慢飄）
+      const clouds = [];
+      for(let i=0;i<5;i++){ const c = new T.Group(); envInst(c, i%2?'cloud_small':'cloud_big', [[0,0,0,R(1,1.6),R(0,6.28)]], {ol:false, shadow:false, fog:false, tint:0xcfd8f0}); c.position.set(R(-30,26), R(9.5,12), R(-40,-32)); c.userData.v = R(.25,.6); bScene.add(c); clouds.push(c); }
+      bScene.userData.tick = dt => clouds.forEach(c=>{ c.position.x += c.userData.v*dt; if(c.position.x>32) c.position.x = -34; });
+    } else for(let i=0;i<18;i++){
       const a = Math.PI*.95 + i/18*Math.PI*1.15, r = 10 + (i%3)*2.4, x = Math.cos(a)*r, z = Math.sin(a)*r*.75 - 2;
       if(z>3) continue;
       const s = .9 + (i%4)*.18;
@@ -1422,6 +1572,7 @@ async function init3D(){
     if(active && visible){
       if(state==='world' || (state==='trans' && !bScene)){ updateWorld(state==='world'?dt:0); renderer.render(W, wCam); if(frame%5===0) drawMini(); }
       else if(bScene){
+        if(bScene.userData.tick) bScene.userData.tick(dt);
         if(B){ animMonster(B.mon, T0); B.ms.forEach((u,i)=>{ if(!u.down || u.C.gl) animChar(u.C, T0+i*.5, false); }); }
         renderer.render(bScene, bCam);
       }
