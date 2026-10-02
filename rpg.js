@@ -1112,7 +1112,7 @@ async function init3D(){
   }
   function drawMini(){
     const m = $('mini'), x = m.getContext('2d'), w = m.width, h = m.height, sx = w/3200, sy = h/2200;
-    x.clearRect(0,0,w,h);
+    x.fillStyle = "#08121c"; x.fillRect(0,0,w,h);   // 不透明底色，後面的 3D 畫面才不會透出來
     REALM.forEach(r=>{ const g = x.createRadialGradient(r.x*sx,r.y*sy,0,r.x*sx,r.y*sy,700*sx); g.addColorStop(0,'#'+new T.Color(r.g).getHexString()); g.addColorStop(1,'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0,0,w,h); });
     x.strokeStyle = 'rgba(243,210,139,.5)'; x.lineWidth = 1.5; x.beginPath(); pathPx.forEach((p,i)=> i ? x.lineTo(p.x*sx,p.y*sy) : x.moveTo(p.x*sx,p.y*sy)); x.stroke();
     shrines.forEach(s=>{ const b = S.best[s.c.id]||0; x.fillStyle = b===3 ? '#f3d28b' : (b>=2 ? '#8fe3b8' : (monOf(s.c).boss ? '#ff6b7f' : 'rgba(255,255,255,.55)')); x.beginPath(); x.arc(POS[s.c.idx][0]*sx, POS[s.c.idx][1]*sy, monOf(s.c).boss?3.6:2.6, 0, 6.283); x.fill(); });
