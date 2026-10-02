@@ -1,0 +1,8 @@
+場景素材（CC0 1.0 Universal）— KayKit by Kay Lousberg  https://kaylousberg.com
+
+- nature.glb：取自 KayKit Medieval Hexagon Pack 1.0（decoration/nature：樹、岩石、山、雲、睡蓮、水草）
+  https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0
+- spooky.glb：取自 KayKit Halloween Bits 1.0（枯樹、秋色松樹、提燈、石柱、拱門、燭台、鐵柵欄、石板路）
+  https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0
+
+本站把各個單一模型的 .gltf 合併成上面兩個 .glb（每個模型一個具名節點），內容未修改。
