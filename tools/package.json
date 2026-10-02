@@ -1,0 +1,11 @@
+{
+  "name": "claude-guide-tools",
+  "private": true,
+  "description": "精靈試煉 RPG 的模型處理腳本（不會部署到網站）",
+  "type": "module",
+  "dependencies": {
+    "@gltf-transform/core": "^4.5.1",
+    "@gltf-transform/extensions": "^4.5.1",
+    "@gltf-transform/functions": "^4.5.1"
+  }
+}
