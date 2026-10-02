@@ -689,7 +689,7 @@ async function init3D(){
   }catch(e){ console.warn('模型載入失敗，改用簡化造型', e); for(const k in TPL) delete TPL[k]; }
 
   // ---------- 大地圖場景 ----------
-  const W = new T.Scene(); window.__rpgDebug.W = W;
+  const W = new T.Scene(); (window.__rpgDebug = window.__rpgDebug || {}).W = W;
   W.background = new T.Color(0x0b1a26); W.fog = new T.Fog(0x0b1a26, 34, 80);
   W.add(new T.HemisphereLight(0xcfe2ff, 0x1a2a20, .8));
   const sun = new T.DirectionalLight(0xfff0d0, .75); sun.position.set(30,60,25); W.add(sun); W.add(sun.target);
