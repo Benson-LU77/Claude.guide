@@ -267,7 +267,7 @@ async function init3D(){
     const take = md => { if(!md) return; files.add(md.file); if(md.tex) texs.add(md.tex); if(md.weapon) weaps.add(md.weapon); if(md.shield) weaps.add(md.shield); };
     R.members.forEach(m=>take(m.model)); Object.values(R.monsters).forEach(s=>take(s.model)); take(R.randomMonster.model);
     const jobs = [load(ASSET+'anims.glb').then(g=>{ g.animations.forEach(c=>{ CLIPS[c.name] = c; }); })];
-    files.forEach(f=>jobs.push(load(ASSET+f+'.glb').then(g=>{
+    files.forEach(f=>jobs.push(load((f.includes('/') ? 'assets/' : ASSET)+f+'.glb').then(g=>{
       g.scene.updateMatrixWorld(true);
       g.scene.traverse(o=>{ if(o.isMesh && !o.geometry.attributes.normal) o.geometry.computeVertexNormals(); });   // 有些模型（如 Fox.glb）沒附法線
       const box = new T.Box3(); g.scene.traverse(o=>{ if(o.isSkinnedMesh){ o.geometry.computeBoundingBox(); const b = o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld); box.union(b); } });
