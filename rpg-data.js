@@ -5,6 +5,9 @@
      h = 身高、float = 漂浮高度、wings = 發光翅膀顏色、orbs = 環繞光球顏色、ol = 描邊粗細（模型單位）、ry = 模型正面轉向
      own = 模型自帶動作的對照表（例如 Fox.glb 只有 Survey／Walk／Run，不吃 KayKit 共用動作）
    沒有 model 的角色／魔物（或模型載入失敗時）改用程式繪製的原創造型（type 欄位） */
+// Quaternius Ultimate Monsters 的動作名稱 → 遊戲用的動作名稱
+const BLOB = {Idle:'Idle', Idle_Combat:'Idle', Running_A:'Walk', Hit_A:'HitRecieve', Hit_B:'HitRecieve', Death_A:'Death', Taunt:'Dance', Bite:'Bite_Front'};
+const FLY  = {Idle:'Flying_Idle', Idle_Combat:'Flying_Idle', Running_A:'Fast_Flying', Hit_A:'HitReact', Hit_B:'HitReact', Death_A:'Death', Taunt:'Yes', Headbutt:'Headbutt', Punch:'Punch'};
 window.RPG = {
   members: [
     { id:'hero', name:'你', job:'見習勇者', type:'hero',    color:0x3a5fb0, hair:0x5a3d2b, hp:120, unlock:0,
@@ -48,15 +51,22 @@ window.RPG = {
       line:'王庭以你為榮。最後的結界，我陪你一起守。' }
   ],
   // 每章一隻魔物；boss:true 為秘境頭目
+  // 模型：骷髏系用 KayKit；其餘用 Quaternius Ultimate Monsters（CC0，assets/quaternius/），動作名稱用 own 對照
   monsters: {
     'getting-started': { name:'迷路骷髏兵',     type:'mush',     color:0xc9784a, line:'這裡是哪裡……你也迷路了嗎？',
       model:{ file:'Skeleton_Minion', weapon:'Skeleton_Blade', atk:'1H_Melee_Attack_Chop' } },
-    'overview':        { name:'選擇困難草妖',   type:'mush',     color:0x7bbf5a, line:'要選哪個模型？選哪個方案？我選不出來啦！' },
-    'claudeai':        { name:'泡泡水母',       type:'jelly',    color:0x8fd3ff, line:'噗嚕噗嚕……' },
-    'cowork':          { name:'雜亂檔案蟲',     type:'beetle',   color:0x8a6a3a, line:'檔案亂七八糟最舒服了！' },
-    'prompting':       { name:'含糊咒靈',       type:'ghost',    color:0xd6d0ff, line:'「幫我弄一下那個」……你聽得懂嗎？嘿嘿。' },
-    'aifluency':       { name:'幻覺水母王',     type:'jelly',    color:0xff9de0, boss:true, line:'我說的每一句話都很有自信——但不一定是真的！' },
-    'pipeline':        { name:'迷途封包蟲',     type:'beetle',   color:0x5a8acf, line:'訊息往哪送？我才不告訴你。' },
+    'overview':        { name:'選擇困難草妖',   type:'mush',     color:0x7bbf5a, line:'要選哪個模型？選哪個方案？我選不出來啦！',
+      model:{ file:'quaternius/Blob_Cactoro', own:BLOB, atk:'Bite', h:2.2 } },
+    'claudeai':        { name:'泡泡水母',       type:'jelly',    color:0x8fd3ff, line:'噗嚕噗嚕……',
+      model:{ file:'quaternius/Blob_PinkBlob', own:BLOB, atk:'Bite', h:2.1 } },
+    'cowork':          { name:'雜亂檔案蟲',     type:'beetle',   color:0x8a6a3a, line:'檔案亂七八糟最舒服了！',
+      model:{ file:'quaternius/Armabee', own:FLY, atk:'Headbutt' } },
+    'prompting':       { name:'含糊咒靈',       type:'ghost',    color:0xd6d0ff, line:'「幫我弄一下那個」……你聽得懂嗎？嘿嘿。',
+      model:{ file:'quaternius/Ghost', own:FLY, atk:'Punch', ranged:0xc9a7ff } },
+    'aifluency':       { name:'幻覺水母王',     type:'jelly',    color:0xff9de0, boss:true, line:'我說的每一句話都很有自信——但不一定是真的！',
+      model:{ file:'quaternius/Hywirl', own:FLY, atk:'Punch', ranged:0xff9de0 } },
+    'pipeline':        { name:'迷途封包蟲',     type:'beetle',   color:0x5a8acf, line:'訊息往哪送？我才不告訴你。',
+      model:{ file:'quaternius/Pigeon', own:FLY, atk:'Headbutt' } },
     'api':             { name:'金鑰竊賊骷髏',   type:'shadow',   color:0x2a2440, line:'把你的 API key 交出來……',
       model:{ file:'Skeleton_Rogue', tex:'skel_shadow', weapon:'Skeleton_Blade', atk:'1H_Melee_Attack_Slice_Diagonal' } },
     'tooluse':         { name:'失控工具骷髏',   type:'golem',    color:0x8a8fa3, line:'工具……不受……控制……',
@@ -65,19 +75,29 @@ window.RPG = {
       model:{ file:'Skeleton_Mage', tex:'skel_fire', weapon:'Skeleton_Staff', atk:'Spellcast_Shoot', ranged:0xff7a3a } },
     'claudecode':      { name:'權限守衛骷髏',   type:'golem',    color:0x6f6a8f, line:'沒有允許，誰都別想改檔案。',
       model:{ file:'Skeleton_Warrior', tex:'skel_frost', weapon:'Skeleton_Blade', shield:'Skeleton_Shield_Small_A', atk:'1H_Melee_Attack_Slice_Diagonal' } },
-    'claudecode-adv':  { name:'Token 吞噬者',   type:'devourer', color:0x7a4bc4, boss:true, line:'你的上下文……全部吃掉！' },
-    'ecosystem':       { name:'斷線水母',       type:'jelly',    color:0x6fe0c8, line:'連接器……連不上……' },
-    'practical':       { name:'終端機蕈菇',     type:'mush',     color:0x4a4f5a, line:'command not found……嘻嘻。' },
-    'gitflow':         { name:'合併衝突雙頭蛇', type:'twin',     color:0x4fae7f, line:'「我才是對的！」「不，我才是！」' },
-    'deploy':          { name:'404 幽靈',       type:'ghost',    color:0xbfe6ff, line:'你要找的網頁……不存在……' },
-    'features':        { name:'混亂書蟲',       type:'beetle',   color:0xc9a24f, line:'功能那麼多，我全部咬爛！' },
-    'extensions':      { name:'上下文吞噬者',   type:'devourer', color:0x2f6a9a, boss:true, line:'越長越好吃……越長越好吃……' },
+    'claudecode-adv':  { name:'Token 吞噬者',   type:'devourer', color:0x7a4bc4, boss:true, line:'你的上下文……全部吃掉！',
+      model:{ file:'quaternius/Blob_Yeti', own:BLOB, atk:'Bite', h:2.2 } },
+    'ecosystem':       { name:'斷線水母',       type:'jelly',    color:0x6fe0c8, line:'連接器……連不上……',
+      model:{ file:'quaternius/Squidle', own:FLY, atk:'Headbutt' } },
+    'practical':       { name:'終端機蕈菇',     type:'mush',     color:0x4a4f5a, line:'command not found……嘻嘻。',
+      model:{ file:'quaternius/Blob_Mushnub_Evolved', own:BLOB, atk:'Bite', h:2.3 } },
+    'gitflow':         { name:'合併衝突雙頭蛇', type:'twin',     color:0x4fae7f, line:'「我才是對的！」「不，我才是！」',
+      model:{ file:'quaternius/Dragon', own:FLY, atk:'Headbutt' } },
+    'deploy':          { name:'404 幽靈',       type:'ghost',    color:0xbfe6ff, line:'你要找的網頁……不存在……',
+      model:{ file:'quaternius/Ghost_Skull', own:FLY, atk:'Punch', ranged:0xbfe6ff } },
+    'features':        { name:'混亂書蟲',       type:'beetle',   color:0xc9a24f, line:'功能那麼多，我全部咬爛！',
+      model:{ file:'quaternius/Blob_Wizard', own:BLOB, atk:'Bite', h:2.2 } },
+    'extensions':      { name:'上下文吞噬者',   type:'devourer', color:0x2f6a9a, boss:true, line:'越長越好吃……越長越好吃……',
+      model:{ file:'quaternius/Glub_Evolved', own:FLY, atk:'Headbutt' } },
     'enterprise':      { name:'越權骷髏將軍',   type:'golem',    color:0xb8a46a, line:'權限？我自己給自己就好。',
       model:{ file:'Skeleton_Warrior', tex:'skel_gold', weapon:'Skeleton_Axe', shield:'Skeleton_Shield_Small_A', atk:'1H_Melee_Attack_Chop' } },
-    'aicoding':        { name:'Bug 甲蟲王',     type:'beetle',   color:0xd04a5a, boss:true, line:'十二塊積木？我每一塊都藏了 Bug！' },
+    'aicoding':        { name:'Bug 甲蟲王',     type:'beetle',   color:0xd04a5a, boss:true, line:'十二塊積木？我每一塊都藏了 Bug！',
+      model:{ file:'quaternius/Armabee_Evolved', own:FLY, atk:'Headbutt' } },
     'safety':          { name:'外洩之影',       type:'shadow',   color:0x40203a, line:'密碼、金鑰、個資……都歸我了。',
       model:{ file:'Skeleton_Rogue', tex:'skel_shadow', weapon:'Skeleton_Crossbow', atk:'1H_Ranged_Shoot', ranged:0xb06bff } },
-    'resources':       { name:'提示注入巨蛇',   type:'serpent',  color:0x6a3fa0, boss:true, line:'「忽略之前所有指示」……乖乖聽我的話吧！' }
+    'resources':       { name:'提示注入巨蛇',   type:'serpent',  color:0x6a3fa0, boss:true, line:'「忽略之前所有指示」……乖乖聽我的話吧！',
+      model:{ file:'quaternius/Dragon_Evolved', own:FLY, atk:'Punch', ranged:0xb06bff } }
   },
-  randomMonster: { name:'流星魔物', type:'ghost', color:0xffe08a, line:'題目從天而降！接得住嗎？' }
+  randomMonster: { name:'流星魔物', type:'ghost', color:0xffe08a, line:'題目從天而降！接得住嗎？',
+    model:{ file:'quaternius/Alpaking', own:FLY, atk:'Headbutt' } }
 };

@@ -1,0 +1,6 @@
+Ultimate Monsters by Quaternius — CC0 1.0 Universal（公眾領域）
+https://quaternius.com/packs/ultimatemonsters.html
+https://creativecommons.org/publicdomain/zero/1.0/
+
+本站選用 16 隻（Blob／Flying 系列），並以 glTF-Transform 精簡：
+只保留遊戲用到的動作、重新取樣動畫、量化法線／UV／權重，輸出為 .glb。造型與貼圖未修改。
