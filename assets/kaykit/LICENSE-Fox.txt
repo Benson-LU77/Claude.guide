@@ -1,0 +1,10 @@
+Fox.glb — 來源：Khronos glTF Sample Models（2.0/Fox）
+https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/Fox
+
+- Low poly fox 模型：by PixelMannen（CC0）https://opengameart.org/content/fox-and-shiba
+- Rigging and animation：by @tomkranis on Sketchfab（CC-BY 4.0）
+  https://sketchfab.com/models/371dea88d7e04a76af5763f2a36866bc
+  授權：https://creativecommons.org/licenses/by/4.0/
+- glTF conversion：by @AsoboStudio and @scurest
+
+本站用法：以 tex/fox_moon.png 換成月光白＋淡紫配色，作為夥伴「菲恩」。
