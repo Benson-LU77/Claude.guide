@@ -115,6 +115,7 @@
     box-shadow:inset 2px 0 0 var(--string-amber);
   }
   nav.tree a.active .idx{color:var(--string-amber);}
+  nav.tree a.nav-quiz .idx, nav.tree a.nav-quiz .nl .zh{color:#f3d28b;}
 
   .sidebar-foot{
     padding:1.2rem 1.4rem 0;
@@ -589,6 +590,8 @@
       <div class="nav-divider">其他</div>
       <a href="#safety"><span class="idx">[20]</span><span class="nl"><span class="zh">安全與限制</span><small>safety_and_limits</small></span></a>
       <a href="#resources"><span class="idx">[21]</span><span class="nl"><span class="zh">術語表與延伸閱讀</span><small>resources</small></span></a>
+      <div class="nav-divider">闖關</div>
+      <a href="quiz.html" class="nav-quiz"><span class="idx">[✦]</span><span class="nl"><span class="zh">精靈試煉</span><small>66 題闖關小測驗</small></span></a>
     </nav>
     <div class="sidebar-foot">
       2026-06 建立 · 2026-09 更新 · 內容以官方文件最新狀態為準
@@ -610,6 +613,7 @@
       <p class="lead">一份給所有人的 Claude 說明書。不管你只是想跟它聊天、想請它幫你做小工具，還是要把它接進自己的程式——這裡從最白話的地方講起，再一路往深處走。每章開頭都有一句「白話一句」，看不懂的名詞隨時到 <a href="#glossary">術語表</a> 查。</p>
       <div class="meta">給一般使用者與開發者 · 22 個章節 · 含可複製的指令與程式碼</div>
       <div class="scroll-cue"><span class="arrow">↓</span> 不知道從哪讀？先看 <a href="#getting-started">新手入門</a> 的閱讀路線</div>
+      <div class="scroll-cue"><span class="arrow">✦</span> 讀完想驗收？每章結尾都有 3 題小關卡，或直接挑戰 <a href="quiz.html">精靈試煉</a>（66 題闖關）</div>
     </section>
 
     <!-- ============ 00. 新手入門 ============ -->
@@ -6434,6 +6438,7 @@ jobs:
       claude.guide.json · 2026-06 建立 · 2026-09 更新，部分名稱與版本以官方文件最新狀態為準
       <div class="links">
         <span>各章程式碼區塊右上角都有「複製」按鈕，可直接取用</span>
+        <span>✦ <a href="quiz.html">精靈試煉：66 題闖關小測驗</a></span>
       </div>
     </footer>
   </main>
@@ -6453,7 +6458,7 @@ scrim.addEventListener('click', closeMenu);
 document.querySelectorAll('nav.tree a').forEach(a=>a.addEventListener('click', closeMenu));
 
 // ---------- scroll-spy ----------
-const navLinks = document.querySelectorAll('nav.tree a');
+const navLinks = document.querySelectorAll('nav.tree a[href^="#"]');
 const targets = [...navLinks].map(a => document.querySelector(a.getAttribute('href')));
 const io = new IntersectionObserver((entries)=>{
   entries.forEach(entry=>{
@@ -6537,5 +6542,7 @@ document.querySelectorAll('.code-block').forEach(block=>{
   }
 });
 </script>
+<script src="quiz-data.js"></script>
+<script src="quiz-inline.js"></script>
 </body>
 </html>

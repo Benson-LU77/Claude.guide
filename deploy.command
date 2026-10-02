@@ -23,6 +23,9 @@ if [ ! -d .git ]; then
   echo "✅ 已連線。"
 fi
 
+# --- 清掉殘留的鎖定檔（上次中斷或其他程式留下的 index.lock）---
+rm -f .git/index.lock
+
 # --- 每次更新：commit + push ---
 git add -A
 if git commit -q -m "更新網站 $(date '+%Y-%m-%d %H:%M')" 2>/dev/null; then

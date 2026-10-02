@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>精靈試煉 · Claude 全貌指南</title>
+<meta name="description" content="Claude 全貌指南的 3D 冒險測驗：帶著夥伴穿越五大秘境，用答題打倒 22 隻魔物。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night-1:#07111f; --night-2:#0d2033; --night-3:#163049;
+    --gold:#f3d28b; --gold-deep:#c9a24f; --leaf:#8fe3b8; --leaf-deep:#3fae7d;
+    --lilac:#c9a7ff; --rose:#ff9db0; --ink:#eaf2ef; --ink-soft:#a9c1bc; --ink-faint:#6f8a88;
+    --glass:rgba(14,32,48,.62); --glass-line:rgba(243,210,139,.28);
+    --win-bg:linear-gradient(180deg,rgba(18,30,78,.94),rgba(8,14,44,.94));
+    --win-line:#e9e6ff;
+    --serif:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{
+    font-family:var(--serif); color:var(--ink); line-height:1.7;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(201,167,255,.22), transparent 60%),
+      radial-gradient(900px 500px at 10% 0%, rgba(143,227,184,.16), transparent 60%),
+      linear-gradient(180deg, var(--night-1) 0%, var(--night-2) 55%, var(--night-3) 100%);
+    background-attachment:fixed; overflow-x:hidden;
+  }
+  .wrap{position:relative;z-index:2;max-width:1100px;margin:0 auto;padding:24px 18px 80px;}
+  a{color:var(--gold);}
+  .back{display:inline-flex;gap:.4em;align-items:center;font-size:.92rem;color:var(--ink-soft);text-decoration:none;}
+  .back:hover{color:var(--gold);}
+  header.title{text-align:center;margin:10px 0 20px;}
+  header.title .eyebrow{letter-spacing:.4em;font-size:.8rem;color:var(--leaf);}
+  header.title h1{margin:.1em 0 .05em;font-size:clamp(2rem,6vw,3.1rem);font-weight:900;letter-spacing:.08em;
+    background:linear-gradient(180deg,#fff6d6,var(--gold) 55%,var(--gold-deep));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  header.title p{margin:0;color:var(--ink-soft);}
+  .glass{background:var(--glass);border:1px solid var(--glass-line);border-radius:18px;
+    box-shadow:0 10px 40px rgba(0,0,0,.35), inset 0 0 30px rgba(243,210,139,.04);backdrop-filter:blur(6px);}
+
+  /* 冒險者卡 */
+  .hero-card{display:grid;grid-template-columns:1fr 1fr;gap:14px 26px;padding:18px 22px;}
+  .rank{font-size:1.25rem;font-weight:900;color:var(--gold);}
+  .rank small{display:block;font-size:.8rem;font-weight:400;color:var(--ink-soft);}
+  .xpbar{height:10px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin:8px 0 4px;border:1px solid rgba(243,210,139,.2)}
+  .xpbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--leaf-deep),var(--leaf),var(--gold));transition:width .9s cubic-bezier(.2,.8,.2,1);}
+  .stats{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.86rem;color:var(--ink-soft);}
+  .stats b{color:var(--ink);}
+  .roster-title{font-size:.85rem;color:var(--ink-soft);margin-bottom:6px;}
+  .roster-title b{color:var(--gold);}
+  .roster{display:flex;flex-wrap:wrap;gap:6px;}
+  .mem{font-size:.8rem;padding:3px 10px;border-radius:99px;border:1px solid rgba(143,227,184,.45);color:var(--ink);background:rgba(143,227,184,.08);}
+  .mem.locked{border-style:dashed;border-color:rgba(255,255,255,.18);color:var(--ink-faint);background:none;}
+  .badges{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;}
+  .badge{font-size:.8rem;padding:3px 12px;border-radius:99px;border:1px dashed rgba(255,255,255,.18);color:var(--ink-faint);}
+  .badge.on{border:1px solid var(--gold);color:var(--gold);background:rgba(243,210,139,.08);}
+
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin:18px 0 12px;}
+  .btn{font-family:inherit;font-size:.95rem;cursor:pointer;border-radius:99px;padding:.55em 1.2em;
+    border:1px solid var(--gold);color:#1b1405;background:linear-gradient(180deg,#fff0c4,var(--gold) 60%,var(--gold-deep));font-weight:600;}
+  .btn:hover{filter:brightness(1.08);}
+  .btn.ghost{background:transparent;color:var(--gold);}
+  .tab{font-family:inherit;font-size:.9rem;cursor:pointer;padding:.45em 1.1em;border-radius:99px;color:var(--ink-soft);
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);}
+  .tab.on{color:#1b1405;background:var(--gold);border-color:var(--gold);font-weight:600;}
+  .sep{width:1px;height:22px;background:rgba(255,255,255,.15);margin:0 4px;}
+
+  /* ===== 遊戲畫面 ===== */
+  .game{position:relative;width:100%;height:min(76vh,700px);min-height:420px;border-radius:18px;overflow:hidden;
+    background:#08121c;border:1px solid var(--glass-line);box-shadow:0 14px 50px rgba(0,0,0,.5);user-select:none;-webkit-user-select:none;}
+  .game:fullscreen{height:100vh;border-radius:0;border:none;}
+  .game canvas#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;outline:none;}
+  .loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-soft);font-size:1rem;z-index:30;background:#08121c;}
+  .layer{position:absolute;inset:0;pointer-events:none;z-index:5;}
+  .layer > *{pointer-events:auto;}
+  .hidden{display:none!important;}
+
+  /* JRPG 視窗 */
+  .win{background:var(--win-bg);border:2px solid var(--win-line);border-radius:10px;
+    box-shadow:0 0 0 2px rgba(10,14,40,.9),0 8px 24px rgba(0,0,0,.5),inset 0 0 16px rgba(120,140,255,.15);color:#fff;}
+  .win button.sel{display:block;width:100%;text-align:left;font-family:inherit;font-size:1rem;color:#fff;background:none;border:none;
+    padding:.38em .4em .38em 1.6em;cursor:pointer;position:relative;border-radius:6px;line-height:1.5;}
+  .win button.sel:hover,.win button.sel:focus-visible{background:rgba(255,255,255,.08);outline:none;}
+  .win button.sel:hover::before,.win button.sel:focus::before{content:"▶";position:absolute;left:.35em;top:.42em;font-size:.8em;color:var(--gold);animation:blink .8s steps(2) infinite;}
+  .win button.sel:disabled{color:rgba(255,255,255,.35);cursor:default;}
+  .win button.sel .d{display:block;font-size:.78rem;color:#b9bfe6;}
+  @keyframes blink{50%{opacity:.2}}
+
+  /* 大地圖 UI */
+  #mini{position:absolute;right:10px;top:10px;width:150px;height:103px;border-radius:8px;border:2px solid var(--win-line);background:rgba(4,10,18,.7);cursor:crosshair;}
+  .toast{position:absolute;left:50%;top:14px;transform:translateX(-50%);text-align:center;pointer-events:none;opacity:0;transition:opacity .6s;}
+  .toast.show{opacity:1;}
+  .toast .rn{font-size:1.6rem;font-weight:900;letter-spacing:.2em;color:var(--gold);text-shadow:0 0 14px #000,0 0 30px rgba(243,210,139,.4);}
+  .toast .rd{font-size:.85rem;text-shadow:0 0 8px #000;}
+  .dialog{position:absolute;left:12px;right:12px;bottom:12px;max-width:640px;margin:0 auto;padding:.8em 1em .9em;cursor:pointer;}
+  .dialog .who{position:absolute;top:-.9em;left:.9em;padding:0 .6em;font-size:.85rem;font-weight:700;color:var(--gold);background:#0f1a4a;border:2px solid var(--win-line);border-radius:6px;}
+  .dialog .txt{font-size:1rem;line-height:1.65;min-height:1.6em;}
+  .dialog .more{position:absolute;right:.7em;bottom:.3em;font-size:.8rem;color:var(--gold);animation:blink .8s steps(2) infinite;}
+  .prompt{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;
+    padding:.6em 1.4em;color:#fff;animation:pulse 1.4s ease-in-out infinite;}
+  @keyframes pulse{50%{box-shadow:0 0 0 2px rgba(10,14,40,.9),0 0 26px rgba(243,210,139,.8);}}
+  .label{position:absolute;transform:translate(-50%,-100%);padding:.15em .7em;font-size:.82rem;border-radius:6px;background:rgba(4,10,18,.75);
+    border:1px solid rgba(243,210,139,.5);white-space:nowrap;pointer-events:none;}
+  .label small{color:var(--gold);}
+  .hint{position:absolute;left:10px;top:10px;font-size:.75rem;color:var(--ink-soft);background:rgba(4,10,18,.6);padding:.25em .7em;border-radius:99px;pointer-events:none;}
+  .corner{position:absolute;right:10px;bottom:10px;display:flex;gap:6px;}
+  .corner button{font-family:inherit;font-size:.78rem;color:var(--ink);background:rgba(4,10,18,.7);border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:.25em .8em;cursor:pointer;}
+
+  /* 戰鬥 UI */
+  .b-top{position:absolute;left:12px;top:12px;min-width:220px;padding:.45em .8em .6em;}
+  .b-top .mn{font-weight:900;letter-spacing:.05em;}
+  .b-top .mn small{color:#ffb3c1;margin-left:.4em;font-weight:600;}
+  .hpbar{height:8px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:4px;}
+  .hpbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ff6b7f,#ffb36b);transition:width .5s;}
+  .b-turn{position:absolute;right:12px;top:12px;padding:.3em .8em;font-size:.85rem;}
+  .b-bottom{position:absolute;left:10px;right:10px;bottom:10px;display:flex;gap:10px;align-items:flex-end;}
+  .b-main{flex:1;min-height:150px;max-height:62%;padding:.7em .9em;overflow:auto;}
+  .b-party{width:250px;padding:.5em .7em;font-size:.85rem;}
+  .pm{display:grid;grid-template-columns:1fr 72px;gap:0 8px;align-items:center;padding:2px 0;}
+  .pm .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pm .nm small{color:#b9bfe6;margin-left:.3em;}
+  .pm .hp{height:6px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;}
+  .pm .hp i{display:block;height:100%;background:linear-gradient(90deg,#4fd18b,#b6f0a0);transition:width .4s;}
+  .pm.down .nm{color:#ff8a9a;text-decoration:line-through;}
+  .pm.shield .nm::after{content:" ◆";color:#b8e08a;}
+  .msg{font-size:1.02rem;line-height:1.75;}
+  .msg .cont{display:inline-block;margin-left:.3em;color:var(--gold);animation:blink .8s steps(2) infinite;}
+  .msg a{color:var(--gold);}
+  .qhead{font-size:.8rem;color:#b9bfe6;margin-bottom:.2em;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+  .qtext{font-size:1.05rem;font-weight:600;margin:.1em 0 .4em;}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;}
+  .opts button.sel .rn{color:var(--lilac);margin-right:.4em;font-weight:900;}
+  .opts button.right{background:rgba(79,209,139,.25)!important;}
+  .opts button.wrong{background:rgba(255,107,127,.25)!important;}
+  .opts button.gone{opacity:.25;text-decoration:line-through;}
+  .qtools{display:flex;gap:8px;flex-wrap:wrap;margin-top:.4em;}
+  .qtools button{font-family:inherit;font-size:.8rem;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:.2em .8em;cursor:pointer;}
+  .qtools button:disabled{opacity:.35;cursor:default;}
+  .result{text-align:center;}
+  .result h3{margin:.1em 0;font-size:1.5rem;letter-spacing:.2em;color:var(--gold);}
+  .result .stars{font-size:2.2rem;letter-spacing:8px;}
+  .result .stars .on{color:var(--gold);text-shadow:0 0 14px rgba(243,210,139,.9);}
+  .result .stars .off{color:rgba(255,255,255,.18);}
+  .result .rbtns{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:.5em;}
+  .result .rbtns button.sel{width:auto;padding:.35em 1em .35em 1.6em;border:1px solid rgba(255,255,255,.3);}
+  .dmg{position:absolute;transform:translate(-50%,-50%);font-weight:900;font-size:1.5rem;pointer-events:none;z-index:8;
+    color:#fff;text-shadow:0 0 4px #000,0 2px 0 #000;animation:dmg 1s ease-out forwards;font-family:system-ui,sans-serif;}
+  .dmg.heal{color:#8cffb0;} .dmg.hurt{color:#ff7b8c;} .dmg.crit{color:#ffd56b;font-size:2rem;} .dmg.txt{font-size:1.05rem;font-family:var(--serif);}
+  @keyframes dmg{0%{opacity:0;margin-top:10px}15%{opacity:1;margin-top:-6px}100%{opacity:0;margin-top:-46px}}
+  .flash{position:absolute;inset:0;z-index:20;pointer-events:none;opacity:0;}
+  .flash.go{animation:swirl .9s ease-in-out;}
+  @keyframes swirl{0%{opacity:0;background:radial-gradient(circle,transparent 0%,#000 0%)}
+    35%{opacity:1;background:radial-gradient(circle,#fff 0%,#c9a7ff 20%,#000 60%)}
+    55%{opacity:1;background:#000}100%{opacity:0;background:#000}}
+  .join{position:absolute;left:50%;top:22%;transform:translateX(-50%);text-align:center;z-index:9;pointer-events:none;}
+  .join .t{font-size:1.6rem;font-weight:900;color:var(--gold);letter-spacing:.1em;text-shadow:0 0 18px rgba(0,0,0,.9),0 0 30px rgba(243,210,139,.6);animation:pop .6s;}
+  .join .s{font-size:.9rem;text-shadow:0 0 8px #000;}
+  @keyframes pop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+
+  @media (max-width:700px){
+    .hero-card{grid-template-columns:1fr;}
+    .game{height:78vh;min-height:460px;}
+    #mini{width:104px;height:72px;}
+    .hint{display:none;}
+    .b-bottom{flex-direction:column;align-items:stretch;}
+    .b-party{width:auto;display:grid;grid-template-columns:1fr 1fr;gap:0 12px;padding:.35em .6em;font-size:.78rem;order:-1;}
+    .pm{grid-template-columns:1fr 46px;}
+    .b-main{min-height:120px;max-height:48vh;}
+    .opts{grid-template-columns:1fr;}
+    .win button.sel{font-size:.95rem;}
+    .b-top{min-width:0;right:auto;max-width:60%;}
+  }
+
+  /* 關卡清單（備用模式） */
+  .realm{margin:16px 0 0;padding:16px 18px 18px;}
+  .realm h2{margin:0 0 4px;font-size:1.2rem;color:var(--gold);}
+  .realm p{margin:0 0 10px;color:var(--ink-soft);font-size:.9rem;}
+  .stages{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;}
+  .stage{font-family:inherit;text-align:left;cursor:pointer;color:var(--ink);padding:10px 12px;border-radius:12px;
+    border:1px solid rgba(143,227,184,.22);background:rgba(143,227,184,.06);}
+  .stage:hover{border-color:var(--gold);}
+  .stage .no{font-size:.72rem;color:var(--leaf);}
+  .stage .nm{display:block;font-weight:900;}
+  .stage .ch{display:block;font-size:.76rem;color:var(--ink-soft);}
+  .stage .mo{display:block;font-size:.76rem;color:#ffb3c1;}
+  .stage .st{color:rgba(255,255,255,.18);letter-spacing:2px;}
+  .stage .st .on{color:var(--gold);}
+
+  /* 純文字試煉（無 3D 時的備用） */
+  .overlay{position:fixed;inset:0;z-index:50;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;background:rgba(4,10,18,.8);padding:24px 14px 60px;}
+  .overlay.show{display:flex;}
+  .trial{width:100%;max-width:640px;padding:20px 22px;margin-top:4vh;}
+  .trial h3{margin:4px 0;color:var(--gold);}
+  .trial .opt{display:block;width:100%;text-align:left;font-family:inherit;font-size:1rem;color:var(--ink);margin:6px 0;padding:10px 12px;border-radius:10px;border:1px solid rgba(201,167,255,.3);background:rgba(201,167,255,.06);cursor:pointer;}
+  .trial .opt.right{border-color:var(--leaf);background:rgba(143,227,184,.16);}
+  .trial .opt.wrong{border-color:var(--rose);background:rgba(255,157,176,.12);}
+
+  footer{margin-top:30px;text-align:center;font-size:.82rem;color:var(--ink-faint);}
+  footer button{font-family:inherit;background:none;border:none;color:var(--ink-faint);text-decoration:underline;cursor:pointer;font-size:.82rem;}
+  @media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation-duration:.01s!important;transition:none!important;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 回到 Claude 全貌指南</a>
+  <header class="title">
+    <div class="eyebrow">THE ELVEN TRIALS</div>
+    <h1>精靈試煉</h1>
+    <p>帶著夥伴穿越五大秘境：用正確答案當武器，打倒盤據 22 座祭壇的魔物。</p>
+  </header>
+
+  <section class="glass hero-card" aria-label="冒險者狀態">
+    <div>
+      <div class="rank" id="rank">迷途旅人<small id="rankNext"></small></div>
+      <div class="xpbar"><i id="xpFill"></i></div>
+      <div class="stats">
+        <span>經驗值 <b id="xp">0</b></span>
+        <span>星星 <b id="stars">0</b> / 66</span>
+        <span>擊敗魔物 <b id="beaten">0</b> / 22</span>
+      </div>
+    </div>
+    <div>
+      <div class="roster-title">隊伍 <b id="partyCount">2</b> / 8 · <span id="nextJoin"></span></div>
+      <div class="roster" id="roster"></div>
+    </div>
+    <div class="badges" id="badges"></div>
+  </section>
+
+  <div class="toolbar">
+    <button class="tab on" data-mode="world">冒險模式</button>
+    <button class="tab" data-mode="list">關卡清單</button>
+    <span class="sep"></span>
+    <button class="btn" id="goNext">前往下一隻魔物</button>
+    <button class="btn ghost" id="goRandom">流星雨試煉（隨機 10 題）</button>
+  </div>
+
+  <section class="game" id="game" aria-label="3D 冒險畫面">
+    <canvas id="gl" tabindex="0" aria-label="精靈世界：方向鍵或 WASD 移動，靠近魔物按 E 開戰；也可以直接點地面移動"></canvas>
+    <div class="loading" id="loading">正在召喚精靈世界……</div>
+
+    <!-- 大地圖 UI -->
+    <div class="layer" id="worldUI">
+      <canvas id="mini" aria-label="小地圖，點一下可以走過去"></canvas>
+      <div class="toast" id="toast"><div class="rn"></div><div class="rd"></div></div>
+      <div class="hint">方向鍵／WASD 移動 · 點地面也能走 · 靠近魔物按 E</div>
+      <div id="labels"></div>
+      <button class="win prompt hidden" id="prompt">挑戰</button>
+      <div class="win dialog hidden" id="dialog"><span class="who" id="who">露米</span><div class="txt" id="dtxt"></div><span class="more">▼</span></div>
+      <div class="corner"><button id="sfxBtn">音效：開</button><button id="fsBtn">全螢幕</button></div>
+    </div>
+
+    <!-- 戰鬥 UI -->
+    <div class="layer hidden" id="battleUI">
+      <div class="win b-top"><div class="mn" id="bName"></div><div class="hpbar"><i id="bHp"></i></div></div>
+      <div class="win b-turn" id="bTurn"></div>
+      <div class="b-bottom">
+        <div class="win b-main" id="bMain"></div>
+        <div class="win b-party" id="bParty"></div>
+      </div>
+      <div id="dmgLayer"></div>
+      <div class="join hidden" id="join"><div class="t"></div><div class="s"></div></div>
+    </div>
+    <div class="flash" id="flash"></div>
+  </section>
+
+  <div id="map" class="hidden"></div>
+
+  <footer>
+    進度只存在你這台裝置的瀏覽器裡。<button id="reset">重置進度</button><br>
+    題目依據 <a href="index.html">Claude 全貌指南</a> 內容出題；功能與名稱以官方文件最新狀態為準。<br>
+    Q 版角色、骷髏魔物與動作：<a href="https://kaylousberg.com" target="_blank" rel="noopener">KayKit by Kay Lousberg</a>（Adventurers、Skeletons，CC0）；其餘角色、魔物與世界為本站原創。3D 引擎：<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>（MIT）。
+  </footer>
+</div>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true"><div class="glass trial" id="trial"></div></div>
+
+<script src="lib/three.min.js"></script>
+<script src="lib/GLTFLoader.js"></script>
+<script src="lib/SkeletonUtils.js"></script>
+<script src="quiz-data.js"></script>
+<script src="rpg-data.js"></script>
+<script src="rpg.js"></script>
+</body>
+</html>
