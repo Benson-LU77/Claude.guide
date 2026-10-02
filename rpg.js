@@ -48,8 +48,64 @@ const Sfx = (function(){
     enc(){ [220,277,330,440,554,659].forEach((f,i)=>tone(f,.08,'square',.045,i*.045)); },
     boom(){ tone(90,.6,'sawtooth',.07,0,30); tone(600,.3,'square',.03,.02,80); }
   };
-  return { play(n){ try{ P[n] && P[n](); }catch(e){} }, toggle(){ on = !on; S.sfx = on; save(); return on; }, get on(){ return on; }, wake(){ if(on) ctx(); } };
+  return { play(n){ try{ P[n] && P[n](); }catch(e){} }, toggle(){ on = !on; S.sfx = on; save(); return on; }, get on(){ return on; }, wake(){ if(on) ctx(); }, ctx };
 })();
+
+// ===================== 背景音樂（WebAudio 即時合成，8 小節循環） =====================
+const Bgm = (function(){
+  // 每首：bpm、每格八分音符；mel = 旋律、bass = 低音（MIDI 音高，0 = 休止）
+  const SONGS = {
+    world:{ bpm:96, lead:'triangle', bassW:'sine', vol:.05,
+      mel:[76,0,79,0,84,0,83,81, 79,0,76,0,0,0,0,0, 77,0,81,0,84,0,81,77, 79,0,0,0,74,0,0,0,
+           76,0,79,0,84,0,86,88, 84,0,81,0,0,0,79,0, 77,0,76,0,74,0,72,0, 74,0,76,0,72,0,0,0],
+      bass:[48,0,55,0,52,0,55,0, 45,0,52,0,48,0,52,0, 41,0,48,0,45,0,48,0, 43,0,50,0,47,0,50,0,
+            48,0,55,0,52,0,55,0, 45,0,52,0,48,0,52,0, 41,0,48,0,45,0,48,0, 43,0,50,0,48,0,0,0] },
+    battle:{ bpm:150, lead:'square', bassW:'triangle', vol:.035,
+      mel:[69,0,72,0,76,0,74,72, 72,0,0,0,69,0,65,0, 67,0,71,0,74,0,72,71, 68,0,0,0,64,0,68,0,
+           69,72,76,81,79,0,76,0, 77,0,76,0,72,0,69,0, 71,0,74,0,79,0,77,76, 76,0,0,0,71,0,68,0],
+      bass:[45,57,45,57,45,57,45,57, 41,53,41,53,41,53,41,53, 43,55,43,55,43,55,43,55, 40,52,40,52,40,52,40,52,
+            45,57,45,57,45,57,45,57, 41,53,41,53,41,53,41,53, 43,55,43,55,43,55,43,55, 40,52,40,52,44,56,44,56] }
+  };
+  let on = S.bgm !== false, want = null, cur = null, master = null, timer = null, step = 0, nextT = 0;
+  const hz = n => 440*Math.pow(2,(n-69)/12);
+  function note(a, f, t, d, type, v){
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(v, t+.015); g.gain.exponentialRampToValueAtTime(.0001, t+d);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t+d+.05);
+  }
+  function tick(){
+    const a = Sfx.ctx(); if(!a || !cur) return;
+    const sg = SONGS[cur], st = 60/sg.bpm/2;
+    while(nextT < a.currentTime + .2){
+      const i = step % sg.mel.length, m = sg.mel[i], b = sg.bass[i];
+      if(m) note(a, hz(m), nextT, st*1.8, sg.lead, sg.vol);
+      if(b) note(a, hz(b), nextT, st*1.6, sg.bassW, sg.vol*1.3);
+      nextT += st; step++;
+    }
+  }
+  function start(name){
+    const a = Sfx.ctx(); if(!a) return;
+    if(!master){ master = a.createGain(); master.connect(a.destination); }
+    master.gain.cancelScheduledValues(a.currentTime); master.gain.setValueAtTime(.0001, a.currentTime); master.gain.linearRampToValueAtTime(1, a.currentTime+.6);
+    cur = name; step = 0; nextT = a.currentTime + .1;
+    clearInterval(timer); timer = setInterval(tick, 60); tick();
+  }
+  function halt(){
+    clearInterval(timer); timer = null; cur = null;
+    if(master && Sfx.ctx()){ const a = Sfx.ctx(); master.gain.cancelScheduledValues(a.currentTime); master.gain.setValueAtTime(master.gain.value, a.currentTime); master.gain.linearRampToValueAtTime(.0001, a.currentTime+.3); }
+  }
+  let woke = false;
+  function sync(){ const w = on && woke && !document.hidden ? want : null; if(w===cur) return; if(w) start(w); else halt(); }
+  document.addEventListener('visibilitychange', sync);
+  return {
+    play(name){ want = name; sync(); },                 // name = 'world' | 'battle' | null
+    wake(){ if(!woke){ woke = true; sync(); } },         // 瀏覽器規定要有使用者操作後才能出聲
+    toggle(){ on = !on; S.bgm = on; save(); sync(); return on; },
+    get on(){ return on; }
+  };
+})();
+['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev, ()=>{ Sfx.wake(); Bgm.wake(); }, {once:false, passive:true}));
 
 // ===================== 上方冒險者卡與關卡清單 =====================
 function renderHUD(){
@@ -131,6 +187,8 @@ $('reset').addEventListener('click',()=>{ if(confirm('確定要清除所有星�
 window.addEventListener('storage', e=>{ if(e.key===KEY){ S = load(); if(!S.best) S.best={}; renderHUD(); if(G) G.refreshAll(); } });
 $('sfxBtn').addEventListener('click',()=>{ $('sfxBtn').textContent = '音效：' + (Sfx.toggle()?'開':'關'); });
 $('sfxBtn').textContent = '音效：' + (Sfx.on?'開':'關');
+$('bgmBtn').addEventListener('click',()=>{ $('bgmBtn').textContent = '音樂：' + (Bgm.toggle()?'開':'關'); });
+$('bgmBtn').textContent = '音樂：' + (Bgm.on?'開':'關');
 $('fsBtn').addEventListener('click',()=>{
   const el = $('game');
   if(document.fullscreenElement) document.exitFullscreen(); else if(el.requestFullscreen) el.requestFullscreen().catch(()=>{});
@@ -180,10 +238,13 @@ async function init3D(){
   // ---------- Q 版模型（KayKit glTF）：載入、描邊、動作 ----------
   const ASSET = 'assets/kaykit/';
   const TPL = {}, WEAP = {}, TEX = {}, CLIPS = {};
-  const outlineMat = (skin) => { const m = new T.MeshBasicMaterial({color:0x17121f, side:T.BackSide, skinning:skin});
-    m.onBeforeCompile = sh => { sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed += normalize(normal) * 0.028;'); };
-    return m; };
-  const OUTM = outlineMat(false), OUTMS = outlineMat(true);
+  // 描邊：沿法線外推的背面網格；w = 粗細（模型單位，KayKit 預設 0.028）
+  const OLM = {};
+  const outlineMat = (skin, w) => { const k = (skin?'s':'m')+w; if(OLM[k]) return OLM[k];
+    const m = new T.MeshBasicMaterial({color:0x17121f, side:T.BackSide, skinning:skin});
+    m.onBeforeCompile = sh => { sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed += normalize(normal) * '+w.toFixed(4)+';'); };
+    m.customProgramCacheKey = () => 'ol'+k;
+    return OLM[k] = m; };
   function toonify(o, tex){
     const old = o.material, map = tex ? TEX[tex] : old.map;
     if(map){ map.encoding = T.LinearEncoding; }
@@ -191,10 +252,10 @@ async function init3D(){
     o.castShadow = true; o.receiveShadow = false; o.frustumCulled = false;
     return o.material;
   }
-  function addOutline(o){
-    let ol;
-    if(o.isSkinnedMesh){ ol = new T.SkinnedMesh(o.geometry, OUTMS); ol.bind(o.skeleton, o.bindMatrix); }
-    else ol = new T.Mesh(o.geometry, OUTM);
+  function addOutline(o, w){
+    let ol; w = w || .028;
+    if(o.isSkinnedMesh){ ol = new T.SkinnedMesh(o.geometry, outlineMat(true, w)); ol.bind(o.skeleton, o.bindMatrix); }
+    else ol = new T.Mesh(o.geometry, outlineMat(false, w));
     ol.position.copy(o.position); ol.quaternion.copy(o.quaternion); ol.scale.copy(o.scale);
     ol.frustumCulled = false; ol.userData.outline = true; o.parent.add(ol);
   }
@@ -208,8 +269,9 @@ async function init3D(){
     const jobs = [load(ASSET+'anims.glb').then(g=>{ g.animations.forEach(c=>{ CLIPS[c.name] = c; }); })];
     files.forEach(f=>jobs.push(load(ASSET+f+'.glb').then(g=>{
       g.scene.updateMatrixWorld(true);
+      g.scene.traverse(o=>{ if(o.isMesh && !o.geometry.attributes.normal) o.geometry.computeVertexNormals(); });   // 有些模型（如 Fox.glb）沒附法線
       const box = new T.Box3(); g.scene.traverse(o=>{ if(o.isSkinnedMesh){ o.geometry.computeBoundingBox(); const b = o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld); box.union(b); } });
-      TPL[f] = {scene:g.scene, h:Math.max(.5, box.max.y - Math.min(0, box.min.y))};
+      TPL[f] = {scene:g.scene, h:Math.max(.5, box.max.y - Math.min(0, box.min.y)), anims:g.animations};
     })));
     weaps.forEach(w=>jobs.push(load(ASSET+w+'.glb').then(g=>{ WEAP[w] = g.scene; })));
     texs.forEach(t=>jobs.push(new Promise((res,rej)=>tl.load(ASSET+'tex/'+t+'.png', tx=>{ tx.flipY = false; tx.encoding = T.LinearEncoding; TEX[t] = tx; res(); }, undefined, rej))));
@@ -228,7 +290,7 @@ async function init3D(){
         if(md.show && !md.show.includes(nm) && !md.show.includes(pn)){ o.visible = false; return; }
         if(!md.show && /Offhand|Shield|2H_|Mug|Spellbook|Throwable|Knife|Crossbow|Wand|Staff|Axe|Sword/.test(nm)){ o.visible = false; return; }
       }
-      mats.push(toonify(o, md.tex)); addOutline(o);
+      mats.push(toonify(o, md.tex)); addOutline(o, md.ol);
     });
     const slot = n => root.getObjectByName(n.replace('.','')) || root.getObjectByName(n);
     [['weapon','handslot.r'],['shield','handslot.l']].forEach(([k,bone])=>{
@@ -238,11 +300,22 @@ async function init3D(){
       b.add(w);
     });
     const g = new T.Group(), holder = new T.Group(); g.add(holder); holder.add(root);
+    if(md.ry) root.rotation.y = md.ry;   // 模型的正面不是 +z 時轉正
     const s = targetH / t.h; holder.scale.setScalar(s);
     return {g, holder, root, mats};
   }
-  function glSetup(X, root){ X.mixer = new T.AnimationMixer(root); X.acts = {}; X.cur = null; X.lt = performance.now(); }
-  function act(X, name){ if(!X.acts[name]){ const c = CLIPS[name]; if(!c) return null; X.acts[name] = X.mixer.clipAction(c); } return X.acts[name]; }
+  function glSetup(X, root, md){
+    X.mixer = new T.AnimationMixer(root); X.acts = {}; X.cur = null; X.lt = performance.now();
+    if(md && md.own){ X.own = md.own; X.ownClips = TPL[md.file].anims || []; }
+  }
+  // 取得動作：一般用 KayKit 共用動作（anims.glb）；有 own 的模型只用自己檔案裡的動作，沒有對應就回傳 null
+  function act(X, name){
+    if(!X.acts[name]){
+      const c = X.own ? X.ownClips.find(k=>k.name===X.own[name]) : CLIPS[name];
+      if(!c) return null; X.acts[name] = X.mixer.clipAction(c);
+    }
+    return X.acts[name];
+  }
   function loopAnim(X, name, fade){
     if(X.cur===name) return; const a = act(X, name); if(!a) return;
     a.reset(); a.setLoop(T.LoopRepeat, Infinity); a.clampWhenFinished = false; a.timeScale = 1; a.enabled = true;
@@ -261,16 +334,27 @@ async function init3D(){
   }
   function glTick(X){ const now = performance.now(), dt = Math.min(.1, (now - X.lt)/1000); X.lt = now; if(dt>0) X.mixer.update(dt); }
   function makeGlChar(m){
-    const md = m.model, I = instModel(md, 2.0);
-    const C = {g:I.g, body:I.holder, legs:[], arms:[], wings:[], spin:[], m, float:0, k:1.05, quad:false, gl:true, mats:I.mats, atkAnim:md.atk};
-    shadowOf(C.g, .5); glSetup(C, I.root); loopAnim(C, 'Idle', 0);
+    const md = m.model, h = md.h || 2.0, I = instModel(md, h);
+    const C = {g:I.g, body:I.holder, legs:[], arms:[], wings:[], spin:[], m, float:md.float||0, k:h/1.9, quad:!!md.own, gl:true, mats:I.mats, atkAnim:md.atk};
+    I.holder.position.y = C.float;
+    shadowOf(C.g, md.own ? .6 : .5); glSetup(C, I.root, md); loopAnim(C, 'Idle', 0);
+    if(md.wings){   // 精靈翅膀（掛在角色群組上，跟著漂浮）
+      for(const sx of [-1,1]){
+        const w = new T.Group(); w.position.set(sx*.08, C.float + h*.6, -.2); C.g.add(w);
+        P(w, GEO.sph, glow(md.wings,.8), sx*.42,.17,0,[.46,.26,.02],{ol:false});
+        P(w, GEO.sph, glow(md.wings,.7), sx*.32,-.18,0,[.3,.17,.02],{ol:false});
+        C.wings.push(w);
+      }
+      C.wingBase = C.float + h*.6;
+    }
+    if(md.orbs) for(let i=0;i<2;i++) C.spin.push(P(C.g, GEO.sph, glow(md.orbs,.85), 0,1,0,.09,{ol:false}));
     return C;
   }
   function makeGlMonster(sp){
-    const md = sp.model, I = instModel(md, 2.1);
-    const M = {g:I.g, body:I.holder, mats:I.mats, type:'gl', gl:true, boss:!!sp.boss, float:0, top:1.7, sp, atkAnim:md.atk, ranged:md.ranged};
-    shadowOf(M.g, .75); glSetup(M, I.root); loopAnim(M, 'Idle', 0);
-    if(M.boss){ M.aura = P(M.g, GEO.ring, glow(0xff6b9a,.55), 0,.06,0,1.4,{rx:Math.PI/2,ol:false}); M.g.scale.setScalar(1.5); }
+    const md = sp.model, I = instModel(md, 2.5);
+    const M = {g:I.g, body:I.holder, mats:I.mats, type:'gl', gl:true, boss:!!sp.boss, float:0, top:2.1, sp, atkAnim:md.atk, ranged:md.ranged};
+    shadowOf(M.g, .75); glSetup(M, I.root, md); loopAnim(M, 'Idle', 0);
+    if(M.boss){ M.aura = P(M.g, GEO.ring, glow(0xff6b9a,.55), 0,.06,0,1.4,{rx:Math.PI/2,ol:false}); M.g.scale.setScalar(1.4); }
     M.mats.forEach(mm=>{ mm.userData.e = mm.emissive.getHex(); mm.userData.ei = mm.emissiveIntensity; });
     return M;
   }
@@ -371,8 +455,13 @@ async function init3D(){
   }
   function fin(C){ C.g.scale.setScalar(C.k); C.body.position.y = C.float; C.g.traverse(o=>{ if(o.isMesh && o.material!==OUT && o.material!==SHADOW && !o.material.transparent) o.castShadow = true; }); return C; }
   function animChar(C, t, mv){
-    if(C.gl){ if(!C.lock) loopAnim(C, mv ? 'Running_A' : (C.battle ? 'Idle_Combat' : 'Idle')); glTick(C); return; }
     const sp = reduce ? 0 : 1;
+    if(C.gl){
+      if(!C.lock) loopAnim(C, mv ? 'Running_A' : (C.battle ? 'Idle_Combat' : 'Idle')); glTick(C);
+      if(C.float){ const y = C.float + Math.sin(t*3)*.1*sp; C.body.position.y = y; C.wings.forEach((w,i)=>{ w.position.y = C.wingBase + (y - C.float); w.rotation.y = (i?-1:1)*(.25+Math.sin(t*(mv?24:8))*.45*sp); }); }
+      C.spin.forEach((s,i)=>{ const a = t*2+i*Math.PI; s.position.set(Math.cos(a)*.75, 1.0+Math.sin(t*3+i)*.1, Math.sin(a)*.75); });
+      return;
+    }
     if(C.quad){
       C.legs.forEach((l,i)=> l.rotation.x = mv ? Math.sin(t*12 + ((i===0||i===3)?0:Math.PI))*.7 : 0);
       C.tail.rotation.y = Math.sin(t*3)*.4*sp;
@@ -492,8 +581,8 @@ async function init3D(){
       for(let i=0;i<5;i++){ const a = i/5*Math.PI*2; P(cr, GEO.cone, col(0xf3d28b), Math.cos(a)*.27,.17,Math.sin(a)*.27,[.07,.22,.07],{ol:false}); }
       P(cr, GEO.sph, glow(0xff5c7a), 0,.08,.32,.06,{ol:false});
       M.aura = P(g, GEO.ring, glow(0xff6b9a,.55), 0,.06,0,1.4,{rx:Math.PI/2,ol:false});
-      g.scale.setScalar(1.5);
-    }
+      g.scale.setScalar(1.6);
+    } else g.scale.setScalar(1.3);
     M.mats.forEach(m=>{ m.userData.e = m.emissive.getHex(); m.userData.ei = m.emissiveIntensity; });
     g.traverse(o=>{ if(o.isMesh && o.material!==OUT && o.material!==SHADOW && !o.material.transparent) o.castShadow = true; });
     return M;
@@ -873,7 +962,7 @@ async function init3D(){
     const g = x.createLinearGradient(0,0,0,256); g.addColorStop(0,top); g.addColorStop(.55,bottom); g.addColorStop(1,'#05080f'); x.fillStyle = g; x.fillRect(0,0,4,256);
     return new T.CanvasTexture(c);
   }
-  function placeBattleCam(){ if(!bCam) return; if(vw<vh){ bCam.position.set(.6,6.5,16.5); } else { bCam.position.set(1.2,4.6,11.2); } bCam.lookAt(.2,1.3,0); if(camBase){ camBase.p = bCam.position.clone(); camLook.set(.2,1.3,0); } }
+  function placeBattleCam(){ if(!bCam) return; if(vw<vh){ bCam.position.set(.6,6.5,16.5); } else { bCam.position.set(1.4,5.6,13.4); } bCam.lookAt(1.1,.6,0); if(camBase){ camBase.p = bCam.position.clone(); camBase.l.set(1.1,.6,0); } camLook.set(1.1,.6,0); }
   function buildBattle(realm, monSpec){
     bScene = new T.Scene(); const rc = REALM[realm];
     bScene.background = new T.Color(0x070d18); bScene.fog = new T.Fog(0x070d18, 22, 60);
@@ -905,13 +994,15 @@ async function init3D(){
     const M = makeMonster(monSpec); M.g.position.set(-3.6,0,-.4); M.g.rotation.y = Math.PI/2 - .45; bScene.add(M.g); M.home = M.g.position.clone(); M.battle = true;
     // 隊伍
     const ms = party().map(m=>({m, C:makeChar(m), hp:m.hp, max:m.hp, down:false}));
-    const n = ms.length, front = Math.min(4, n), back = n-front;
+    // 兩排交錯、沿畫面橫向排開（不沿鏡頭深度方向排，才不會互相擋住）
     ms.forEach((u,i)=>{
-      const row = i<front ? 0 : 1, k = row ? i-front : i, cnt = row ? back : front;
-      const z = (k-(cnt-1)/2)*1.45 + (row?.5:0), x = 2.4 + row*1.7 + Math.abs(z)*.12;
-      u.C.g.position.set(x,0,z); u.C.g.rotation.y = -Math.PI/2 + .45; u.home = u.C.g.position.clone(); u.C.battle = true; bScene.add(u.C.g);
+      const col = Math.floor(i/2), row = i%2;
+      const x = 1.7 + col*1.5 + row*.75, z = row ? -1.05 : 1.0;
+      u.C.g.position.set(x,0,z);
+      u.C.g.rotation.y = -Math.PI/2 + .5;   // 面向魔物、略轉向鏡頭（3/4 側面）
+      u.home = u.C.g.position.clone(); u.C.battle = true; bScene.add(u.C.g);
     });
-    camBase = {p:bCam.position.clone(), l:new T.Vector3(.2,1.3,0)};
+    camBase = {p:bCam.position.clone(), l:camLook.clone()};
     return {M, ms};
   }
   // 鏡頭特寫：移到 from/look 之間，再回原位
@@ -931,6 +1022,7 @@ async function init3D(){
   // UI 小工具
   const bMain = $('bMain');
   function partyHUD(){
+    $('bParty').classList.toggle('many', B.ms.length>4);
     $('bParty').innerHTML = B.ms.map(u=>`<div class="pm${u.down?' down':''}${B.guard&&u===B.ms.find(x=>x.m.id==='gren'||x.m.id==='leo')?' shield':''}"><span class="nm">${u.m.id==='hero'?'你':u.m.name}<small>${u.hp}/${u.max}</small></span><span class="hp"><i style="width:${u.hp/u.max*100}%"></i></span></div>`).join('');
   }
   function monHUD(){ $('bName').innerHTML = `${B.mon.boss?'【頭目】':''}${B.spec.name}<small>HP ${Math.ceil(B.h*B.maxHp)}/${B.maxHp}</small>`; $('bHp').style.width = (B.h*100)+'%'; }
@@ -987,7 +1079,7 @@ async function init3D(){
     const h = new T.Mesh(GEO.sph, new T.MeshBasicMaterial({color, transparent:true, opacity:.35, blending:T.AdditiveBlending, depthWrite:false})); h.scale.setScalar(2.2); s.add(h);
     return tween(300, k=>{ s.position.lerpVectors(from, to, k); s.position.y += Math.sin(k*Math.PI)*1.1; }).then(()=>bScene.remove(s));
   }
-  const monCenter = () => B.mon.g.position.clone().add(new T.Vector3(0, (B.mon.top*.55+B.mon.float)*(B.mon.boss?1.5:1), 0));
+  const monCenter = () => B.mon.g.position.clone().add(new T.Vector3(0, (B.mon.top*.55+B.mon.float)*B.mon.g.scale.x, 0));
   async function hitMon(dmg, crit, color){
     Sfx.play(crit?'crit':'hit');
     flashMon(B.mon, true); const c = monCenter();
@@ -1058,7 +1150,7 @@ async function init3D(){
   function hurtAnim(u, dead){
     const C = u.C; if(!C.gl) return;
     C.lock = true;
-    if(dead){ onceAnim(C, 'Death_A', {clamp:true}); return; }
+    if(dead){ if(!onceAnim(C, 'Death_A', {clamp:true})) tween(200, k=>{ C.g.rotation.z = -k*1.3; }); return; }
     const d = onceAnim(C, 'Hit_A', {speed:1.2}); setTimeout(()=>{ if(!u.down) C.lock = false; }, d*1000);
   }
   async function monsterAttack(){
@@ -1185,6 +1277,7 @@ async function init3D(){
     const n = cfg.items.length, need = Math.ceil(n*2/3);
     B = {mode:cfg.mode, c:cfg.c, spec:cfg.spec, mon:built.M, ms:built.ms, h:1, maxHp:cfg.spec.boss?360:150, need, ok:0, hint:1, guard:false, crit:false, used:{}, partyBefore:party().length};
     $('worldUI').classList.add('hidden'); $('battleUI').classList.remove('hidden'); $('join').classList.add('hidden');
+    Bgm.play('battle');
     state = 'battle'; monHUD(); partyHUD(); $('bTurn').textContent = `第 1 / ${n} 回合`;
     await sleep(350);
     if(B.mon.gl && CLIPS['Spawn_Ground_Skeletons']){ B.mon.lock = true; const d = onceAnim(B.mon, 'Spawn_Ground_Skeletons'); setTimeout(()=>{ if(B) B.mon.lock = false; }, d*1000); }
@@ -1227,12 +1320,13 @@ async function init3D(){
       if(B.ms.every(u=>u.down)){ await msg('全員倒下了……'); break; }
     }
     // 結算
-    if(fled){ Sfx.play('lose'); await msg('隊伍撤退了。整理好再回來吧！'); return leaveBattle(null); }
+    if(fled){ Bgm.play(null); Sfx.play('lose'); await msg('隊伍撤退了。整理好再回來吧！'); return leaveBattle(null); }
     const win = B.ok>=need && !B.ms.every(u=>u.down);
     if(win){ await finisher(); Sfx.play('win'); await msg(`<b>${cfg.spec.name}</b> 被打倒了！`); }
     else { Sfx.play('lose');
       if(B.mon.gl){ B.mon.lock = true; onceAnim(B.mon, 'Taunt'); await tween(900, ()=>{}); }
       else await tween(500, k=>{ B.mon.g.position.y = Math.abs(Math.sin(k*Math.PI*3))*.5; }); await msg(`<b>${cfg.spec.name}</b> 還站著……隊伍先撤退了。複習一下再來挑戰！`); }
+    Bgm.play(null);
     let result = {win, ok:B.ok, n, mode:cfg.mode};
     if(cfg.mode==='stage'){
       const prev = S.best[cfg.c.id]||0; result.prev = prev;
@@ -1272,6 +1366,7 @@ async function init3D(){
       waiter = null;
       bMain.innerHTML = html + `<div class="rbtns"><button class="sel" data-v="map">回到大地圖</button><button class="sel" data-v="again">${r.mode==='stage'?'再戰一次':'再來一場'}</button>${r.mode==='stage'&&nx&&nx!==B.c?`<button class="sel" data-v="next">前往下一隻：${monOf(nx).name}</button>`:''}</div></div>`;
       bMain.querySelectorAll('button.sel').forEach(b=>b.addEventListener('click',()=>{
+        if(!B) return; bMain.querySelectorAll('button.sel').forEach(x=>x.disabled = true);   // 避免連點
         Sfx.play('sel'); const v = b.dataset.v, c = B.c, mode = B.mode;
         leaveBattle(r).then(()=>{
           if(v==='again'){ if(mode==='stage') engage(c); else randomBattle(); }
@@ -1286,7 +1381,7 @@ async function init3D(){
     const fl = $('flash'); fl.classList.remove('go'); void fl.offsetWidth; fl.classList.add('go');
     await sleep(420);
     $('battleUI').classList.add('hidden'); $('worldUI').classList.remove('hidden');
-    bScene = null; B = null; refreshAll(); state = 'world'; lastNear = undefined;
+    bScene = null; B = null; refreshAll(); state = 'world'; lastNear = undefined; Bgm.play(active ? 'world' : null);
     if(r && r.mode==='stage'){
       if(r.win && r.ok===3) say('完美！祭壇亮起金色光柱了。往下一隻魔物前進吧！', '露米', 5000);
       else if(r.win) say('打倒了！再拿一顆星就能點亮金色光柱喔。', '露米', 5000);
@@ -1336,7 +1431,7 @@ async function init3D(){
   }
 
   // ---------- 啟動 ----------
-  buildParty(); refreshShrines(); resize();
+  buildParty(); refreshShrines(); resize(); Bgm.play('world');
   wCam.position.set(hero.x+camOff.x, camOff.y, hero.z+camOff.z); wCam.lookAt(hero.x, 1, hero.z);
   requestAnimationFrame(loop);
   setTimeout(()=>{
@@ -1356,7 +1451,7 @@ async function init3D(){
     walkTo(c){ walkTo(c); },
     randomBattle(){ randomBattle(); },
     refreshAll(rebuild){ refreshAll(rebuild); },
-    setActive(v){ active = v; if(v) setTimeout(resize, 30); },
+    setActive(v){ active = v; if(v) setTimeout(resize, 30); Bgm.play(v ? (state==='world' ? 'world' : 'battle') : null); },
     placeAt(c){ const s = shrines[c.idx]; hero.x = s.w.x; hero.z = s.w.z+4.6; buildParty(); }
   };
 }
