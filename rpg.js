@@ -55,46 +55,54 @@ const Sfx = (function(){
 const Bgm = (function(){
   // 每首：bpm、每格八分音符；mel = 旋律、bass = 低音（MIDI 音高，0 = 休止）
   const SONGS = {
-    world:{ bpm:96, lead:'triangle', bassW:'sine', vol:.05,
+    world:{ bpm:96, lead:'triangle', bassW:'sine', vol:.075,
       mel:[76,0,79,0,84,0,83,81, 79,0,76,0,0,0,0,0, 77,0,81,0,84,0,81,77, 79,0,0,0,74,0,0,0,
            76,0,79,0,84,0,86,88, 84,0,81,0,0,0,79,0, 77,0,76,0,74,0,72,0, 74,0,76,0,72,0,0,0],
       bass:[48,0,55,0,52,0,55,0, 45,0,52,0,48,0,52,0, 41,0,48,0,45,0,48,0, 43,0,50,0,47,0,50,0,
             48,0,55,0,52,0,55,0, 45,0,52,0,48,0,52,0, 41,0,48,0,45,0,48,0, 43,0,50,0,48,0,0,0] },
-    battle:{ bpm:150, lead:'square', bassW:'triangle', vol:.035,
+    battle:{ bpm:150, lead:'square', bassW:'triangle', vol:.05,
       mel:[69,0,72,0,76,0,74,72, 72,0,0,0,69,0,65,0, 67,0,71,0,74,0,72,71, 68,0,0,0,64,0,68,0,
            69,72,76,81,79,0,76,0, 77,0,76,0,72,0,69,0, 71,0,74,0,79,0,77,76, 76,0,0,0,71,0,68,0],
       bass:[45,57,45,57,45,57,45,57, 41,53,41,53,41,53,41,53, 43,55,43,55,43,55,43,55, 40,52,40,52,40,52,40,52,
             45,57,45,57,45,57,45,57, 41,53,41,53,41,53,41,53, 43,55,43,55,43,55,43,55, 40,52,40,52,44,56,44,56] }
   };
-  let on = S.bgm !== false, want = null, cur = null, master = null, timer = null, step = 0, nextT = 0;
-  const hz = n => 440*Math.pow(2,(n-69)/12);
-  function note(a, f, t, d, type, v){
-    const o = a.createOscillator(), g = a.createGain();
-    o.type = type; o.frequency.setValueAtTime(f, t);
-    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(v, t+.015); g.gain.exponentialRampToValueAtTime(.0001, t+d);
-    o.connect(g); g.connect(master); o.start(t); o.stop(t+d+.05);
-  }
-  function tick(){
-    const a = Sfx.ctx(); if(!a || !cur) return;
-    const sg = SONGS[cur], st = 60/sg.bpm/2;
-    while(nextT < a.currentTime + .2){
-      const i = step % sg.mel.length, m = sg.mel[i], b = sg.bass[i];
-      if(m) note(a, hz(m), nextT, st*1.8, sg.lead, sg.vol);
-      if(b) note(a, hz(b), nextT, st*1.6, sg.bassW, sg.vol*1.3);
-      nextT += st; step++;
-    }
+  // 做法：第一次需要某首曲子時，用 OfflineAudioContext 把整段循環預先「錄」成 AudioBuffer，之後用 loop 播放。
+  // 播放完全交給音訊執行緒，不靠 setTimeout 排音符，3D 畫面再忙也不會斷音。
+  let on = S.bgm !== false, want = null, cur = null, master = null, src = null, srcGain = null;
+  const BUF = {}, hz = n => 440*Math.pow(2,(n-69)/12);
+  function render(name){
+    if(BUF[name]) return BUF[name];
+    const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext; if(!OAC) return BUF[name] = Promise.resolve(null);
+    const sg = SONGS[name], st = 60/sg.bpm/2, len = sg.mel.length*st, sr = 22050, oc = new OAC(1, Math.ceil(len*sr), sr);
+    const note = (f, t, d, type, v) => {
+      const o = oc.createOscillator(), g = oc.createGain();
+      o.type = type; o.frequency.setValueAtTime(f, t);
+      g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(v, t+.015); g.gain.exponentialRampToValueAtTime(.0001, t+d);
+      o.connect(g); g.connect(oc.destination); o.start(t); o.stop(Math.min(len, t+d+.05));
+    };
+    sg.mel.forEach((m,i)=>{ const t = i*st, b = sg.bass[i], d = Math.min(st*1.8, len-t-.01);
+      if(m) note(hz(m), t, d, sg.lead, sg.vol); if(b) note(hz(b), t, Math.min(st*1.6, len-t-.01), sg.bassW, sg.vol*1.3); });
+    const p = oc.startRendering ? new Promise((res,rej)=>{ oc.oncomplete = e=>res(e.renderedBuffer); const r = oc.startRendering(); if(r && r.then) r.then(res, rej); }) : Promise.resolve(null);
+    return BUF[name] = p.catch(()=>null);
   }
   function start(name){
     const a = Sfx.ctx(); if(!a) return;
     if(!master){ master = a.createGain(); master.connect(a.destination); }
-    master.gain.cancelScheduledValues(a.currentTime); master.gain.setValueAtTime(.0001, a.currentTime); master.gain.linearRampToValueAtTime(1, a.currentTime+.6);
-    cur = name; step = 0; nextT = a.currentTime + .1;
-    clearInterval(timer); timer = setInterval(tick, 60); tick();
+    stopSrc(.25); cur = name;
+    render(name).then(buf=>{
+      if(!buf || cur!==name) return;
+      const s = a.createBufferSource(), g = a.createGain(); s.buffer = buf; s.loop = true; s.connect(g); g.connect(master);
+      g.gain.setValueAtTime(.0001, a.currentTime); g.gain.linearRampToValueAtTime(1, a.currentTime+.6);
+      s.start(); src = s; srcGain = g;
+    });
   }
-  function halt(){
-    clearInterval(timer); timer = null; cur = null;
-    if(master && Sfx.ctx()){ const a = Sfx.ctx(); master.gain.cancelScheduledValues(a.currentTime); master.gain.setValueAtTime(master.gain.value, a.currentTime); master.gain.linearRampToValueAtTime(.0001, a.currentTime+.3); }
+  function stopSrc(fade){
+    const a = Sfx.ctx(); if(!src || !a) return;
+    const s = src, g = srcGain; src = srcGain = null;
+    g.gain.cancelScheduledValues(a.currentTime); g.gain.setValueAtTime(g.gain.value, a.currentTime); g.gain.linearRampToValueAtTime(.0001, a.currentTime+fade);
+    try{ s.stop(a.currentTime+fade+.05); }catch(e){}
   }
+  function halt(){ cur = null; stopSrc(.3); }
   let woke = false;
   function sync(){ const w = on && woke && !document.hidden ? want : null; if(w===cur) return; if(w) start(w); else halt(); }
   document.addEventListener('visibilitychange', sync);
@@ -105,7 +113,8 @@ const Bgm = (function(){
     get on(){ return on; }
   };
 })();
-['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev, ()=>{ Sfx.wake(); Bgm.wake(); }, {once:false, passive:true}));
+// 瀏覽器規定要有使用者操作才能出聲；Safari 只認 click／touchend／keydown，所以都聽
+['pointerdown','click','touchend','keydown'].forEach(ev=>document.addEventListener(ev, ()=>{ const a = Sfx.ctx(); if(a && a.state!=='running') a.resume(); Sfx.wake(); Bgm.wake(); }, {passive:true}));
 
 // ===================== 上方冒險者卡與關卡清單 =====================
 function renderHUD(){
@@ -330,7 +339,7 @@ async function init3D(){
   }
   // 播一次動作，回傳動作長度（秒）
   function onceAnim(X, name, opts){
-    opts = opts || {}; const a = act(X, name); if(!a) return 0;
+    opts = opts || {}; const a = act(X, name); if(!a) return X.procFx ? X.procFx(name, opts) : 0;
     a.reset(); a.setLoop(T.LoopOnce, 1); a.clampWhenFinished = !!opts.clamp; a.timeScale = opts.speed || 1; a.enabled = true;
     const p = X.cur && X.acts[X.cur];
     if(p && p!==a){ a.play(); a.crossFadeFrom(p, .12, false); } else a.play();
@@ -343,17 +352,46 @@ async function init3D(){
     const C = {g:I.g, body:I.holder, legs:[], arms:[], wings:[], spin:[], m, float:md.float||0, k:h/1.9, quad:!!md.own, gl:true, mats:I.mats, atkAnim:md.atk};
     I.holder.position.y = C.float;
     shadowOf(C.g, md.own ? .6 : .5); glSetup(C, I.root, md); loopAnim(C, 'Idle', 0);
-    if(md.wings){   // 精靈翅膀（掛在角色群組上，跟著漂浮）
+    if(md.wings){   // 精靈翅膀：畫布畫的半透明翅膀（漸層＋翅脈），張成 V 字往後斜，從側面也看得到；再加飄落的光粉
+      const tex = wingTex(md.wings), wm = new T.MeshBasicMaterial({map:tex, transparent:true, depthWrite:false, side:T.DoubleSide});
+      const wg = new T.PlaneGeometry(1,1); wg.translate(.5,0,0);   // 鉸鏈在左緣
       for(const sx of [-1,1]){
-        const w = new T.Group(); w.position.set(sx*.08, C.float + h*.6, -.2); C.g.add(w);
-        P(w, GEO.sph, glow(md.wings,.8), sx*.42,.17,0,[.46,.26,.02],{ol:false});
-        P(w, GEO.sph, glow(md.wings,.7), sx*.32,-.18,0,[.3,.17,.02],{ol:false});
-        C.wings.push(w);
+        const w = new T.Group(); w.position.set(sx*.06, C.float + h*.6, -.16); C.g.add(w);
+        const m = new T.Mesh(wg, wm); m.scale.set(sx*h*.62, h*.62, 1); m.rotation.z = sx*.18; w.add(m);
+        w.userData.sx = sx; C.wings.push(w);
       }
       C.wingBase = C.float + h*.6;
+      const DN = 14, dp = new Float32Array(DN*3); C.dust = {n:DN, ph:[...Array(DN)].map(()=>Math.random()), x:[...Array(DN)].map(()=>(Math.random()-.5)*h*.9), pos:dp, top:C.wingBase+.2};
+      const dg = new T.BufferGeometry(); dg.setAttribute('position', new T.BufferAttribute(dp,3));
+      C.dust.pts = new T.Points(dg, new T.PointsMaterial({color:md.wings, size:.16, map:DOT, transparent:true, depthWrite:false, blending:T.AdditiveBlending})); C.g.add(C.dust.pts);
     }
     if(md.orbs) for(let i=0;i<2;i++) C.spin.push(P(C.g, GEO.sph, glow(md.orbs,.85), 0,1,0,.09,{ol:false}));
+    if(md.own) C.procFx = (name, opts) => quadFx(C, name, opts);   // 模型沒有的動作用程式補
     return C;
+  }
+  // 四足模型（菲恩）缺少的動作：撲擊、受擊後仰、施法跳轉、勝利跳躍；回傳動作秒數
+  function quadFx(C, name, opts){
+    const b = C.body, y0 = C.float, sp = (opts && opts.speed) || 1;
+    const done = () => { b.position.set(0, y0, 0); b.rotation.set(0,0,0); };
+    let d = 0;
+    if(/Pounce|Attack|Jump/.test(name)){          // 撲擊：先壓低蓄力，再往前躍起、落地
+      d = .62;
+      tween(d*1000/sp, k=>{
+        if(k<.3){ const e = k/.3; b.position.y = y0 - .08*e; b.rotation.x = -.28*e; b.position.z = -.12*e; }
+        else { const e = (k-.3)/.7; b.position.y = y0 + Math.sin(e*Math.PI)*.75; b.rotation.x = -.28 + .7*Math.sin(e*Math.PI*.9); b.position.z = -.12 + Math.sin(e*Math.PI)*.9; }
+      }).then(done);
+      if(C.acts && act(C,'Running_A')) loopAnim(C, 'Running_A', .1);
+    } else if(/Hit|Block/.test(name)){              // 受擊：往後一縮、後仰、左右甩一下
+      d = .42; const amt = /Block/.test(name) ? .5 : 1;
+      tween(d*1000/sp, k=>{ const e = Math.sin(k*Math.PI); b.position.z = -.35*e*amt; b.rotation.x = -.4*e*amt; b.rotation.z = Math.sin(k*Math.PI*3)*.12*(1-k)*amt; }).then(done);
+    } else if(/Spell|Use_Item|Cast/.test(name)){    // 施法：跳起轉一圈
+      d = .75;
+      tween(d*1000/sp, k=>{ b.position.y = y0 + Math.sin(k*Math.PI)*.6; b.rotation.y = ease(k)*Math.PI*2; }).then(done);
+    } else if(/Cheer/.test(name)){                   // 勝利：連跳兩下
+      d = .9;
+      tween(d*1000/sp, k=>{ b.position.y = y0 + Math.abs(Math.sin(k*Math.PI*2))*.45; b.rotation.x = -Math.abs(Math.sin(k*Math.PI*2))*.2; }).then(done);
+    }
+    return d/sp;
   }
   function makeGlMonster(sp){
     const md = sp.model, I = instModel(md, 2.5);
@@ -362,6 +400,21 @@ async function init3D(){
     if(M.boss){ M.aura = P(M.g, GEO.ring, glow(0xff6b9a,.55), 0,.06,0,1.4,{rx:Math.PI/2,ol:false}); M.g.scale.setScalar(1.4); }
     M.mats.forEach(mm=>{ mm.userData.e = mm.emissive.getHex(); mm.userData.ei = mm.emissiveIntensity; });
     return M;
+  }
+
+  // 精靈翅膀貼圖：上下兩片翅葉，鉸鏈在左邊；中心亮、往外漸淡，白色翅脈與亮邊
+  function wingTex(col){
+    const cv = document.createElement('canvas'); cv.width = cv.height = 256; const x = cv.getContext('2d'), c = new T.Color(col);
+    const rgb = a => `rgba(${Math.round(c.r*255)},${Math.round(c.g*255)},${Math.round(c.b*255)},${a})`;
+    const lobe = (cx, cy, rx, ry, rot) => { x.beginPath(); x.ellipse(cx, cy, rx, ry, rot, 0, Math.PI*2); };
+    const fillLobe = (cx, cy, rx, ry, rot) => {
+      const g = x.createRadialGradient(8,128,4, 8,128,250); g.addColorStop(0,'rgba(255,255,255,.95)'); g.addColorStop(.35, rgb(.75)); g.addColorStop(1, rgb(.25));
+      lobe(cx,cy,rx,ry,rot); x.fillStyle = g; x.fill(); x.lineWidth = 3; x.strokeStyle = 'rgba(255,255,255,.85)'; x.stroke(); };
+    fillLobe(120, 82, 118, 66, -.55);   // 上翅
+    fillLobe(86, 178, 80, 44, .5);      // 下翅
+    x.strokeStyle = 'rgba(255,255,255,.55)'; x.lineWidth = 2;
+    [[200,20],[236,70],[214,120],[150,214],[120,170]].forEach(([ex,ey])=>{ x.beginPath(); x.moveTo(6,128); x.quadraticCurveTo((6+ex)/2, (128+ey)/2 - 18, ex, ey); x.stroke(); });
+    const t = new T.CanvasTexture(cv); t.encoding = T.LinearEncoding; return t;
   }
 
   // ---------- 場景素材：同一個模型大量擺放（InstancedMesh＋描邊） ----------
@@ -496,7 +549,11 @@ async function init3D(){
     const sp = reduce ? 0 : 1;
     if(C.gl){
       if(!C.lock) loopAnim(C, mv ? 'Running_A' : (C.battle ? 'Idle_Combat' : 'Idle')); glTick(C);
-      if(C.float){ const y = C.float + Math.sin(t*3)*.1*sp; C.body.position.y = y; C.wings.forEach((w,i)=>{ w.position.y = C.wingBase + (y - C.float); w.rotation.y = (i?-1:1)*(.25+Math.sin(t*(mv?24:8))*.45*sp); }); }
+      if(C.float){ const y = C.float + Math.sin(t*3)*.1*sp; C.body.position.y = y;
+        // 翅膀：往後張開約 35°，拍動時開合
+        C.wings.forEach(w=>{ w.position.y = C.wingBase + (y - C.float); w.rotation.y = w.userData.sx*(.6 + Math.sin(t*(mv?22:7))*.42*sp); });
+        if(C.dust){ const D = C.dust; for(let i=0;i<D.n;i++){ const k = (t*.35 + D.ph[i]) % 1; D.pos[i*3] = D.x[i]*(1-k*.4) + Math.sin(t*2+i)*.05; D.pos[i*3+1] = D.top + (y - C.float) - k*D.top; D.pos[i*3+2] = -.25 - k*.2; } D.pts.geometry.attributes.position.needsUpdate = true; D.pts.material.opacity = .9; }
+      }
       C.spin.forEach((s,i)=>{ const a = t*2+i*Math.PI; s.position.set(Math.cos(a)*.75, 1.0+Math.sin(t*3+i)*.1, Math.sin(a)*.75); });
       return;
     }
@@ -690,7 +747,7 @@ async function init3D(){
 
   // ---------- 大地圖場景 ----------
   const W = new T.Scene(); (window.__rpgDebug = window.__rpgDebug || {}).W = W;
-  W.background = new T.Color(0x0b1a26); W.fog = new T.Fog(0x0b1a26, 34, 80);
+  W.background = new T.Color(0x0b1a26); W.fog = new T.Fog(0x0d1f2b, 24, 60);   // 畫面上方（較遠處）漸漸淡入夜色
   W.add(new T.HemisphereLight(0xcfe2ff, 0x1a2a20, .8));
   const sun = new T.DirectionalLight(0xfff0d0, .75); sun.position.set(30,60,25); W.add(sun); W.add(sun.target);
   sun.castShadow = true; sun.shadow.mapSize.set(2048,2048); sun.shadow.bias = -0.0008; sun.shadow.normalBias = .02;
@@ -698,38 +755,86 @@ async function init3D(){
   W.add(new T.AmbientLight(0xffffff, .12));
   const wCam = new T.PerspectiveCamera(45, 1, .1, 300);
 
-  // 地面（頂點色混出五個秘境）
+  // ---------- 地形：平緩小山丘＋自然漸層 ----------
+  // 水池（晨露森林、星橋山谷）：先決定位置，地形在這裡壓低、裝飾避開
+  const PONDS = [];   // 角色不能走進去
   {
-    const geo = new T.PlaneGeometry(220,170,110,85); geo.rotateX(-Math.PI/2);
-    const pos = geo.attributes.position, cols = new Float32Array(pos.count*3), base = new T.Color(0x0d1c24), tmp = new T.Color();
-    const rc = REALM.map(r=>new T.Color(r.g));
-    for(let i=0;i<pos.count;i++){
-      const px = (pos.getX(i)+OX)*PX, py = (pos.getZ(i)+OZ)*PX;
-      let wsum = 0; const acc = new T.Color(0,0,0);
-      REALM.forEach((r,k)=>{ const d2 = (r.x-px)**2+(r.y-py)**2, w = Math.exp(-d2/(2*620*620)); wsum += w; acc.r += rc[k].r*w; acc.g += rc[k].g*w; acc.b += rc[k].b*w; });
-      tmp.copy(base).lerp(new T.Color(acc.r/Math.max(wsum,1e-6), acc.g/Math.max(wsum,1e-6), acc.b/Math.max(wsum,1e-6)), Math.min(1, wsum*1.25));
-      const n = (Math.sin(px*.013)+Math.cos(py*.011)+Math.sin((px+py)*.007))*.018;
-      tmp.offsetHSL(0,0,n);
-      const out = px<0||px>3200||py<0||py>2200; if(out) tmp.multiplyScalar(.55);
-      cols[i*3] = tmp.r; cols[i*3+1] = tmp.g; cols[i*3+2] = tmp.b;
+    const ponds = PONDS;
+    // 水池（晨露森林、星橋山谷）：先決定位置，裝飾避開
+    if(hasEnv()) for(let k=0;k<400 && ponds.length<7;k++){
+      const x = 120+rnd()*2960, y = 120+rnd()*1960, r = realmAtPx(x,y), rad = 2.2+rnd()*1.6;
+      if(r!==0 && r!==2) continue;
+      if(pathPx.some(p=>(p.x-x)**2+(p.y-y)**2 < (110+rad*20)**2)) continue;
+      if(POS.some(p=>(p[0]-x)**2+(p[1]-y)**2 < 200*200) || ponds.some(p=>(p.x-x)**2+(p.y-y)**2 < 300*300)) continue;
+      if((SPAWN.x-x)**2+(SPAWN.y-y)**2 < 200*200) continue;
+      const pw = toW(x,y); ponds.push({x, y, rad, wx:pw.x, wz:pw.z});
     }
-    geo.setAttribute('color', new T.BufferAttribute(cols,3));
-    const gm = new T.Mesh(geo, new T.MeshToonMaterial({vertexColors:true, gradientMap:grad})); gm.receiveShadow = true; W.add(gm);
   }
-  // 道路
   const pathW = pathPx.map(p=>toW(p.x,p.y));
+  const GS = .8, GX0 = -110, GZ0 = -85, NX = Math.round(220/GS)+1, NZ = Math.round(170/GS)+1;
+  const HT = new Float32Array(NX*NZ), PDIST = new Float32Array(NX*NZ);
+  const hash2 = (i,j)=>{ const v = Math.sin(i*127.1 + j*311.7)*43758.5453; return v - Math.floor(v); };
+  function vnoise(x,z){ const i = Math.floor(x), j = Math.floor(z), fx = x-i, fz = z-j, u = fx*fx*(3-2*fx), v = fz*fz*(3-2*fz);
+    const a = hash2(i,j), b = hash2(i+1,j), c = hash2(i,j+1), d = hash2(i+1,j+1); return a + (b-a)*u + (c-a)*v + (a-b-c+d)*u*v; }
+  const fbm = (x,z)=> vnoise(x,z)*.55 + vnoise(x*2.1+17,z*2.1+9)*.3 + vnoise(x*4.3+41,z*4.3+3)*.15;
+  const sstep = (a,b,x)=>{ const t = Math.max(0, Math.min(1, (x-a)/(b-a))); return t*t*(3-2*t); };
+  // 高度：路、祭壇、起點、水池附近壓平；地圖外圍逐漸隆起
   {
-    const v = [], idx = [];
-    pathW.forEach((p,i)=>{
-      const a = pathW[Math.max(0,i-1)], b = pathW[Math.min(pathW.length-1,i+1)];
-      let tx = b.x-a.x, tz = b.z-a.z; const l = Math.hypot(tx,tz)||1; tx/=l; tz/=l;
-      v.push(p.x - tz*1.3, .04, p.z + tx*1.3, p.x + tz*1.3, .04, p.z - tx*1.3);
-      if(i){ const k = i*2; idx.push(k-2,k-1,k, k-1,k+1,k); }
-    });
-    const geo = new T.BufferGeometry(); geo.setAttribute('position', new T.Float32BufferAttribute(v,3)); geo.setIndex(idx); geo.computeVertexNormals();
-    const pm = new T.Mesh(geo, new T.MeshToonMaterial({color:0xb9a47a, gradientMap:grad, side:T.DoubleSide})); pm.receiveShadow = true; W.add(pm);
+    const SH = POS.map(p=>toW(p[0],p[1])), SP = toW(SPAWN.x, SPAWN.y);
+    for(let j=0;j<NZ;j++) for(let i=0;i<NX;i++){
+      const x = GX0+i*GS, z = GZ0+j*GS, k = j*NX+i;
+      let pd = 1e9; for(let q=0;q<pathW.length;q+=1){ const dx = pathW[q].x-x, dz = pathW[q].z-z, d = dx*dx+dz*dz; if(d<pd) pd = d; } pd = Math.sqrt(pd); PDIST[k] = pd;
+      let sd = 1e9; SH.forEach(w=>{ sd = Math.min(sd, Math.hypot(w.x-x, w.z+1.5-z)); });
+      let h = Math.max(0, fbm(x*.05, z*.05) - .26) * 6.2;
+      h *= sstep(2.4, 8, pd) * sstep(5, 10, sd) * sstep(3.5, 8, Math.hypot(SP.x-x, SP.z-z));
+      const out = Math.max(0, Math.abs(x)-77, Math.abs(z)-52); h += out*out*.035 + out*.25;
+      PONDS.forEach(p=>{ const d = Math.hypot((x-p.wx)/(p.rad+2.2), (z-p.wz)/((p.rad+2.2)*.8)); if(d<1) h = h*sstep(.55,1,d) - .14*(1-sstep(.45,.75,d)); });
+      HT[k] = h;
+    }
+  }
+  // 地面高度（雙線性內插），角色、景物、祭壇都放在這個高度上
+  function getH(x,z){
+    const fx = Math.max(0, Math.min(NX-1.001, (x-GX0)/GS)), fz = Math.max(0, Math.min(NZ-1.001, (z-GZ0)/GS));
+    const i = Math.floor(fx), j = Math.floor(fz), u = fx-i, v = fz-j, k = j*NX+i;
+    return HT[k]*(1-u)*(1-v) + HT[k+1]*u*(1-v) + HT[k+NX]*(1-u)*v + HT[k+NX+1]*u*v;
+  }
+  let groundCol = null;
+  {
+    const geo = new T.PlaneGeometry(220,170,NX-1,NZ-1); geo.rotateX(-Math.PI/2);
+    const pos = geo.attributes.position, cols = new Float32Array(pos.count*3), tmp = new T.Color(), dirt = new T.Color(0x8c7652), dirtC = new T.Color(0xb59a6a);
+    // 地面用較自然的色調（森林綠、暮紫、青綠山谷、橄欖金、石板藍灰）；戰鬥場地與小地圖仍用 REALM.g
+    const rc = [0x2e6a44, 0x4a4868, 0x2f6457, 0x5d6230, 0x3b4660].map(c=>new T.Color(c));
+    for(let n=0;n<pos.count;n++){
+      const x = pos.getX(n), z = pos.getZ(n), i = Math.round((x-GX0)/GS), j = Math.round((z-GZ0)/GS), k = j*NX+i, h = HT[k];
+      pos.setY(n, h);
+      // 秘境交界：座標先用噪聲扭曲，再做高斯混色，邊界才不會是正圓
+      const px = (x+OX)*PX + (vnoise(x*.06, z*.06)-.5)*520, py = (z+OZ)*PX + (vnoise(x*.06+30, z*.06+70)-.5)*520;
+      let wsum = 0, r = 0, g = 0, b = 0;
+      REALM.forEach((rr,q)=>{ const w = Math.exp(-((rr.x-px)**2+(rr.y-py)**2)/(2*420*420)); wsum += w; r += rc[q].r*w; g += rc[q].g*w; b += rc[q].b*w; });
+      tmp.setRGB(r/wsum, g/wsum, b/wsum);
+      // 草地明暗斑塊、高處較亮、低處較暗
+      const pn = fbm(x*.13+100, z*.13+50), hn = fbm(x*.35, z*.35);
+      tmp.offsetHSL((pn-.5)*.03, .02 + (pn-.5)*.1, .05 + (pn-.5)*.10 + (hn-.5)*.04 + Math.min(h,3)*.035);
+      // 道路：邊緣柔和的泥土小徑，中間被踩得較亮
+      const pd = PDIST[k], pt = 1 - sstep(1.0, 2.6, pd);
+      if(pt>0){ const dc = dirt.clone().lerp(tmp, .25).lerp(dirtC, (1-sstep(0,1.1,pd))*.4); tmp.lerp(dc, pt*.92); }
+      // 地圖外圍漸暗
+      const out = Math.max(0, Math.abs(x)-74, Math.abs(z)-49); tmp.multiplyScalar(1 - .5*sstep(0, 22, out));
+      cols[n*3] = tmp.r; cols[n*3+1] = tmp.g; cols[n*3+2] = tmp.b;
+    }
+    geo.setAttribute('color', new T.BufferAttribute(cols,3)); geo.computeVertexNormals();
+    const gm = new T.Mesh(geo, new T.MeshLambertMaterial({vertexColors:true})); gm.receiveShadow = true; W.add(gm);
+    groundCol = {geo, cols};
+  }
+  // 在地面上壓暗一圈（樹下、石頭邊的接地陰影）
+  function groundShade(x, z, r, amt){
+    const i0 = Math.max(0, Math.floor((x-r-GX0)/GS)), i1 = Math.min(NX-1, Math.ceil((x+r-GX0)/GS)), j0 = Math.max(0, Math.floor((z-r-GZ0)/GS)), j1 = Math.min(NZ-1, Math.ceil((z+r-GZ0)/GS));
+    for(let j=j0;j<=j1;j++) for(let i=i0;i<=i1;i++){ const d = Math.hypot(GX0+i*GS-x, GZ0+j*GS-z); if(d>r) continue; const f = 1 - amt*(1-d/r)*(1-d/r), n = (j*NX+i)*3; groundCol.cols[n] *= f; groundCol.cols[n+1] *= f; groundCol.cols[n+2] *= f; }
+  }
+  // 道路（泥土小徑已畫進地面頂點色；這裡只留引導光點）
+  {
     const pg = new T.BufferGeometry(), pv = [];
-    for(let i=0;i<pathW.length;i+=2) pv.push(pathW[i].x, .35, pathW[i].z);
+    for(let i=0;i<pathW.length;i+=2) pv.push(pathW[i].x, .35+getH(pathW[i].x, pathW[i].z), pathW[i].z);
     pg.setAttribute('position', new T.Float32BufferAttribute(pv,3));
     var pathDots = new T.Points(pg, new T.PointsMaterial({color:0xf3d28b, size:.5, map:DOT, transparent:true, depthWrite:false, blending:T.AdditiveBlending, opacity:.6}));
     W.add(pathDots);
@@ -737,14 +842,13 @@ async function init3D(){
   // 起點
   {
     const sp = toW(SPAWN.x, SPAWN.y);
-    P(W, GEO.ring, glow(0x8fe3b8,.7), sp.x,.08,sp.z, 1.6, {rx:Math.PI/2, ol:false});
+    P(W, GEO.ring, glow(0x8fe3b8,.7), sp.x,.08+getH(sp.x,sp.z),sp.z, 1.6, {rx:Math.PI/2, ol:false});
   }
-  const PONDS = [];   // 水池（角色不能走進去）
   // 裝飾（InstancedMesh）：有 KayKit 場景素材就用模型，沒有就用程式繪製的簡化造型
   {
     const L = {trunk:[], canopy:[], cone:[], stem:[], cap:[], crystal:[], rune:[], pillar:[], pole:[], lamp:[], flower:[], grass:[]};
     const K = {};   // 模型名稱 → [[x,y,z,縮放,旋轉], …]
-    const put = (name, x, z, s, ry, y) => (K[name] = K[name] || []).push([x, y||0, z, s, ry===undefined ? rnd()*6.28 : ry]);
+    const put = (name, x, z, s, ry, y) => (K[name] = K[name] || []).push([x, (y||0) + (name.startsWith('mountain') ? 0 : getH(x,z)) - (name.startsWith('water') ? 0 : .03), z, s, ry===undefined ? rnd()*6.28 : ry]);   // 邊界大山不跟著外圍隆起抬高（以免擋住鏡頭）
     const env = hasEnv();
     const CAN = [0x2f8a62,0x5b4a9a,0x2f6a9a,0xa8862e,0x8a93b8], ACC = REALM.map(r=>r.a);
     const KINDS = env
@@ -782,16 +886,7 @@ async function init3D(){
       }
     }
     if(!env){ KINDS.forEach(k=>k.forEach((x,i)=>{ if(x==='pine') k[i] = 'pine0'; })); }
-    // 水池（晨露森林、星橋山谷）：先決定位置，裝飾避開
     const ponds = PONDS;
-    if(env) for(let k=0;k<400 && ponds.length<7;k++){
-      const x = 120+rnd()*2960, y = 120+rnd()*1960, r = realmAtPx(x,y), rad = 2.2+rnd()*1.6;
-      if(r!==0 && r!==2) continue;
-      if(pathPx.some(p=>(p.x-x)**2+(p.y-y)**2 < (110+rad*20)**2)) continue;
-      if(POS.some(p=>(p[0]-x)**2+(p[1]-y)**2 < 200*200) || ponds.some(p=>(p.x-x)**2+(p.y-y)**2 < 300*300)) continue;
-      if((SPAWN.x-x)**2+(SPAWN.y-y)**2 < 200*200) continue;
-      const pw = toW(x,y); ponds.push({x, y, rad, wx:pw.x, wz:pw.z});
-    }
     const inPond = (x,y,m) => ponds.some(p=>(p.x-x)**2+(p.y-y)**2 < (p.rad*20+(m||30))**2);
     for(let k=0;k<1600 && (L.trunk.length+L.crystal.length+L.rune.length+L.pillar.length+L.pole.length+L.flower.length/4+Object.values(K).reduce((a,v)=>a+v.length,0))<780;k++){
       const x = 30+rnd()*3140, y = 40+rnd()*2120;
@@ -819,9 +914,9 @@ async function init3D(){
     ponds.forEach(p=>{
       const w = toW(p.x, p.y);
       const wm = new T.Mesh(GEO.disk, new T.MeshPhongMaterial({color:0x2f86b0, emissive:0x0d2a40, shininess:90, specular:0x9fd8ff, transparent:true, opacity:.88}));
-      wm.rotation.x = -Math.PI/2; wm.position.set(w.x,.07,w.z); wm.scale.set(p.rad, p.rad*.8, 1); wm.receiveShadow = true; W.add(wm);
-      const rim = new T.Mesh(GEO.disk, new T.MeshToonMaterial({color:0x6b5a3a, gradientMap:grad})); rim.rotation.x = -Math.PI/2; rim.position.set(w.x,.055,w.z); rim.scale.set(p.rad+.45, (p.rad+.45)*.8, 1); W.add(rim);
-      for(let i=0;i<4;i++){ const a = rnd()*6.28, d = rnd()*.6; put(rnd()<.5?'waterlily_A':'waterlily_B', w.x+Math.cos(a)*p.rad*d, w.z+Math.sin(a)*p.rad*.8*d, 3, undefined, .08); }
+      wm.rotation.x = -Math.PI/2; wm.position.set(w.x,.03,w.z); wm.scale.set(p.rad, p.rad*.8, 1); wm.receiveShadow = true; W.add(wm);
+      const rim = new T.Mesh(GEO.disk, new T.MeshToonMaterial({color:0x6b5a3a, gradientMap:grad})); rim.rotation.x = -Math.PI/2; rim.position.set(w.x,.012,w.z); rim.scale.set(p.rad+.45, (p.rad+.45)*.8, 1); W.add(rim);
+      for(let i=0;i<4;i++){ const a = rnd()*6.28, d = rnd()*.6; { const lx = w.x+Math.cos(a)*p.rad*d, lz = w.z+Math.sin(a)*p.rad*.8*d; put(rnd()<.5?'waterlily_A':'waterlily_B', lx, lz, 3, undefined, .045-getH(lx,lz)); } }
       for(let i=0;i<7;i++){ const a = i/7*6.28+rnd()*.4; const ex = Math.cos(a)*(p.rad+.3), ez = Math.sin(a)*(p.rad+.3)*.8;
         if(i%2) put(ROCKS[Math.floor(rnd()*4)], w.x+ex, w.z+ez, 2.2+rnd()*1.2); else put(rnd()<.5?'waterplant_A':'waterplant_C', w.x+ex*.92, w.z+ez*.92, 4); }
     });
@@ -833,11 +928,16 @@ async function init3D(){
       for(let i=0;i<3;i++) L.grass.push([w.x+(rnd()-.5)*.6, .1, w.z+(rnd()-.5)*.6, .13, .2+rnd()*.12, .13, rnd()*6.28, c]);
     }
     for(const name in K) envInst(W, name, K[name], name.startsWith('mountain') ? {ow:.012, tint:0xa9c9b4, chunk:40} : {chunk:32});
+    // 樹下、石頭邊的接地陰影（直接壓暗地面頂點色）
+    const SHADE = {tree_single_A:1.7, tree_single_B:1.9, trees_A_medium:3.4, trees_B_small:3, tree_pine_yellow_large:2.2, tree_pine_orange_medium:1.9, tree_dead_large:1.2, tree_dead_medium:1, tree_dead_small:.9, pillar:.9, lantern_standing:.7, shrine_candles:.8};
+    for(const name in K){ const r = SHADE[name] || (name.startsWith('rock') ? .9 : 0); if(r) K[name].forEach(d=>groundShade(d[0], d[2], r, .4)); }
+    L.trunk.forEach(d=>groundShade(d[0], d[2], 1.6, .35));
+    groundCol.geo.attributes.color.needsUpdate = true;
     const dummy = new T.Object3D(), cc = new T.Color();
     function inst(list, geo, material, shadow){
       if(!list.length) return;
       const im = new T.InstancedMesh(geo, material, list.length);
-      list.forEach((d,i)=>{ dummy.position.set(d[0],d[1],d[2]); dummy.scale.set(d[3],d[4],d[5]); dummy.rotation.set(0,d[6],0); dummy.updateMatrix(); im.setMatrixAt(i, dummy.matrix); cc.set(d[7]); im.setColorAt(i, cc); });
+      list.forEach((d,i)=>{ dummy.position.set(d[0],d[1]+getH(d[0],d[2]),d[2]); dummy.scale.set(d[3],d[4],d[5]); dummy.rotation.set(0,d[6],0); dummy.updateMatrix(); im.setMatrixAt(i, dummy.matrix); cc.set(d[7]); im.setColorAt(i, cc); });
       im.instanceMatrix.needsUpdate = true; if(im.instanceColor) im.instanceColor.needsUpdate = true;
       im.castShadow = shadow!==false && !(material.transparent || material.isMeshBasicMaterial); im.receiveShadow = false; im.frustumCulled = false;
       W.add(im);
@@ -853,7 +953,7 @@ async function init3D(){
   }
   // 螢火蟲
   const FF = 280, ffGeo = new T.BufferGeometry(), ffBase = new Float32Array(FF*3), ffPos = new Float32Array(FF*3);
-  for(let i=0;i<FF;i++){ const w = toW(rnd()*3200, rnd()*2200); ffBase[i*3] = w.x; ffBase[i*3+1] = .6+rnd()*3; ffBase[i*3+2] = w.z; }
+  for(let i=0;i<FF;i++){ const w = toW(rnd()*3200, rnd()*2200); ffBase[i*3] = w.x; ffBase[i*3+1] = .6+rnd()*3+getH(w.x,w.z); ffBase[i*3+2] = w.z; }
   ffPos.set(ffBase); ffGeo.setAttribute('position', new T.BufferAttribute(ffPos,3));
   const fireflies = new T.Points(ffGeo, new T.PointsMaterial({color:0xfff0a0, size:.45, map:DOT, transparent:true, depthWrite:false, blending:T.AdditiveBlending}));
   W.add(fireflies);
@@ -871,7 +971,7 @@ async function init3D(){
     const t = new T.CanvasTexture(cv); return t;
   }
   const shrines = Q.chapters.map((c,i)=>{
-    const w = toW(POS[i][0], POS[i][1]), a = REALM[c.realm].a, g = new T.Group(); g.position.set(w.x,0,w.z); W.add(g);
+    const w = toW(POS[i][0], POS[i][1]), a = REALM[c.realm].a, g = new T.Group(); g.position.set(w.x,getH(w.x,w.z),w.z); W.add(g);
     P(g, GEO.cyl, mat(0x2a2f3a), 0,.17,0,[1.7,.34,1.7]);
     const ring = P(g, GEO.ring, glow(a,.85), 0,.38,0,1.4,{rx:Math.PI/2,ol:false});
     P(g, GEO.obel, mat(0x4b5163), 0,1.6,-.4,[.85,2.6,.85],{ry:Math.PI/4});
@@ -880,7 +980,7 @@ async function init3D(){
     const pillar = new T.Mesh(new T.CylinderGeometry(1,1,1,20,1,true), new T.MeshBasicMaterial({color:0xf3d28b, transparent:true, opacity:.16, depthWrite:false, blending:T.AdditiveBlending, side:T.DoubleSide}));
     pillar.scale.set(1.1,22,1.1); pillar.position.y = 11; g.add(pillar);
     g.traverse(o=>{ if(o.isMesh && o.material.isMeshToonMaterial){ o.castShadow = true; o.receiveShadow = true; } });
-    const mon = makeMonster(monOf(c)); mon.ph = i; mon.g.position.set(w.x, 0, w.z+2.8); W.add(mon.g);
+    const mon = makeMonster(monOf(c)); mon.ph = i; mon.g.position.set(w.x, getH(w.x,w.z+2.8), w.z+2.8); W.add(mon.g);
     return {c, g, w, ring, sprite, pillar, mon, best:-1};
   });
   function refreshShrines(){
@@ -899,7 +999,7 @@ async function init3D(){
   let chars = [], trail = [];
   function buildParty(){
     chars.forEach(c=>W.remove(c.g));
-    chars = party().map(m=>{ const C = makeChar(m); W.add(C.g); C.x = hero.x; C.z = hero.z; C.g.position.set(hero.x,0,hero.z); return C; });
+    chars = party().map(m=>{ const C = makeChar(m); W.add(C.g); C.x = hero.x; C.z = hero.z; C.g.position.set(hero.x,getH(hero.x,hero.z),hero.z); return C; });
     trail = []; for(let i=0;i<120;i++) trail.push({x:hero.x, z:hero.z+i*.22});
     trail.reverse();
   }
@@ -955,16 +1055,16 @@ async function init3D(){
       const mv = i===0 ? hero.moving : d>.05;
       if(i===0){ C.x = tx; C.z = tz; } else { const k = Math.min(1, dt*10); C.x += ddx*k; C.z += ddz*k; }
       if(i===0) C.face = hero.face; else if(d>.05) C.face = Math.atan2(ddx,ddz);
-      C.g.position.set(C.x, 0, C.z);
+      C.g.position.set(C.x, getH(C.x,C.z), C.z);
       let dr = (C.face||0) - C.g.rotation.y; while(dr>Math.PI) dr -= Math.PI*2; while(dr<-Math.PI) dr += Math.PI*2;
       C.g.rotation.y += dr*Math.min(1, dt*12);
       animChar(C, T0 + i*.7, mv);
     });
     // 鏡頭
-    const want = new T.Vector3(hero.x, 0, hero.z).add(camOff);
+    const want = new T.Vector3(hero.x, getH(hero.x,hero.z)*.7, hero.z).add(camOff);
     wCam.position.lerp(want, Math.min(1, dt*5));
-    wCam.lookAt(wCam.position.x - camOff.x, 1, wCam.position.z - camOff.z);
-    sun.position.set(hero.x+18, 42, hero.z+16); sun.target.position.set(hero.x, 0, hero.z);
+    wCam.lookAt(wCam.position.x - camOff.x, wCam.position.y - camOff.y + 1, wCam.position.z - camOff.z);
+    sun.position.set(hero.x+26, 30, hero.z+12); sun.target.position.set(hero.x, 0, hero.z);
     // 魔物與祭壇
     shrines.forEach(s=>{
       const d = Math.hypot(s.w.x-hero.x, s.w.z-hero.z);
@@ -986,7 +1086,7 @@ async function init3D(){
     let lh = '';
     shrines.forEach(s=>{
       const d = Math.hypot(s.w.x-hero.x, s.w.z-hero.z); if(d>16) return;
-      const v = new T.Vector3(s.w.x, 0, s.w.z+2.8).project(wCam); if(v.z>1) return;
+      const v = new T.Vector3(s.w.x, getH(s.w.x,s.w.z+2.8), s.w.z+2.8).project(wCam); if(v.z>1) return;
       const x = (v.x+1)/2*vw, y = (1-v.y)/2*vh + 26;
       const mo = monOf(s.c);
       lh += `<div class="label" style="left:${x}px;top:${y+22}px">${s.c.stage}${s.mon.g.visible?` <small>· ${mo.boss?'頭目 ':''}${mo.name}</small>`:''}</div>`;
@@ -1033,7 +1133,7 @@ async function init3D(){
       target = {x:best.w.x, z:best.w.z+4.6}; autoEngage = best; return;
     }
     ray.setFromCamera({x:mx/vw*2-1, y:-(my/vh)*2+1}, wCam);
-    if(ray.ray.intersectPlane(ground, hitV)){ target = {x:Math.max(-78,Math.min(78,hitV.x)), z:Math.max(-52,Math.min(54,hitV.z))}; autoEngage = null; }
+    if(ray.ray.intersectPlane(ground, hitV)){ ground.constant = -getH(hitV.x, hitV.z); ray.ray.intersectPlane(ground, hitV); ground.constant = 0; target = {x:Math.max(-78,Math.min(78,hitV.x)), z:Math.max(-52,Math.min(54,hitV.z))}; autoEngage = null; }
   });
   $('mini').addEventListener('pointerdown', e=>{
     e.stopPropagation(); if(state!=='world') return;
@@ -1362,7 +1462,7 @@ async function init3D(){
       await tween(700, k=>{ B.mon.g.scale.setScalar(s0*(1-k)); B.mon.g.rotation.y += .25; B.mon.g.position.y = k*1.2; });
     }
     B.mon.g.visible = false;
-    alive.forEach(u=>{ u.C.armLock = false; u.C.g.position.y = 0; if(u.C.gl){ u.C.lock = true; loopAnim(u.C, 'Cheer', .25); } });
+    alive.forEach(u=>{ u.C.armLock = false; u.C.g.position.y = 0; if(u.C.gl){ u.C.lock = true; loopAnim(u.C, 'Cheer', .25); if(u.C.procFx) u.C.procFx('Cheer'); } });
   }
   async function skillFx(u, color, text){
     const top = u.C.g.position.clone().add(new T.Vector3(0,1.8*u.C.k,0));

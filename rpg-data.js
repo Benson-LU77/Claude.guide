@@ -3,7 +3,8 @@
    model：使用 assets/kaykit 的 Q 版模型（KayKit by Kay Lousberg，CC0）
      file = 模型檔名、tex = 換色貼圖（assets/kaykit/tex/）、show = 要顯示的配件、atk = 攻擊動作
      h = 身高、float = 漂浮高度、wings = 發光翅膀顏色、orbs = 環繞光球顏色、ol = 描邊粗細（模型單位）、ry = 模型正面轉向
-     own = 模型自帶動作的對照表（例如 Fox.glb 只有 Survey／Walk／Run，不吃 KayKit 共用動作）
+     own = 模型自帶動作的對照表（例如 Fox.glb 只有 Survey／Walk／Run，不吃 KayKit 共用動作）；
+           對照表裡沒有的動作（撲擊、受擊、施法、歡呼）由 rpg.js 的 quadFx 用程式補
    沒有 model 的角色／魔物（或模型載入失敗時）改用程式繪製的原創造型（type 欄位） */
 // Quaternius Ultimate Monsters 的動作名稱 → 遊戲用的動作名稱
 const BLOB = {Idle:'Idle', Idle_Combat:'Idle', Running_A:'Walk', Hit_A:'HitRecieve', Hit_B:'HitRecieve', Death_A:'Death', Taunt:'Dance', Bite:'Bite_Front'};
@@ -41,7 +42,7 @@ window.RPG = {
       line:'受傷了嗎？波波的孢子什麼都治得好～' },
     { id:'fen',  name:'菲恩', job:'月影狐靈', type:'fox',   color:0xf0ecff, hair:0xc9a7ff, hp:95,  unlock:14,
       atk:'狐火', style:'melee', fx:0xc9a7ff,
-      model:{ file:'Fox', tex:'fox_moon', h:1.3, ol:1.4, atk:'Pounce', own:{Idle:'Survey', Idle_Combat:'Survey', Cheer:'Survey', Running_A:'Run', Pounce:'Run'}, orbs:0xc9a7ff },
+      model:{ file:'Fox', tex:'fox_moon', h:1.3, ol:1.4, atk:'Pounce', own:{Idle:'Survey', Idle_Combat:'Survey', Cheer:'Survey', Running_A:'Run'}, orbs:0xc9a7ff },
       skill:{ id:'foxfire', name:'狐火連舞', desc:'對魔物造成一段額外傷害（每場 1 次）' },
       line:'……月光說你很努力。我就勉強跟著你吧。' },
     { id:'leo',  name:'雷歐', job:'王庭聖騎', type:'paladin',color:0xd9c27a, hair:0xfff6d6, hp:150, unlock:18,
