@@ -3,557 +3,222 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Claude 全貌指南（非官方）· claude.guide.json</title>
+<title>Claude 全貌指南（非官方）</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
+  /* ===== Claude 全貌指南：溫暖紙本書版式 =====
+     米白紙張、深咖啡字、赭橘強調（呼應橘貓）；標題思源宋體、內文思源黑體、程式碼 JetBrains Mono。
+     變數名沿用舊版（圖表 SVG 也用這些變數），只是換成淺色配色。 */
   :root{
-    --bg-deep:#10141c;
-    --bg-panel:#151b26;
-    --bg-panel-2:#1a212e;
-    --ink:#c9d1d9;
-    --ink-soft:#8b94a3;
-    --ink-faint:#5c6470;
-    --key-blue:#7aa2d9;
-    --string-amber:#e3a857;
-    --type-violet:#b58cd9;
-    --green:#7fc99a;
-    --border:#232938;
-    --border-soft:#1d2330;
-    --gutter-w:3.4rem;
-    --content-max:760px;
+    --bg-deep:#faf6ef;        /* 紙張 */
+    --bg-panel:#f3ecdf;       /* 卡片、表格 */
+    --bg-panel-2:#ebe1cf;     /* 表頭、圖表方塊 */
+    --ink:#2b2320;            /* 內文 */
+    --ink-soft:#5b4e46;       /* 次要文字 */
+    --ink-faint:#8d8076;      /* 註記 */
+    --key-blue:#2d6a86;       /* 連結、資訊色 */
+    --string-amber:#b4561a;   /* 赭橘（文字用，較深以確保對比） */
+    --accent:#d9772b;         /* 赭橘（裝飾用） */
+    --type-violet:#7a4e8a;
+    --green:#3f7d52;
+    --rose:#b4475a;
+    --border:#e0d3bf;
+    --border-soft:#ebe2d4;
+    --content-max:46rem;
+    --serif:"Noto Serif TC","Songti TC","PMingLiU",serif;
+    --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,monospace;
   }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{
     margin:0;
     background:var(--bg-deep);
+    background-image:radial-gradient(rgba(120,90,60,.035) 1px, transparent 1px);
+    background-size:4px 4px;
     color:var(--ink);
-    font-family:'Inter',-apple-system,sans-serif;
-    font-size:16px;
-    line-height:1.7;
+    font-family:var(--sans);
+    font-size:17px;
+    line-height:1.85;
     -webkit-font-smoothing:antialiased;
   }
-  ::selection{background:var(--string-amber);color:#10141c;}
+  ::selection{background:#f2c9a6;color:var(--ink);}
+  a{color:var(--key-blue);text-decoration:underline;text-decoration-color:rgba(45,106,134,.3);text-underline-offset:3px;}
+  a:hover{color:var(--string-amber);text-decoration-color:currentColor;}
+  code,.mono{font-family:var(--mono);}
 
-  a{color:var(--key-blue);text-decoration:none;}
-  a:hover{color:var(--string-amber);}
+  /* ---------- 版面骨架 ---------- */
+  .shell{display:flex;min-height:100vh;}
+  main{flex:1;min-width:0;}
 
-  code,.mono{font-family:'JetBrains Mono',monospace;}
-
-  /* ---------- Layout shell ---------- */
-  .shell{
-    display:flex;
-    min-height:100vh;
-  }
-
-  /* ---------- Sidebar (JSON tree nav) ---------- */
+  /* ---------- 側欄：書的目錄 ---------- */
   .sidebar{
-    width:268px;
-    flex-shrink:0;
-    background:var(--bg-panel);
+    width:268px;flex-shrink:0;
+    background:#f4ede1;
     border-right:1px solid var(--border);
-    position:sticky;
-    top:0;
-    height:100vh;
-    overflow-y:auto;
+    position:sticky;top:0;height:100vh;overflow-y:auto;
     padding:1.6rem 0 2rem;
   }
-  .sidebar-brand{
-    padding:0 1.4rem 1.2rem;
-    border-bottom:1px solid var(--border-soft);
-    margin-bottom:1rem;
-  }
-  .sidebar-brand .tag{
-    font-family:'JetBrains Mono',monospace;
-    font-size:.72rem;
-    color:var(--ink-faint);
-    letter-spacing:.06em;
-  }
-  .sidebar-brand h1{
-    font-family:'JetBrains Mono',monospace;
-    font-size:1.02rem;
-    margin:.3rem 0 0;
-    color:var(--ink);
-    font-weight:600;
-  }
+  .sidebar-brand{padding:0 1.4rem 1.2rem;border-bottom:1px solid var(--border);margin-bottom:.8rem;}
+  .sidebar-brand .tag{font-size:.74rem;color:var(--ink-faint);letter-spacing:.08em;}
+  .sidebar-brand h1{font-family:var(--serif);font-size:1.22rem;margin:.35rem 0 0;color:var(--ink);font-weight:900;letter-spacing:.04em;display:flex;align-items:center;}
   .sidebar-brand h1 .b{color:var(--string-amber);}
-
   nav.tree{padding:0 .6rem;}
-  .nav-divider{
-    font-family:'JetBrains Mono',monospace;
-    font-size:.66rem;
-    letter-spacing:.08em;
-    color:var(--ink-faint);
-    padding:.9rem .8rem .3rem;
-    text-transform:uppercase;
-  }
-  nav.tree a{
-    display:flex;
-    align-items:baseline;
-    gap:.5rem;
-    padding:.42rem .8rem;
-    border-radius:6px;
-    font-family:'JetBrains Mono',monospace;
-    font-size:.84rem;
-    color:var(--ink-soft);
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-  nav.tree a .idx{color:var(--type-violet);flex-shrink:0;}
-  nav.tree a .nl{display:flex;flex-direction:column;line-height:1.25;min-width:0;}
-  nav.tree a .nl .zh{font-family:system-ui,-apple-system,"PingFang TC","Noto Sans TC",sans-serif;font-size:.86rem;color:var(--ink);}
-  nav.tree a .nl small{font-size:.68rem;color:var(--ink-faint);overflow:hidden;text-overflow:ellipsis;}
-  nav.tree a.active .nl .zh{color:var(--string-amber);}
-  .content > p.eli5{color:var(--ink);background:var(--bg-panel);border:1px solid var(--border);border-left:3px solid var(--green);padding:.85rem 1.1rem;border-radius:0 8px 8px 0;font-size:1rem;margin-bottom:1.4rem;}
-  .eli5-tag::before{content:"";display:inline-block;width:1.15em;height:1.05em;margin-right:.3em;vertical-align:-.22em;background:url(assets/logo/pixel-cat.svg) no-repeat center/contain;image-rendering:pixelated;}
-  .hero-note{display:flex;gap:.7rem;align-items:flex-start;max-width:46rem;margin:1rem 0 0;padding:.7rem .9rem;border:1px solid var(--border);border-radius:8px;background:var(--bg-panel);color:var(--ink-soft);font-size:.86rem;line-height:1.65;}
-  .hero-cat{width:2.6rem;height:auto;flex:none;image-rendering:pixelated;}
-  footer .disclaimer{margin-top:.5rem;font-size:.8rem;opacity:.85;}
-  .eli5-tag{display:inline-block;font:700 .72rem system-ui,sans-serif;color:var(--bg-deep);background:var(--green);border-radius:4px;padding:.08rem .45rem;margin-right:.55rem;vertical-align:.1em;}
+  .nav-divider{font-family:var(--serif);font-size:.78rem;font-weight:700;letter-spacing:.12em;color:var(--string-amber);padding:1rem .8rem .3rem;}
+  nav.tree a{display:flex;align-items:baseline;gap:.55rem;padding:.38rem .8rem;border-radius:6px;font-size:.9rem;color:var(--ink-soft);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  nav.tree a .idx{color:var(--ink-faint);flex-shrink:0;font-family:var(--serif);font-size:.82rem;min-width:1.6em;text-align:right;}
+  nav.tree a .nl{display:flex;flex-direction:column;line-height:1.35;min-width:0;}
+  nav.tree a .nl .zh{color:var(--ink);font-size:.92rem;}
+  nav.tree a .nl small{display:none;}
   nav.tree a:hover{background:var(--bg-panel-2);color:var(--ink);}
-  nav.tree a.active{
-    background:var(--bg-panel-2);
-    color:var(--string-amber);
-    box-shadow:inset 2px 0 0 var(--string-amber);
-  }
-  nav.tree a.active .idx{color:var(--string-amber);}
-  nav.tree a.nav-quiz .idx, nav.tree a.nav-quiz .nl .zh{color:#f3d28b;}
+  nav.tree a.active{background:#fff8ee;box-shadow:inset 3px 0 0 var(--accent);}
+  nav.tree a.active .nl .zh,nav.tree a.active .idx{color:var(--string-amber);font-weight:700;}
+  nav.tree a.nav-quiz .idx,nav.tree a.nav-quiz .nl .zh{color:var(--green);}
+  .sidebar-foot{padding:1.2rem 1.4rem 0;margin-top:1.2rem;border-top:1px solid var(--border);font-size:.74rem;color:var(--ink-faint);line-height:1.7;}
+  .brand-cat{height:1.5em;width:auto;image-rendering:pixelated;vertical-align:-0.35em;margin-right:.45em;}
 
-  .sidebar-foot{
-    padding:1.2rem 1.4rem 0;
-    margin-top:1.2rem;
-    border-top:1px solid var(--border-soft);
-    font-family:'JetBrains Mono',monospace;
-    font-size:.7rem;
-    color:var(--ink-faint);
-    line-height:1.6;
-  }
-
-  /* ---------- Mobile top bar ---------- */
-  .topbar{
-    display:none;
-    position:sticky;
-    top:0;
-    z-index:50;
-    background:var(--bg-panel);
-    border-bottom:1px solid var(--border);
-    padding:.8rem 1.1rem;
-    align-items:center;
-    justify-content:space-between;
-  }
-  .topbar h1{
-    font-family:'JetBrains Mono',monospace;
-    font-size:.92rem;
-    margin:0;
-    color:var(--ink);
-  }
+  /* ---------- 手機頂欄 ---------- */
+  .topbar{display:none;position:sticky;top:0;z-index:50;background:#f4ede1;border-bottom:1px solid var(--border);padding:.8rem 1.1rem;align-items:center;justify-content:space-between;}
+  .topbar h1{font-family:var(--serif);font-size:1rem;margin:0;color:var(--ink);font-weight:900;}
   .topbar h1 .b{color:var(--string-amber);}
-  .menu-btn{
-    background:none;border:1px solid var(--border);border-radius:6px;
-    color:var(--ink);width:36px;height:36px;
-    display:flex;align-items:center;justify-content:center;cursor:pointer;
-  }
-  .menu-btn span, .menu-btn::before, .menu-btn::after{
-    content:'';display:block;width:16px;height:2px;background:var(--ink);
-    position:relative;
-  }
-  .menu-btn::before{ box-shadow:0 -5px 0 var(--ink), 0 5px 0 var(--ink); }
+  .menu-btn{background:none;border:1px solid var(--border);border-radius:6px;color:var(--ink);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .menu-btn span,.menu-btn::before,.menu-btn::after{content:'';display:block;width:16px;height:2px;background:var(--ink);position:relative;}
+  .menu-btn::before{box-shadow:0 -5px 0 var(--ink),0 5px 0 var(--ink);}
 
-  /* ---------- Main column ---------- */
-  main{
-    flex:1;
-    min-width:0;
-  }
+  /* ---------- 封面 ---------- */
+  .hero{padding:5rem 2.6rem 3.6rem;max-width:62rem;}
+  .hero-cover{display:flex;align-items:center;gap:2.4rem;flex-wrap:wrap;}
+  .hero-cover img{width:9.5rem;height:auto;image-rendering:pixelated;filter:drop-shadow(0 10px 18px rgba(120,70,30,.18));}
+  .hero .eyebrow{font-family:var(--serif);letter-spacing:.35em;font-size:.82rem;color:var(--string-amber);font-weight:700;}
+  .hero h2{font-family:var(--serif);font-size:clamp(2rem,4.4vw,3.1rem);line-height:1.3;margin:.4rem 0 .9rem;color:var(--ink);font-weight:900;letter-spacing:.04em;}
+  .hero h2 .b{display:block;font-size:.5em;font-weight:600;color:var(--string-amber);letter-spacing:.06em;margin-top:.5rem;}
+  .hero p.lead{color:var(--ink-soft);font-size:1.08rem;max-width:40rem;margin:1.4rem 0 1.2rem;}
+  .hero .meta{font-size:.84rem;color:var(--ink-faint);letter-spacing:.04em;}
+  .hero-note{display:flex;gap:.8rem;align-items:flex-start;max-width:44rem;margin:1.2rem 0 0;padding:.8rem 1rem;border:1px solid var(--border);border-radius:10px;background:var(--bg-panel);color:var(--ink-soft);font-size:.88rem;line-height:1.7;}
+  .hero-cat{width:2.4rem;height:auto;flex:none;image-rendering:pixelated;}
+  .scroll-cue{margin-top:1.6rem;font-size:.86rem;color:var(--ink-soft);display:flex;align-items:center;gap:.5rem;}
+  .scroll-cue .arrow{color:var(--accent);animation:bob 1.6s ease-in-out infinite;}
+  .scroll-cue + .scroll-cue{margin-top:.4rem;}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
 
-  /* ---------- Hero ---------- */
-  .hero{
-    padding:5.4rem 2.4rem 4rem;
-    max-width:980px;
-  }
-  .hero-term{
-    font-family:'JetBrains Mono',monospace;
-    font-size:.95rem;
-    background:var(--bg-panel);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:1.4rem 1.6rem;
-    color:var(--ink-soft);
-    max-width:560px;
-    box-shadow:0 18px 50px -24px rgba(0,0,0,.6);
-  }
-  .hero-term .tt-line{white-space:pre;}
-  .hero-term .cur{
-    display:inline-block;width:.55em;height:1.05em;background:var(--string-amber);
-    vertical-align:text-bottom;animation:blink 1s step-end infinite;
-  }
-  @keyframes blink{50%{opacity:0;}}
-  .hero h2{
-    font-family:'JetBrains Mono',monospace;
-    font-size:clamp(1.7rem,3.6vw,2.6rem);
-    line-height:1.25;
-    margin:2rem 0 .9rem;
-    color:#fff;
-    font-weight:700;
-  }
-  .hero h2 .b{color:var(--string-amber);}
-  .hero p.lead{
-    color:var(--ink-soft);
-    font-size:1.05rem;
-    max-width:640px;
-    margin:0 0 1.6rem;
-  }
-  .hero .meta{
-    font-family:'JetBrains Mono',monospace;
-    font-size:.78rem;
-    color:var(--ink-faint);
-  }
-  .scroll-cue{
-    margin-top:2.6rem;
-    font-family:'JetBrains Mono',monospace;
-    font-size:.78rem;
-    color:var(--ink-faint);
-    display:flex;
-    align-items:center;
-    gap:.5rem;
-  }
-  .scroll-cue .arrow{animation:bob 1.6s ease-in-out infinite;}
-  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+  /* ---------- 章節 ---------- */
+  section.chapter{max-width:62rem;padding:3.2rem 2.6rem 2.6rem;scroll-margin-top:1rem;border-top:1px solid var(--border);}
+  .chap-head{margin-bottom:.4rem;}
+  .chap-head .brace{display:none;}
+  .chap-head .chap-no{display:block;font-family:var(--serif);font-size:.86rem;font-weight:700;letter-spacing:.16em;color:var(--string-amber);margin-bottom:.2rem;}
+  .chap-head h2{font-family:var(--serif);font-size:clamp(1.7rem,3vw,2.2rem);margin:0;color:var(--ink);font-weight:900;letter-spacing:.04em;line-height:1.35;}
+  .chap-head h2::after{content:"";display:block;width:3.2rem;height:3px;background:var(--accent);border-radius:2px;margin-top:.8rem;}
+  .chap-sub{font-size:.95rem;color:var(--ink-soft);margin:.7rem 0 1.8rem;}
+  .content{position:relative;}
+  .content > *{position:relative;max-width:var(--content-max);}
+  .content > .closing-brace{display:none;}
+  .content > h3{font-family:var(--serif);font-size:1.32rem;color:var(--ink);margin:2.6rem 0 .8rem;font-weight:900;letter-spacing:.03em;padding-left:.75rem;border-left:4px solid var(--accent);line-height:1.4;}
+  .content h4{font-family:var(--serif);font-size:1.08rem;color:var(--ink);margin:1.8rem 0 .5rem;font-weight:700;}
+  .content > p{margin:1rem 0;color:var(--ink);}
+  .content > p.note{color:var(--ink-soft);background:var(--bg-panel);border:1px solid var(--border);border-left:4px solid var(--accent);padding:.9rem 1.15rem;border-radius:0 10px 10px 0;font-size:.95rem;}
+  .content > ul,.content > ol{margin:1rem 0;padding-left:1.4rem;color:var(--ink);}
+  .content li{margin:.4rem 0;}
+  .content li::marker{color:var(--accent);}
+  .content strong{color:#1c1512;font-weight:700;}
+  .content code.inline{overflow-wrap:anywhere;background:#efe5d4;border:1px solid var(--border);border-radius:4px;padding:.05rem .38rem;font-size:.84em;color:#8a3f10;}
 
-  /* ---------- Section / "JSON object" framing ---------- */
-  section.chapter{
-    max-width:980px;
-    padding:1.4rem 2.4rem 2.2rem;
-    scroll-margin-top:1.5rem;
-  }
-  .chap-head{
-    display:flex;
-    align-items:baseline;
-    gap:.7rem;
-    margin-bottom:.3rem;
-  }
-  .chap-head .brace{
-    font-family:'JetBrains Mono',monospace;
-    color:var(--ink-faint);
-    font-size:1.3rem;
-  }
-  .chap-head h2{
-    font-family:'JetBrains Mono',monospace;
-    font-size:clamp(1.25rem,2.4vw,1.55rem);
-    margin:0;
-    color:#fff;
-    font-weight:600;
-  }
-  .chap-head h2 .quote{color:var(--ink-faint);}
-  .chap-head h2 .key{color:var(--key-blue);}
-  .chap-sub{
-    font-family:'JetBrains Mono',monospace;
-    font-size:.78rem;
-    color:var(--ink-faint);
-    margin:0 0 1.6rem 1.9rem;
-  }
+  /* 白話一句：橘貓書籤 */
+  .content > p.eli5{color:var(--ink);background:#fff8ec;border:1px solid #f0d9bd;border-left:4px solid var(--accent);padding:1rem 1.2rem;border-radius:0 12px 12px 0;font-size:1.02rem;margin:0 0 1.8rem;box-shadow:0 6px 18px -14px rgba(150,90,40,.5);}
+  .eli5-tag{display:inline-flex;align-items:center;font:700 .76rem var(--sans);color:#fff;background:var(--accent);border-radius:99px;padding:.12rem .6rem .12rem .35rem;margin-right:.6rem;vertical-align:.12em;letter-spacing:.06em;}
+  .eli5-tag::before{content:"";display:inline-block;width:1.25em;height:1.1em;margin-right:.3em;background:url(assets/logo/pixel-cat.svg) no-repeat center/contain;image-rendering:pixelated;}
 
-  .content{
-    margin-left:1.9rem;
-    padding-left:var(--gutter-w);
-    border-left:1px dashed var(--border);
-    position:relative;
-    counter-reset:line;
-  }
-  .content > *{
-    counter-increment:line;
-    position:relative;
-    max-width:var(--content-max);
-  }
-  .content > *::before{
-    content:counter(line,decimal-leading-zero);
-    position:absolute;
-    left:calc(-1 * var(--gutter-w));
-    width:calc(var(--gutter-w) - .9rem);
-    text-align:right;
-    font-family:'JetBrains Mono',monospace;
-    font-size:.68rem;
-    color:var(--ink-faint);
-    top:.2rem;
-    opacity:.7;
-  }
-  .content > h3{
-    font-family:'JetBrains Mono',monospace;
-    font-size:1.02rem;
-    color:var(--type-violet);
-    margin:1.8rem 0 .7rem;
-    font-weight:600;
-  }
-  .content > h3::before{top:.35rem;}
-  .content > p{margin:.9rem 0;color:var(--ink);}
-  .content > p.note{
-    color:var(--ink-soft);
-    background:var(--bg-panel);
-    border:1px solid var(--border);
-    border-left:3px solid var(--string-amber);
-    padding:.85rem 1.1rem;
-    border-radius:0 8px 8px 0;
-    font-size:.95rem;
-  }
-  .content > ul, .content > ol{margin:.9rem 0;padding-left:1.3rem;color:var(--ink);}
-  .content > ul li, .content > ol li{margin:.4rem 0;}
-  .content strong{color:#fff;font-weight:600;}
-  .content code.inline{
-    background:var(--bg-panel-2);
-    border:1px solid var(--border);
-    border-radius:4px;
-    padding:.1rem .4rem;
-    font-size:.86em;
-    color:var(--string-amber);
-  }
-
-  .content > .closing-brace{
-    font-family:'JetBrains Mono',monospace;
-    color:var(--ink-faint);
-    font-size:1.1rem;
-    margin-top:1.6rem;
-  }
-  .content > .closing-brace::before{content:'';}
-
-  /* ---------- Tables ---------- */
-  .content > .table-wrap{overflow-x:auto;margin:1.1rem 0 1.4rem;}
-  .content details.more{margin:1rem 0 1.3rem;background:var(--bg-panel);border:1px solid var(--border);border-radius:8px;padding:.2rem 1rem;}
-  .content details.more > summary{cursor:pointer;padding:.6rem 0;color:var(--key-blue);font-weight:600;}
-  .content details.more[open] > summary{border-bottom:1px solid var(--border);margin-bottom:.6rem;}
-  .diagram-wrap{margin:1.1rem 0 1.4rem;padding:1rem;background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;}
-  .fig-cap{margin:.7rem 0 0;font-size:.82rem;color:var(--ink-soft);text-align:center;}
-  .steps{margin:1rem 0;display:flex;flex-direction:column;gap:.6rem;}
-  .steps .step{display:flex;gap:.7rem;align-items:flex-start;}
-  .steps .sn{flex:none;width:24px;height:24px;border-radius:50%;background:var(--bg-panel-2);border:1px solid var(--border);color:var(--string-amber);font:600 13px system-ui,sans-serif;display:flex;align-items:center;justify-content:center;margin-top:.1rem;}
-  table{
-    border-collapse:collapse;
-    width:100%;
-    font-size:.88rem;
-    background:var(--bg-panel);
-    border:1px solid var(--border);
-    border-radius:8px;
-    overflow:hidden;
-  }
-  thead th{
-    background:var(--bg-panel-2);
-    color:var(--key-blue);
-    font-family:'JetBrains Mono',monospace;
-    font-weight:600;
-    text-align:left;
-    padding:.6rem .9rem;
-    font-size:.78rem;
-    border-bottom:1px solid var(--border);
-  }
-  tbody td{
-    padding:.55rem .9rem;
-    border-bottom:1px solid var(--border-soft);
-    color:var(--ink-soft);
-    vertical-align:top;
-  }
+  /* ---------- 表格 ---------- */
+  .content > .table-wrap{overflow-x:auto;margin:1.3rem 0 1.6rem;width:max-content;min-width:100%;max-width:min(1180px, calc(100vw - 268px - 6rem));border:1px solid var(--border);border-radius:10px;background:#fffdf8;}
+  .table-wrap th,.table-wrap td{min-width:7.5em;}
+  .table-wrap th:first-child,.table-wrap td:first-child{min-width:6em;}
+  .table-wrap td code{white-space:nowrap;}
+  table{border-collapse:collapse;width:100%;font-size:.9rem;}
+  /* 沒包在 .table-wrap 裡的表格（例如卡片內）也要能橫向捲動，不撐開整頁 */
+  .content table{max-width:100%;}
+  .content :not(.table-wrap) > table{display:block;overflow-x:auto;}
+  thead th{background:var(--bg-panel-2);color:var(--ink);font-family:var(--serif);font-weight:700;text-align:left;padding:.65rem .95rem;font-size:.86rem;border-bottom:2px solid var(--border);}
+  tbody td{padding:.65rem .95rem;border-bottom:1px solid var(--border-soft);color:var(--ink-soft);vertical-align:top;line-height:1.7;}
+  tbody tr:nth-child(even) td{background:rgba(243,236,223,.45);}
   tbody tr:last-child td{border-bottom:none;}
-  tbody td code{color:var(--string-amber);font-family:'JetBrains Mono',monospace;font-size:.85em;}
+  tbody td strong{color:var(--ink);}
+  tbody td code{color:#8a3f10;font-family:var(--mono);font-size:.85em;}
 
-  /* ---------- Code blocks ---------- */
-  .content > .code-block{
-    margin:1.1rem 0 1.4rem;
-    border:1px solid var(--border);
-    border-radius:10px;
-    overflow:hidden;
-    background:#0d1117;
-  }
-  .code-block .cb-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    background:var(--bg-panel-2);
-    padding:.45rem .9rem;
-    border-bottom:1px solid var(--border);
-    font-family:'JetBrains Mono',monospace;
-    font-size:.72rem;
-    color:var(--ink-faint);
-  }
+  /* ---------- 折疊、圖表、步驟 ---------- */
+  .content details.more{margin:1.1rem 0 1.4rem;background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;padding:.2rem 1.1rem;}
+  .content details.more > summary{cursor:pointer;padding:.65rem 0;color:var(--string-amber);font-weight:700;}
+  .content details.more[open] > summary{border-bottom:1px solid var(--border);margin-bottom:.6rem;}
+  .diagram-wrap{margin:1.3rem 0 1.6rem;padding:1.1rem;background:#fffdf8;border:1px solid var(--border);border-radius:12px;}
+  .fig-cap{margin:.7rem 0 0;font-size:.84rem;color:var(--ink-soft);text-align:center;}
+  .steps{margin:1.1rem 0;display:flex;flex-direction:column;gap:.7rem;}
+  .steps .step{display:flex;gap:.75rem;align-items:flex-start;}
+  .steps .sn{flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font:700 13px var(--sans);display:flex;align-items:center;justify-content:center;margin-top:.15rem;}
+
+  /* ---------- 程式碼區塊：淺色 ---------- */
+  .content > .code-block{margin:1.3rem 0 1.6rem;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fbf7f0;}
+  .code-block .cb-head{display:flex;align-items:center;justify-content:space-between;background:var(--bg-panel-2);padding:.45rem .95rem;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:.74rem;color:var(--ink-soft);}
   .code-block .dots{display:flex;gap:.35rem;}
-  .code-block .dots span{width:8px;height:8px;border-radius:50%;background:var(--border);}
-  .code-block .copy-btn{
-    background:none;border:1px solid var(--border);color:var(--ink-faint);
-    font-family:'JetBrains Mono',monospace;font-size:.68rem;
-    padding:.2rem .55rem;border-radius:5px;cursor:pointer;
-  }
-  .code-block .copy-btn:hover{color:var(--string-amber);border-color:var(--string-amber);}
-  .code-block pre{
-    margin:0;
-    padding:1rem 1.2rem;
-    overflow-x:auto;
-    font-family:'JetBrains Mono',monospace;
-    font-size:.82rem;
-    line-height:1.65;
-    color:var(--ink);
-  }
-  .tok-key{color:var(--key-blue);}
-  .tok-string{color:var(--string-amber);}
-  .tok-num{color:var(--type-violet);}
-  .tok-bool{color:var(--green);}
+  .code-block .dots span{width:9px;height:9px;border-radius:50%;background:#d8c9b2;}
+  .code-block .dots span:first-child{background:#e3a07a;}
+  .code-block .copy-btn{background:#fffaf2;border:1px solid var(--border);color:var(--ink-soft);font-family:var(--sans);font-size:.74rem;padding:.2rem .65rem;border-radius:6px;cursor:pointer;}
+  .code-block .copy-btn:hover{color:#fff;background:var(--accent);border-color:var(--accent);}
+  .code-block pre{margin:0;padding:1rem 1.2rem;overflow-x:auto;font-family:var(--mono);font-size:.84rem;line-height:1.7;color:#2b2320;}
+  .tok-key{color:#2d6a86;}
+  .tok-string{color:#a24d12;}
+  .tok-num{color:#7a4e8a;}
+  .tok-bool{color:#3f7d52;}
   .tok-null{color:var(--ink-faint);}
-  .tok-comment{color:var(--ink-faint);font-style:italic;}
-  .tok-keyword{color:var(--key-blue);}
+  .tok-comment{color:#8d8076;font-style:italic;}
+  .tok-keyword{color:#7a4e8a;font-weight:600;}
 
-  /* ---------- Flow diagram ---------- */
-  .content > .flow{
-    margin:1.2rem 0 1.4rem;
-    background:var(--bg-panel);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:1.2rem 1.3rem;
-    font-family:'JetBrains Mono',monospace;
-    font-size:.82rem;
-  }
-  .flow .fstep{
-    padding:.5rem .7rem;
-    border-radius:6px;
-    background:var(--bg-panel-2);
-    color:var(--ink);
-    border-left:3px solid var(--key-blue);
-  }
-  .flow .fstep.you{border-left-color:var(--string-amber);}
-  .flow .fstep .lab{color:var(--ink-faint);font-size:.72rem;display:block;margin-bottom:.15rem;}
-  .flow .farrow{text-align:center;color:var(--ink-faint);padding:.25rem 0;}
+  /* ---------- 流程圖 ---------- */
+  .content > .flow{margin:1.3rem 0 1.6rem;background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;padding:1.2rem 1.3rem;font-size:.9rem;}
+  .flow .fstep{padding:.55rem .8rem;border-radius:8px;background:#fffdf8;color:var(--ink);border:1px solid var(--border);border-left:4px solid var(--key-blue);}
+  .flow .fstep.you{border-left-color:var(--accent);}
+  .flow .fstep .lab{color:var(--ink-faint);font-size:.76rem;display:block;margin-bottom:.15rem;}
+  .flow .farrow{text-align:center;color:var(--accent);padding:.25rem 0;}
 
-  /* ---------- Card grid (ecosystem) ---------- */
-  .content > .card-grid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:.9rem;
-    margin:1.1rem 0 1.4rem;
-  }
-  .card{
-    background:var(--bg-panel);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:1rem 1.1rem;
-  }
-  .card .ck{
-    font-family:'JetBrains Mono',monospace;
-    color:var(--key-blue);
-    font-size:.86rem;
-    font-weight:600;
-    display:block;
-    margin-bottom:.4rem;
-  }
-  .card p{margin:0;color:var(--ink-soft);font-size:.88rem;line-height:1.6;}
-  .card.feature{grid-column:1/-1;border-color:var(--string-amber);background:linear-gradient(160deg,var(--bg-panel),var(--bg-panel-2));}
-  .card.feature .ck{color:var(--string-amber);font-size:1rem;}
+  /* ---------- 卡片 ---------- */
+  .content > .card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin:1.3rem 0 1.6rem;}
+  .card{background:#fffdf8;border:1px solid var(--border);border-radius:12px;padding:1.05rem 1.15rem;}
+  .card .ck{font-family:var(--serif);color:var(--ink);font-size:1rem;font-weight:900;display:block;margin-bottom:.4rem;}
+  .card p{margin:0;color:var(--ink-soft);font-size:.92rem;line-height:1.7;}
+  .card.feature{grid-column:1/-1;border-color:#f0c9a3;background:#fff6ea;}
+  .card.feature .ck{color:var(--string-amber);font-size:1.08rem;}
+  .pill{display:inline-block;font-size:.74rem;color:var(--type-violet);border:1px solid var(--border);background:#fffdf8;border-radius:99px;padding:.1rem .6rem;margin:0 .25rem .25rem 0;}
 
-  .pill{
-    display:inline-block;
-    font-family:'JetBrains Mono',monospace;
-    font-size:.68rem;
-    color:var(--type-violet);
-    border:1px solid var(--border);
-    border-radius:99px;
-    padding:.12rem .55rem;
-    margin:0 .25rem .25rem 0;
-  }
+  /* ---------- 定義卡 ---------- */
+  .content > .def-stack{display:flex;flex-direction:column;gap:1rem;margin:1.3rem 0 1.6rem;}
+  .def-card{background:#fffdf8;border:1px solid var(--border);border-radius:12px;padding:1.15rem 1.35rem;}
+  .def-card h4{margin:0 0 .85rem;font-family:var(--serif);color:var(--ink);font-size:1.08rem;font-weight:900;display:flex;align-items:center;gap:.55rem;}
+  .def-card h4 .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+  .def-list{margin:0;display:grid;grid-template-columns:5.5rem minmax(0,1fr);row-gap:.7rem;column-gap:1rem;}
+  .def-list dt{font-family:var(--serif);font-size:.82rem;font-weight:700;color:var(--string-amber);padding-top:.15rem;white-space:nowrap;}
+  .def-list dd{margin:0;color:var(--ink-soft);font-size:.92rem;line-height:1.75;}
+  .def-list dd code.inline{background:#efe5d4;border:1px solid var(--border);border-radius:4px;padding:.05rem .38rem;font-size:.84em;color:#8a3f10;}
 
-  /* ---------- Footer ---------- */
-  footer{
-    max-width:980px;
-    padding:2rem 2.4rem 5rem 4.3rem;
-    font-family:'JetBrains Mono',monospace;
-    font-size:.8rem;
-    color:var(--ink-faint);
-    border-top:1px solid var(--border-soft);
-    margin-top:1rem;
-  }
+  /* ---------- 頁尾 ---------- */
+  footer{max-width:62rem;padding:2.2rem 2.6rem 5rem;font-size:.84rem;color:var(--ink-faint);border-top:1px solid var(--border);margin-top:1rem;}
   footer a{color:var(--ink-soft);}
   footer .links{margin-top:.8rem;display:flex;flex-direction:column;gap:.3rem;}
+  footer .disclaimer{margin-top:.6rem;font-size:.82rem;}
 
-  /* ---------- Responsive ---------- */
+  /* ---------- 窄螢幕 ---------- */
   @media (max-width:1023px){
-    .sidebar{
-      position:fixed;
-      left:0;top:0;bottom:0;
-      transform:translateX(-100%);
-      transition:transform .25s ease;
-      z-index:60;
-      box-shadow:20px 0 40px rgba(0,0,0,.4);
-    }
+    .sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .25s ease;z-index:60;box-shadow:20px 0 40px rgba(60,40,20,.2);}
     .sidebar.open{transform:translateX(0);}
     .topbar{display:flex;}
-    .scrim{
-      display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:55;
-    }
+    .scrim{display:none;position:fixed;inset:0;background:rgba(40,30,20,.35);z-index:55;}
     .scrim.show{display:block;}
-    section.chapter{padding:1.2rem 1.3rem 1.6rem;}
+    section.chapter{padding:2.4rem 1.3rem 1.8rem;}
     .hero{padding:2.6rem 1.3rem 2.4rem;}
-    .content{padding-left:2.2rem;--gutter-w:2.2rem;}
-    .content > *::before{font-size:.6rem;}
+    .hero-cover img{width:6rem;}
     .content > .card-grid{grid-template-columns:1fr;}
-    footer{padding:1.6rem 1.3rem 3rem 1.3rem;}
-    .chap-sub{margin-left:0;}
+    .content > .table-wrap{max-width:calc(100vw - 2.6rem);}
+    footer{padding:1.6rem 1.3rem 3rem;}
+    .def-list{grid-template-columns:4.5rem minmax(0,1fr);}
   }
-
-  /* ---------- Definition cards ---------- */
-  .content > .def-stack{
-    display:flex;
-    flex-direction:column;
-    gap:.9rem;
-    margin:1.1rem 0 1.4rem;
-  }
-  .def-card{
-    background:var(--bg-panel);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:1.1rem 1.3rem;
-  }
-  .def-card h4{
-    margin:0 0 .8rem;
-    font-family:'JetBrains Mono',monospace;
-    color:#fff;
-    font-size:1rem;
-    font-weight:600;
-    display:flex;
-    align-items:center;
-    gap:.55rem;
-  }
-  .def-card h4 .dot{
-    width:7px;height:7px;border-radius:50%;
-    background:var(--string-amber);
-    flex-shrink:0;
-  }
-  .def-list{
-    margin:0;
-    display:grid;
-    grid-template-columns:96px 1fr;
-    row-gap:.65rem;
-    column-gap:1rem;
-  }
-  .def-list dt{
-    font-family:'JetBrains Mono',monospace;
-    font-size:.72rem;
-    color:var(--type-violet);
-    padding-top:.15rem;
-    white-space:nowrap;
-  }
-  .def-list dd{
-    margin:0;
-    color:var(--ink-soft);
-    font-size:.88rem;
-    line-height:1.7;
-  }
-  .def-list dd code.inline{
-    background:var(--bg-panel-2);
-    border:1px solid var(--border);
-    border-radius:4px;
-    padding:.1rem .4rem;
-    font-size:.86em;
-    color:var(--string-amber);
-  }
-  @media (max-width:1023px){
-    .def-list{grid-template-columns:72px 1fr;}
-  }
-
-  .brand-cat{height:1.6em;width:auto;image-rendering:pixelated;vertical-align:-0.35em;margin-right:.45em;}
 </style>
 <link rel="icon" type="image/svg+xml" href="assets/logo/pixel-cat-sleep.svg">
 <link rel="icon" type="image/png" sizes="48x48" href="assets/logo/pixel-cat-sleep-48.png">
@@ -568,39 +233,39 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <div class="tag">// unofficial · 非官方</div>
-      <h1><img class="brand-cat" src="assets/logo/pixel-cat-sleep.svg" alt="">claude<span class="b">.</span>guide<span class="b">.json</span></h1>
+      <h1><img class="brand-cat" src="assets/logo/pixel-cat-sleep.svg" alt="">Claude 全貌指南</h1>
     </div>
     <nav class="tree">
-      <a href="#hero"><span class="idx">[*]</span><span class="nl"><span class="zh">前言</span><small>intro</small></span></a>
+      <a href="#hero"><span class="idx">◆</span><span class="nl"><span class="zh">前言</span><small>intro</small></span></a>
       <div class="nav-divider">一般使用者</div>
-      <a href="#getting-started"><span class="idx">[0]</span><span class="nl"><span class="zh">新手入門</span><small>getting_started</small></span></a>
-      <a href="#overview"><span class="idx">[1]</span><span class="nl"><span class="zh">總覽與選擇</span><small>overview</small></span></a>
-      <a href="#claudeai"><span class="idx">[2]</span><span class="nl"><span class="zh">claude.ai 功能</span><small>claude_ai</small></span></a>
-      <a href="#cowork"><span class="idx">[3]</span><span class="nl"><span class="zh">Cowork</span><small>cowork</small></span></a>
-      <a href="#ecosystem"><span class="idx">[4]</span><span class="nl"><span class="zh">周邊生態</span><small>ecosystem</small></span></a>
-      <a href="#prompting"><span class="idx">[5]</span><span class="nl"><span class="zh">怎麼問問題</span><small>prompting</small></span></a>
-      <a href="#aifluency"><span class="idx">[6]</span><span class="nl"><span class="zh">AI 素養</span><small>ai_fluency</small></span></a>
-      <a href="#safety"><span class="idx">[7]</span><span class="nl"><span class="zh">安全與限制</span><small>safety_and_limits</small></span></a>
+      <a href="#getting-started"><span class="idx">序</span><span class="nl"><span class="zh">新手入門</span><small>getting_started</small></span></a>
+      <a href="#overview"><span class="idx">1</span><span class="nl"><span class="zh">總覽與選擇</span><small>overview</small></span></a>
+      <a href="#claudeai"><span class="idx">2</span><span class="nl"><span class="zh">claude.ai 功能</span><small>claude_ai</small></span></a>
+      <a href="#cowork"><span class="idx">3</span><span class="nl"><span class="zh">Cowork</span><small>cowork</small></span></a>
+      <a href="#ecosystem"><span class="idx">4</span><span class="nl"><span class="zh">周邊生態</span><small>ecosystem</small></span></a>
+      <a href="#prompting"><span class="idx">5</span><span class="nl"><span class="zh">怎麼問問題</span><small>prompting</small></span></a>
+      <a href="#aifluency"><span class="idx">6</span><span class="nl"><span class="zh">AI 素養</span><small>ai_fluency</small></span></a>
+      <a href="#safety"><span class="idx">7</span><span class="nl"><span class="zh">安全與限制</span><small>safety_and_limits</small></span></a>
       <div class="nav-divider">開發者</div>
-      <a href="#pipeline"><span class="idx">[8]</span><span class="nl"><span class="zh">一則訊息的旅程</span><small>message_pipeline</small></span></a>
-      <a href="#api"><span class="idx">[9]</span><span class="nl"><span class="zh">API 與 JSON</span><small>api_and_json</small></span></a>
-      <a href="#tooluse"><span class="idx">[10]</span><span class="nl"><span class="zh">工具調用</span><small>tool_use</small></span></a>
-      <a href="#codeexec"><span class="idx">[11]</span><span class="nl"><span class="zh">程式碼執行</span><small>code_execution</small></span></a>
-      <a href="#claudecode"><span class="idx">[12]</span><span class="nl"><span class="zh">Claude Code 入門</span><small>claude_code</small></span></a>
-      <a href="#claudecode-adv"><span class="idx">[13]</span><span class="nl"><span class="zh">Claude Code 進階</span><small>claude_code_advanced</small></span></a>
-      <a href="#practical"><span class="idx">[14]</span><span class="nl"><span class="zh">實際操作</span><small>practical_usage</small></span></a>
-      <a href="#extensions"><span class="idx">[15]</span><span class="nl"><span class="zh">開發者延伸</span><small>developer_extensions</small></span></a>
+      <a href="#pipeline"><span class="idx">8</span><span class="nl"><span class="zh">一則訊息的旅程</span><small>message_pipeline</small></span></a>
+      <a href="#api"><span class="idx">9</span><span class="nl"><span class="zh">API 與 JSON</span><small>api_and_json</small></span></a>
+      <a href="#tooluse"><span class="idx">10</span><span class="nl"><span class="zh">工具調用</span><small>tool_use</small></span></a>
+      <a href="#codeexec"><span class="idx">11</span><span class="nl"><span class="zh">程式碼執行</span><small>code_execution</small></span></a>
+      <a href="#claudecode"><span class="idx">12</span><span class="nl"><span class="zh">Claude Code 入門</span><small>claude_code</small></span></a>
+      <a href="#claudecode-adv"><span class="idx">13</span><span class="nl"><span class="zh">Claude Code 進階</span><small>claude_code_advanced</small></span></a>
+      <a href="#practical"><span class="idx">14</span><span class="nl"><span class="zh">實際操作</span><small>practical_usage</small></span></a>
+      <a href="#extensions"><span class="idx">15</span><span class="nl"><span class="zh">開發者延伸</span><small>developer_extensions</small></span></a>
       <div class="nav-divider">團隊管理者</div>
-      <a href="#enterprise"><span class="idx">[16]</span><span class="nl"><span class="zh">企業與團隊</span><small>enterprise</small></span></a>
+      <a href="#enterprise"><span class="idx">16</span><span class="nl"><span class="zh">企業與團隊</span><small>enterprise</small></span></a>
       <div class="nav-divider">查閱</div>
-      <a href="#features"><span class="idx">[17]</span><span class="nl"><span class="zh">功能字典</span><small>feature_reference</small></span></a>
-      <a href="#resources"><span class="idx">[18]</span><span class="nl"><span class="zh">術語表與延伸閱讀</span><small>resources</small></span></a>
+      <a href="#features"><span class="idx">17</span><span class="nl"><span class="zh">功能字典</span><small>feature_reference</small></span></a>
+      <a href="#resources"><span class="idx">18</span><span class="nl"><span class="zh">術語表與延伸閱讀</span><small>resources</small></span></a>
       <div class="nav-divider">附錄・動手做專題</div>
-      <a href="#gitflow"><span class="idx">[A1]</span><span class="nl"><span class="zh">Git 與 GitHub</span><small>git_and_github</small></span></a>
-      <a href="#deploy"><span class="idx">[A2]</span><span class="nl"><span class="zh">部署上線</span><small>deployment</small></span></a>
-      <a href="#aicoding"><span class="idx">[A3]</span><span class="nl"><span class="zh">AI coding 地圖</span><small>ai_coding_map</small></span></a>
+      <a href="#gitflow"><span class="idx">A1</span><span class="nl"><span class="zh">Git 與 GitHub</span><small>git_and_github</small></span></a>
+      <a href="#deploy"><span class="idx">A2</span><span class="nl"><span class="zh">部署上線</span><small>deployment</small></span></a>
+      <a href="#aicoding"><span class="idx">A3</span><span class="nl"><span class="zh">AI coding 地圖</span><small>ai_coding_map</small></span></a>
       <div class="nav-divider">闖關</div>
-      <a href="quiz.html" class="nav-quiz"><span class="idx">[✦]</span><span class="nl"><span class="zh">精靈試煉</span><small>66 題闖關小測驗</small></span></a>
+      <a href="quiz.html" class="nav-quiz"><span class="idx">✦</span><span class="nl"><span class="zh">精靈試煉</span><small>66 題闖關小測驗</small></span></a>
     </nav>
     <div class="sidebar-foot">
       2026-06 建立 · 2026-10 更新 · 內容以官方文件最新狀態為準
@@ -609,16 +274,19 @@
 
   <main>
     <div class="topbar">
-      <h1><img class="brand-cat" src="assets/logo/pixel-cat-sleep.svg" alt="">claude<span class="b">.</span>guide<span class="b">.json</span></h1>
+      <h1><img class="brand-cat" src="assets/logo/pixel-cat-sleep.svg" alt="">Claude 全貌指南</h1>
       <button class="menu-btn" id="menuBtn" aria-label="開啟選單"><span></span></button>
     </div>
 
     <!-- ============ HERO ============ -->
     <section class="hero" id="hero">
-      <div class="hero-term">
-        <div class="tt-line" id="typeLine"></div>
+      <div class="hero-cover">
+        <img src="assets/logo/pixel-cat.svg" alt="橘貓">
+        <div>
+          <div class="eyebrow">非官方學習指南</div>
+      <h2>Claude 全貌指南<span class="b">從「Claude 是什麼」到「做出東西、放上網路」</span></h2>
+        </div>
       </div>
-      <h2>Claude 全貌指南<br><span class="b">{ 從「Claude 是什麼」到「做出東西、放上網路」 }</span></h2>
       <p class="lead">一份給所有人的 Claude 說明書。不管你只是想跟它聊天、想請它幫你做小工具，還是要把它接進自己的程式——這裡從最白話的地方講起，再一路往深處走。每章開頭都有一句「白話一句」，看不懂的名詞隨時到 <a href="#glossary">術語表</a> 查。</p>
       <div class="meta">給一般使用者、開發者與團隊管理者 · 19 章＋3 篇附錄 · 含可複製的指令與程式碼</div>
       <p class="hero-note"><img class="hero-cat" src="assets/logo/pixel-cat.svg" alt=""><span>本站是個人整理的<strong>非官方</strong>學習指南，與 Anthropic 沒有隸屬或合作關係；Claude 是 Anthropic 的商標。功能、價格與限制以 Anthropic 官方文件為準。每章開頭的「白話一句」由這隻橘貓帶你先抓重點。</span></p>
@@ -630,7 +298,7 @@
     <section class="chapter" id="getting-started">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="quote">"</span><span class="key">00_getting_started</span><span class="quote">"</span>:</h2>
+    <h2><span class="chap-no">序章</span>新手入門</h2>
   </div>
   <p class="chap-sub">新手第一步：它是什麼、去哪裡下載、從哪一章開始讀</p>
   <div class="content">
@@ -703,7 +371,7 @@
     <section class="chapter" id="overview">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="quote">"</span><span class="key">01_overview</span><span class="quote">"</span>:</h2>
+    <h2><span class="chap-no">第 1 章</span>總覽與選擇</h2>
   </div>
   <p class="chap-sub">Claude 不是一個東西，是一個產品家族：模型、方案、入口一次看懂</p>
   <div class="content">
@@ -827,7 +495,7 @@
     <section class="chapter" id="claudeai">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="quote">"</span><span class="key">02_claude_ai</span><span class="quote">"</span>:</h2>
+    <h2><span class="chap-no">第 2 章</span>claude.ai 功能</h2>
   </div>
   <p class="chap-sub">一般使用者怎麼用：網頁、桌面版、手機 App 的每個功能在哪裡、怎麼開</p>
   <div class="content">
@@ -1024,7 +692,7 @@
     <section class="chapter" id="cowork">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="quote">"</span><span class="key">03_cowork</span><span class="quote">"</span>:</h2>
+    <h2><span class="chap-no">第 3 章</span>Cowork</h2>
   </div>
   <p class="chap-sub">把一件多步驟的工作真的交出去：從下載、連資料夾、第一個任務，到排程與外掛</p>
   <div class="content">
@@ -1243,7 +911,7 @@ sudo apt install qemu-system-x86 ovmf virtiofsd</code></pre>
     <section class="chapter" id="ecosystem">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="quote">"</span><span class="key">04_ecosystem</span><span class="quote">"</span>:</h2>
+    <h2><span class="chap-no">第 4 章</span>周邊生態</h2>
   </div>
   <p class="chap-sub">周邊生態：從聊天視窗延伸到瀏覽器、Office、Slack、設計與科學研究，再用 MCP 接上各種外部工具</p>
   <div class="content">
@@ -1436,7 +1104,7 @@ claude --chrome
     <section class="chapter" id="prompting">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="quote">"</span><span class="key">05_prompting</span><span class="quote">"</span>:</h2>
+    <h2><span class="chap-no">第 5 章</span>怎麼問問題</h2>
   </div>
   <p class="chap-sub">怎麼跟 Claude 講話 — 在學 JSON 之前，先學會「問」</p>
   <div class="content">
@@ -1615,7 +1283,7 @@ for block in response.content:
     <section class="chapter" id="aifluency">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="quote">"</span><span class="key">06_ai_fluency</span><span class="quote">"</span>:</h2>
+    <h2><span class="chap-no">第 6 章</span>AI 素養</h2>
   </div>
   <p class="chap-sub">AI 素養 — 跟 AI 好好協作的思維，模型再怎麼變都適用</p>
   <div class="content">
@@ -1703,7 +1371,7 @@ for block in response.content:
     <section class="chapter" id="safety">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="quote">"</span><span class="key">07_safety_and_limits</span><span class="quote">"</span>:</h2>
+    <h2><span class="chap-no">第 7 章</span>安全與限制</h2>
   </div>
   <p class="chap-sub">Claude 不是萬能的 — 限制、隱私、代理操作的安全，幾個新手容易誤踩的點</p>
   <div class="content">
@@ -1836,7 +1504,7 @@ for block in response.content:
     <section class="chapter" id="pipeline">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="quote">"</span><span class="key">08_message_pipeline</span><span class="quote">"</span>:</h2>
+    <h2><span class="chap-no">第 8 章</span>一則訊息的旅程</h2>
   </div>
   <p class="chap-sub">一則訊息的旅程 — 你打下一行字之後，整條鏈路是怎麼被驅動的</p>
   <div class="content">
@@ -1960,7 +1628,7 @@ for block in response.content:
     <section class="chapter" id="api">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="quote">"</span><span class="key">09_api_and_json</span><span class="quote">"</span>:</h2>
+        <h2><span class="chap-no">第 9 章</span>API 與 JSON</h2>
       </div>
       <p class="chap-sub">開發者怎麼跟 Claude「對話」— 核心只有一個端點</p>
       <div class="content">
@@ -2240,7 +1908,7 @@ print("".join(b.text for b in second.content if b.type == "text"))</code></pre>
     <section class="chapter" id="tooluse">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="quote">"</span><span class="key">10_tool_use</span><span class="quote">"</span>:</h2>
+        <h2><span class="chap-no">第 10 章</span>工具調用</h2>
       </div>
       <p class="chap-sub">Claude 怎麼「做事」而不只是「講話」— 完整 JSON 定義</p>
       <div class="content">
@@ -2664,7 +2332,7 @@ if __name__ == "__main__":
     <section class="chapter" id="codeexec">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="quote">"</span><span class="key">11_code_execution</span><span class="quote">"</span>:</h2>
+        <h2><span class="chap-no">第 11 章</span>程式碼執行</h2>
       </div>
       <p class="chap-sub">程式碼到底怎麼「跑」起來的</p>
       <div class="content">
@@ -2894,7 +2562,7 @@ print("".join(b.text for b in follow_up.content if b.type == "text"))</code></pr
     <section class="chapter" id="claudecode">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="quote">"</span><span class="key">12_claude_code</span><span class="quote">"</span>:</h2>
+        <h2><span class="chap-no">第 12 章</span>Claude Code 入門</h2>
       </div>
       <p class="chap-sub">會自己動手的寫程式助手：在哪用、怎麼控制它、怎麼交給雲端</p>
       <div class="content">
@@ -3293,7 +2961,7 @@ claude --cloud "照 docs/plan.md 的計畫執行"</code></pre>
     <section class="chapter" id="claudecode-adv">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="quote">"</span><span class="key">13_claude_code_advanced</span><span class="quote">"</span>:</h2>
+        <h2><span class="chap-no">第 13 章</span>Claude Code 進階</h2>
       </div>
       <p class="chap-sub">把 Claude Code 變成你的：客製化、設定、安全、自動化、平行作業</p>
       <div class="content">
@@ -3694,7 +3362,7 @@ jobs:
     <section class="chapter" id="practical">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="quote">"</span><span class="key">14_practical_usage</span><span class="quote">"</span>:</h2>
+    <h2><span class="chap-no">第 14 章</span>實際操作</h2>
   </div>
   <p class="chap-sub">實務層面：終端機指令、介面操作、API 怎麼真的打一輪、錢怎麼省、錯誤怎麼看</p>
   <div class="content">
@@ -3971,7 +3639,7 @@ claude mcp add --transport http --scope user my-notes https://notes.example.com/
     <section class="chapter" id="extensions">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="quote">"</span><span class="key">15_developer_extensions</span><span class="quote">"</span>:</h2>
+    <h2><span class="chap-no">第 15 章</span>開發者延伸</h2>
   </div>
   <p class="chap-sub">給開發者的延伸：IDE 外掛、瀏覽器、GitHub、Agent SDK，以及 Claude API 的進階功能</p>
   <div class="content">
@@ -4345,7 +4013,7 @@ ant messages create \
     <section class="chapter" id="enterprise">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="quote">"</span><span class="key">16_enterprise</span><span class="quote">"</span>:</h2>
+    <h2><span class="chap-no">第 16 章</span>企業與團隊</h2>
   </div>
   <p class="chap-sub">給團隊管理者與企業 IT：帳號、權限、政策、資料保留、雲端部署與用量控管</p>
   <div class="content">
@@ -4772,7 +4440,7 @@ ant messages create \
     <section class="chapter" id="features">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="quote">"</span><span class="key">17_feature_reference</span><span class="quote">"</span>:</h2>
+    <h2><span class="chap-no">第 17 章</span>功能字典</h2>
   </div>
   <p class="chap-sub">claude.ai、API、Claude Code 各項功能的定義：是什麼 / 能做什麼 / 在哪裡開 / 什麼時候用</p>
   <div class="content">
@@ -5405,7 +5073,7 @@ ant messages create \
     <section class="chapter" id="resources">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="quote">"</span><span class="key">18_resources</span><span class="quote">"</span>:</h2>
+        <h2><span class="chap-no">第 18 章</span>術語表與延伸閱讀</h2>
       </div>
       <p class="chap-sub">術語表 + 延伸閱讀，官方文件最新狀態以連結為準</p>
       <div class="content">
@@ -5547,7 +5215,7 @@ ant messages create \
     <section class="chapter" id="gitflow">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="quote">"</span><span class="key">A1_git_and_github</span><span class="quote">"</span>:</h2>
+        <h2><span class="chap-no">附錄 A1</span>Git 與 GitHub</h2>
       </div>
       <p class="chap-sub">Git 與 GitHub — 為什麼 AI 寫程式之後，這件事反而更重要</p>
       <div class="content">
@@ -5849,7 +5517,7 @@ pause</code></pre>
     <section class="chapter" id="deploy">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="quote">"</span><span class="key">A2_deployment</span><span class="quote">"</span>:</h2>
+        <h2><span class="chap-no">附錄 A2</span>部署上線</h2>
       </div>
       <p class="chap-sub">部署上線 — 東西做好了，怎麼讓別人也打得開</p>
       <div class="content">
@@ -5938,7 +5606,7 @@ git add .nojekyll &amp;&amp; git commit -m "停用 Jekyll 建置" &amp;&amp; git
     <section class="chapter" id="aicoding">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="quote">"</span><span class="key">A3_ai_coding_map</span><span class="quote">"</span>:</h2>
+        <h2><span class="chap-no">附錄 A3</span>AI coding 地圖</h2>
       </div>
       <p class="chap-sub">一個系統的 12 塊積木 — 換個視角：用 AI 打造系統，需要哪些零件</p>
       <div class="content">
@@ -6127,7 +5795,7 @@ jobs:
 
 
     <footer>
-      claude.guide.json · 2026-06 建立 · 2026-10 更新，部分名稱與版本以官方文件最新狀態為準
+      Claude 全貌指南 · 2026-06 建立 · 2026-10 更新，部分名稱與版本以官方文件最新狀態為準
       <div class="disclaimer">本站是個人整理的<strong>非官方</strong>學習指南，與 Anthropic 沒有隸屬或合作關係；Claude 是 Anthropic 的商標。功能、價格與限制以 Anthropic 官方文件為準。</div>
       <div class="links">
         <span>各章程式碼區塊右上角都有「複製」按鈕，可直接取用</span>
@@ -6163,35 +5831,14 @@ const io = new IntersectionObserver((entries)=>{
 }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
 targets.forEach(t => t && io.observe(t));
 
-// ---------- hero typing animation ----------
-const typeEl = document.getElementById('typeLine');
-const ttLines = [
-  '{',
-  '  "name": "Claude",',
-  '  "made_by": "Anthropic",',
-  '  "this_guide": "unofficial",',
-  '  "surfaces": ["claude.ai", "cowork", "claude_code", "api"],',
-  '  "status": "reading guide..."',
-  '}'
-];
-let li = 0, ci = 0;
-function typeTick(){
-  if(li >= ttLines.length){ return; }
-  const line = ttLines[li];
-  if(ci <= line.length){
-    let html = '';
-    for(let k=0;k<li;k++){ html += escapeHtml(ttLines[k]) + '\n'; }
-    html += escapeHtml(line.slice(0, ci));
-    typeEl.innerHTML = html + '<span class="cur"></span>';
-    ci++;
-    setTimeout(typeTick, 18 + Math.random()*22);
-  } else {
-    li++; ci = 0;
-    setTimeout(typeTick, 110);
-  }
-}
+// ---------- 表格：文字多的欄位給較寬的最小寬度，避免擠成一字一行 ----------
+document.querySelectorAll('.table-wrap td').forEach(td=>{
+  const n = td.textContent.trim().length;
+  if(n > 90) td.style.minWidth = '17em'; else if(n > 45) td.style.minWidth = '12em';
+});
+
+
 function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-typeTick();
 
 // ---------- syntax highlighting ----------
 function highlightJSON(src){
