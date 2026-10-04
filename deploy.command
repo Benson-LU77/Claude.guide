@@ -34,6 +34,15 @@ else
   echo "ℹ️  沒有偵測到新變更。"
 fi
 
+# --- 先把線上較新的版本（例如在別處用 Claude Code 推的 PR）合併下來 ---
+echo "🔄 同步線上最新版本 ..."
+if ! git pull --rebase -q origin main; then
+  echo "⚠️  本機修改和線上版本改到同一段，需要手動處理衝突。"
+  echo "   請先執行：git rebase --abort ，再把這段訊息貼給 Claude 協助。"
+  read -r _
+  exit 1
+fi
+
 echo "🚀 推送到 GitHub ..."
 git push -u origin main
 
