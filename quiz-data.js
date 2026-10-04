@@ -208,7 +208,7 @@ window.QUIZ = {
       "Free 方案就能設定"
      ],
      "answer": 1,
-     "explain": "雲端排程不能綁本機資料夾；需要本機檔案的排程只能在本機跑，電腦要醒著、Claude Desktop 要開著。",
+     "explain": "雲端排程不能綁本機資料夾，也不能用本機連接器。Pro／Max 自 2026-10-06 起，新任務與排程一律在雲端跑（包括用到電腦檔案的排程），這類排程執行時 Claude Desktop 要開著；Team／Enterprise 需要本機檔案的排程仍在本機跑、電腦要醒著。",
      "link": "#cowork-schedule"
     }
    ]

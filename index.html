@@ -598,7 +598,7 @@
       <a href="quiz.html" class="nav-quiz"><span class="idx">[✦]</span><span class="nl"><span class="zh">精靈試煉</span><small>66 題闖關小測驗</small></span></a>
     </nav>
     <div class="sidebar-foot">
-      2026-06 建立 · 2026-09 更新 · 內容以官方文件最新狀態為準
+      2026-06 建立 · 2026-10 更新 · 內容以官方文件最新狀態為準
     </div>
   </aside>
 
@@ -705,29 +705,29 @@
   <div class="content">
     <p class="eli5"><span class="eli5-tag">白話一句</span>Claude 是一個「家族」：同一顆大腦，有聊天、交辦工作、寫程式、給工程師接程式等不同入口；模型有大有小，不確定就先用 Opus 5.5；方案決定你能用多少、能用哪些功能。</p>
     <p>「Claude」這個名字底下，其實是好幾個共用同一套模型、但用法完全不同的產品：<strong>claude.ai</strong>（網頁／桌面版／手機 App 的對話介面，一般使用者用）、<strong>Cowork</strong>（把多步驟工作交給 Claude 執行）、<strong>Claude Code</strong>（寫程式的 agent 工具）、<strong>Claude API</strong>（開發者直接呼叫模型，走 JSON）。這一章是全站<strong>模型、價格、方案、用量上限</strong>的唯一說明處，其他章節提到這些時都會連回這裡。</p>
-    <p class="note">本章的模型、價格、方案、上限資訊<strong>截至 2026-09</strong>，這類資訊變動很快，實際以 Anthropic 官方的 <code class="inline">platform.claude.com/docs</code> 模型頁與 <code class="inline">claude.com/pricing</code> 為準。</p>
+    <p class="note">本章的模型、價格、方案、上限資訊<strong>截至 2026-10</strong>，這類資訊變動很快，實際以 Anthropic 官方的 <code class="inline">platform.claude.com/docs</code> 模型頁與 <code class="inline">claude.com/pricing</code> 為準。</p>
 
     <h3 id="overview-models">模型陣容：哪種任務用哪個</h3>
-    <p>模型不是「越貴越好」，而是各有適用區間。官方目前的建議很簡單：<strong>不確定用哪個，就先用 Claude Opus 5.5</strong>；遇到特別難的推理、要自主跑很久的任務，或 Opus 5.5 調高 effort 仍不夠好時，再換 Fable 5.1；要快、要便宜、量大時用 Sonnet 5 或 Haiku 4.5。</p>
+    <p>模型不是「越貴越好」，而是各有適用區間。官方目前的建議很簡單：<strong>不確定用哪個，就先用 Claude Opus 5.5</strong>；遇到特別難的推理、要自主跑很久的任務，或 Opus 5.5 調高 effort 仍不夠好時，再換 Fable 5.1；要快、要便宜、量大時用 Sonnet 5.5 或 Haiku 4.5。</p>
     <div class="table-wrap">
     <table>
       <thead><tr><th>模型</th><th>API 模型 ID</th><th>價格（輸入／輸出，每百萬 token）</th><th>定位</th><th>適合的任務</th><th>Thinking 類型</th><th>Effort 參數</th><th>上下文／最長輸出（API）</th><th>知識截止日</th></tr></thead>
       <tbody>
         <tr><td><strong>Claude Fable 5.1</strong></td><td><code class="inline">claude-fable-5-1</code></td><td>$10 ／ $50</td><td>最強、最慢；目前最高階的公開模型</td><td>要求最高的推理、長時間自主執行的 agent 工作（原本要人盯好幾小時的端到端任務）、Opus 5.5 調高 effort 仍達不到的情況。<br><strong>注意</strong>：Fable 5.1／Fable 5 是官方指定的 <strong>Covered Models</strong>，必須開 30 天資料保留；設定為零資料保留（ZDR）的組織呼叫會回 <code class="inline">400</code> 錯誤（可只為單一 workspace 開 30 天保留），見 <a href="#enterprise">企業與團隊</a></td><td>Adaptive（一律開啟）</td><td>支援，預設 <code class="inline">high</code></td><td>1M ／ 128K</td><td>2026 年 6 月</td></tr>
         <tr><td><strong>Claude Opus 5.5</strong><br>（官方建議多數情況先用）</td><td><code class="inline">claude-opus-5-5</code></td><td>$4 ／ $20</td><td>現行旗艦主力；官方說多數工作表現接近 Fable 5.1，成本比 Opus 5 低約 40%</td><td>長時間的 agentic coding 與知識工作、大型程式碼分析、複雜架構決策、報告與研究</td><td>Adaptive（一律開啟）</td><td>支援，預設 <code class="inline">medium</code></td><td>1M ／ 128K</td><td>2026 年 6 月</td></tr>
-        <tr><td><strong>Claude Sonnet 5</strong></td><td><code class="inline">claude-sonnet-5</code></td><td>$2 ／ $10</td><td>速度與智慧的最佳平衡</td><td>日常寫作、分析、一般寫程式、需要快速回應的產品功能</td><td>Adaptive</td><td>支援，預設 <code class="inline">high</code></td><td>1M ／ 128K</td><td>2026 年 1 月</td></tr>
+        <tr><td><strong>Claude Sonnet 5.5</strong></td><td><code class="inline">claude-sonnet-5-5</code></td><td>$2 ／ $10</td><td>速度與智慧的最佳平衡（2026-09-28 推出，取代 Sonnet 5）</td><td>日常寫作、分析、一般寫程式、需要快速回應的產品功能</td><td>Adaptive</td><td>支援，預設 <code class="inline">high</code></td><td>1M ／ 128K</td><td>2026 年 6 月</td></tr>
         <tr><td><strong>Claude Haiku 4.5</strong></td><td><code class="inline">claude-haiku-4-5-20251001</code></td><td>$1 ／ $5</td><td>最快、最便宜，接近前沿的智慧</td><td>高量低複雜度：分類、抽取、格式轉換、即時聊天、背景 AI 功能。<br><strong>注意</strong>：官方生命週期表寫它「最早 2026-10-15 退役（Not sooner than）」，退役前官方會提前通知；長期專案請預留換模型的空間</td><td>Extended（手動設定思考預算）</td><td>不支援</td><td>200K ／ 64K</td><td>2025 年 2 月</td></tr>
       </tbody>
     </table>
     </div>
     <p class="note">「知識截止日」是官方寫的 <em>Reliable knowledge cutoff</em>：模型對這個日期以前的世界知識最可靠，之後發生的事它可能不知道或說錯，要查新資訊請開網路搜尋（見 <a href="#safety">安全與限制</a>）。表中「上下文」是 API 的數字；在 claude.ai、Claude Code、Cowork 裡，同一個模型的上下文長度可能不同，見下方<a href="#overview-context">上下文長度</a>。</p>
-    <p>白話對照：<strong>不知道選哪個</strong> → Opus 5.5；<strong>最難、要自主跑很久</strong> → Fable 5.1；<strong>一般日常、要快</strong> → Sonnet 5；<strong>格式轉換／分類／大量重複</strong> → Haiku 4.5。實務上常做「模型分流」：大量簡單任務交給 Haiku 或 Sonnet，難的才升到 Opus 或 Fable，能明顯壓低成本（實際省多少取決於你的任務組合，建議用自己的資料實測）。</p>
-    <p class="note"><strong>上一代模型（官方模型頁歸在「legacy models」）</strong>：Claude Fable 5、Opus 5（<code class="inline">claude-opus-5</code>，$5／$25，官方建議遷移到 Opus 5.5）、Opus 4.8、Opus 4.7、Opus 4.6、Opus 4.5、Sonnet 4.6、Sonnet 4.5。它們在官方生命週期表上仍是 <strong>Active</strong>（照常可用），但不會再更新，新專案不建議選。官方表上的退役日期都寫成「<strong>最早不早於</strong>（Not sooner than）某日」，不是確定的關閉日；其中最近的是 <strong>Sonnet 4.5 最早 2026-09-29</strong>、<strong>Opus 4.5 最早 2026-11-24</strong>，其餘上一代模型多在 2027 年。現行表中的 Haiku 4.5 也是<strong>最早 2026-10-15</strong>。官方承諾公開發布的模型退役前至少提前 60 天通知。新寫的程式請用上表現行 ID，範例程式碼一律用 <code class="inline">claude-opus-5-5</code>，需要便宜快速時用 <code class="inline">claude-haiku-4-5-20251001</code>（留意上述退役時程）。最新日期以官方「Model deprecations」頁為準。</p>
+    <p>白話對照：<strong>不知道選哪個</strong> → Opus 5.5；<strong>最難、要自主跑很久</strong> → Fable 5.1；<strong>一般日常、要快</strong> → Sonnet 5.5；<strong>格式轉換／分類／大量重複</strong> → Haiku 4.5。實務上常做「模型分流」：大量簡單任務交給 Haiku 或 Sonnet，難的才升到 Opus 或 Fable，能明顯壓低成本（實際省多少取決於你的任務組合，建議用自己的資料實測）。</p>
+    <p class="note"><strong>上一代模型（官方模型頁歸在「legacy models」）</strong>：Claude Fable 5、Opus 5（<code class="inline">claude-opus-5</code>，$5／$25，官方建議遷移到 Opus 5.5）、Sonnet 5（<code class="inline">claude-sonnet-5</code>，$2／$10，官方建議遷移到 Sonnet 5.5）、Opus 4.8、Opus 4.7、Opus 4.6、Opus 4.5、Sonnet 4.6。它們在官方生命週期表上仍是 <strong>Active</strong>（照常可用），但不會再更新，新專案不建議選。官方表上的退役日期都寫成「<strong>最早不早於</strong>（Not sooner than）某日」，不是確定的關閉日；其中最近的是 <strong>Opus 4.5 最早 2026-11-24</strong>，其餘上一代模型多在 2027 年。<strong>Sonnet 4.5 已於 2026-09-30 列為 Deprecated，2026-11-30 退役</strong>（官方建議改用 <code class="inline">claude-sonnet-5-5</code>）。現行表中的 Haiku 4.5 是<strong>最早 2026-10-15</strong>（截至 2026-10 仍是 Active、尚未發棄用通知）。官方承諾公開發布的模型退役前至少提前 60 天通知。新寫的程式請用上表現行 ID，範例程式碼一律用 <code class="inline">claude-opus-5-5</code>，需要便宜快速時用 <code class="inline">claude-haiku-4-5-20251001</code>（留意上述退役時程）。最新日期以官方「Model deprecations」頁為準。</p>
     <p class="note"><strong>Mythos 系列</strong>：你可能在新聞或官方文件看到 Claude Mythos（例如 Mythos 5.1，規格與價格同 Fable 5.1）。它只透過 <strong>Project Glasswing</strong> 邀請制開放給特定合作夥伴，一般使用者與一般 API 帳號都用不到，選模型時可以忽略。</p>
 
     <h4>Thinking 與 effort 是什麼？</h4>
     <ul>
-      <li><strong>Thinking（思考）</strong>：Claude 回答前先在內部推理。<strong>Adaptive thinking</strong> 是新一代做法，由模型自己決定要想多少；Fable 5.1 與 Opus 5.5 的 thinking 一律開啟、不能關。<strong>Extended thinking</strong> 是舊做法，由你指定一個思考 token 預算（<code class="inline">budget_tokens</code>），Haiku 4.5 用的是這種。</li>
+      <li><strong>Thinking（思考）</strong>：Claude 回答前先在內部推理。<strong>Adaptive thinking</strong> 是新一代做法，由模型自己決定要想多少；Fable 5.1、Fable 5 與 Opus 5.5 的 thinking 一律開啟、不能關。<strong>Extended thinking</strong> 是舊做法，由你指定一個思考 token 預算（<code class="inline">budget_tokens</code>），Haiku 4.5 用的是這種。</li>
       <li><strong>Effort（投入程度）</strong>：控制 Claude 每次回應花多少力氣（token）。等級有 Low、Medium、High、Extra high（<code class="inline">xhigh</code>，Opus 4.7 以後的模型才有）、Max。越高越周到，但越慢、越耗用量。Haiku 4.5 不支援 effort。</li>
     </ul>
     <p><strong>在 claude.ai 怎麼換</strong>：點輸入框旁送出鍵附近的模型名稱 → 選模型（「More models」看更多）→ 點「Effort」選等級；支援的模型可在同一選單切換「Thinking」開關。日常任務用預設即可；數學證明、複雜程式、完整專案規劃這類難題再調高。</p>
@@ -741,10 +741,10 @@
     </details>
 
     <h4 id="overview-model-switch">為什麼對話中途「換了模型」？安全分類器自動切換</h4>
-    <p><strong>是什麼</strong>：Fable 5／5.1、Opus 5／5.5 會對每個請求跑自動安全檢查（分類器）。少數高風險請求會被<strong>自動改由能力較低的模型回答</strong>，或直接擋下。檢查範圍不只你打的字，也包含記憶、連接器內容、網路搜尋結果和檔案，所以就算你沒打什麼敏感內容也可能觸發。</p>
+    <p><strong>是什麼</strong>：Fable 5／5.1、Opus 5／5.5、Sonnet 5.5 會對每個請求跑自動安全檢查（分類器）。少數高風險請求會被<strong>自動改由能力較低的模型回答</strong>，或直接擋下。檢查範圍不只你打的字，也包含記憶、連接器內容、網路搜尋結果和檔案，所以就算你沒打什麼敏感內容也可能觸發。</p>
     <ul>
       <li><strong>哪些會被切換</strong>：攻擊性資安（寫 exploit、滲透測試、惡意程式等）；生物、病毒、毒理、分子設計等「兩用」研究問題；少數前沿大型模型開發工作（例如特定 ML 加速器的 kernel 開發）。日常資安（檢查自己程式碼的漏洞、寫安全的程式）與一般健康、教育問題不受影響。</li>
-      <li><strong>換成誰</strong>：依類別改用 Opus 5 或 Opus 4.8（截至 2026-09）。試圖套取模型內部推理過程的「蒸餾」請求則<strong>直接擋下</strong>、不切換。</li>
+      <li><strong>換成誰</strong>：Opus 系列依類別改用 Opus 5 或 Opus 4.8，Sonnet 5.5 改用 Sonnet 5（截至 2026-09）。試圖套取模型內部推理過程的「蒸餾」請求則<strong>直接擋下</strong>、不切換。</li>
       <li><strong>畫面上會看到什麼</strong>：出現模型已切換的通知，回應會標出是哪個模型回答的；之後這個對話的模型選單會停在較低階的模型，你可以隨時手動切回（但原請求還在對話裡的話可能又被切換，先改寫那則訊息再試）。</li>
       <li><strong>在哪裡關</strong>：<code class="inline">Settings &gt; Capabilities</code> 關掉「Switch models when a message is flagged」（Claude Code 在 Config 的 MODEL &amp; OUTPUT）。關掉後被攔下的請求會暫停，讓你改寫或手動換模型。</li>
       <li><strong>計費</strong>：切換後的回答依實際回答的模型計費；部分類別在尚未輸出前就被擋下也可能計費，細節以官方說明為準。API 預設不自動切換，要自己設定 fallback（見 <a href="#api">API 與 JSON</a>）。</li>
@@ -757,7 +757,7 @@
     <table>
       <thead><tr><th>方案</th><th>價格（美國，未稅）</th><th>用量</th><th>適合誰／重點</th></tr></thead>
       <tbody>
-        <tr><td><strong>Free</strong></td><td>$0</td><td>以「每 5 小時」為一段的使用上限，可傳訊息數隨訊息長度與當下系統負載浮動</td><td>先試用。可聊天、上傳檔案、建立最多 5 個 Projects、使用記憶、語音模式、無痕對話、Artifacts，並可連接 1 個外部工具。<strong>不含</strong> Cowork、Claude Code、Research、Fable 模型</td></tr>
+        <tr><td><strong>Free</strong></td><td>$0</td><td>以「每 5 小時」為一段的使用上限，可傳訊息數隨訊息長度與當下系統負載浮動</td><td>先試用。可聊天、上傳檔案、建立最多 5 個 Projects、使用記憶、語音模式、無痕對話、Artifacts，並可使用連接器（自訂連接器限 1 個）。<strong>不含</strong> Cowork、Claude Code、Research、Fable 模型</td></tr>
         <tr><td><strong>Pro</strong></td><td>$20／月（年繳較便宜；各地以當地幣別與稅制顯示）</td><td>每段使用量比 Free 多；5 小時上限＋每週上限</td><td>把 Claude 用在日常工作的個人，多數人從這裡開始。含 Claude Code、Cowork、Research、長時間多步驟任務。Fable 模型要用 usage credits 付費使用</td></tr>
         <tr><td><strong>Max 5x／Max 20x</strong></td><td>$100／月、$200／月（僅月繳；手機內購價格可能不同）</td><td>每段使用量為 Pro 的 5 倍／20 倍；5 小時上限＋每週上限</td><td>整天活在 Claude 裡的重度使用者。新功能與新模型優先使用。Fable 5／5.1 內含，最多可用掉每週上限的 50%</td></tr>
         <tr><td><strong>Team</strong></td><td>Standard：$25／人／月（年繳 $20）<br>Premium：$125／人／月（年繳 $100）</td><td>Standard 為 Pro 的 1.25 倍、Premium 為 Pro 的 6.25 倍（每段）；另有每週上限。上限按「每位成員」計算，不是全隊共用</td><td>2～150 人的團隊。含 Pro 的全部功能，加上管理後台、SSO、共享 Projects、Enterprise Search、支出上限。座位可混搭；Fable 只含在 Premium 座位（同樣最多用掉每週上限 50%）</td></tr>
@@ -781,7 +781,7 @@
     <table>
       <thead><tr><th>上下文長度</th><th>claude.ai 聊天時的模型</th></tr></thead>
       <tbody>
-        <tr><td><strong>1M token</strong></td><td>Fable 5.1、Opus 5.5、Opus 5、Sonnet 5</td></tr>
+        <tr><td><strong>1M token</strong></td><td>Fable 5.1、Opus 5.5、Opus 5、Sonnet 5.5、Sonnet 5</td></tr>
         <tr><td><strong>500K token</strong></td><td>Fable 5、Opus 4.8、Opus 4.7、Opus 4.6、Sonnet 4.6</td></tr>
         <tr><td><strong>200K token</strong></td><td>其他模型（例如 Haiku 4.5）</td></tr>
       </tbody>
@@ -999,7 +999,7 @@
     <p class="note">官方說明：<a href="https://support.claude.com/en/articles/10167454-use-the-github-integration" target="_blank" rel="noopener">Use the GitHub integration</a>。要讓 Claude 直接改 GitHub 上的程式，請看 <a href="#claudecode">Claude Code 入門</a> 的雲端工作階段。</p>
     <h3 id="claudeai-connectors">把你的工具、公司知識、網路接進來</h3>
     <ul>
-      <li><strong>Connectors（連接器）</strong>：接你的工具（Google Drive、Gmail、Notion、Slack、Microsoft 365…），Claude 能直接查資料、部分能寫入。到側欄 <code class="inline">Customize &gt; Connectors</code> 選服務並完成授權；對話中從「+」選單選要用哪些。Free 方案可連 1 個，付費方案可連更多。背後的技術是 MCP，概念見 <a href="#ecosystem">周邊生態</a>，實作步驟見 <a href="#practical">實際操作</a>。</li>
+      <li><strong>Connectors（連接器）</strong>：接你的工具（Google Drive、Gmail、Notion、Slack、Microsoft 365…），Claude 能直接查資料、部分能寫入。到側欄 <code class="inline">Customize &gt; Connectors</code> 選服務並完成授權；對話中從「+」選單選要用哪些。所有方案都能用目錄裡的連接器；自己加的自訂連接器（remote MCP）Free 方案限 1 個。背後的技術是 MCP，概念見 <a href="#ecosystem">周邊生態</a>，實作步驟見 <a href="#practical">實際操作</a>。</li>
       <li><strong>Enterprise Search</strong>（Team／Enterprise）：跨公司內部知識庫搜尋，問「我們的差旅規定是什麼」它去翻內部文件並附出處。</li>
       <li><strong>網路搜尋</strong>：需要即時資訊時使用；新體驗下沒有開關，Claude 需要時會自己搜。要深入研究用上面的 Research。</li>
       <li><strong>程式碼執行與檔案建立</strong>：讓 Claude 在雲端沙箱跑程式、做出 Excel、Word、簡報等真實檔案；在 <code class="inline">Settings &gt; Capabilities</code> 開啟。背後原理見 <a href="#codeexec">程式碼執行</a>。</li>
@@ -1088,13 +1088,13 @@
     <ul>
       <li><strong>雲端（預設，beta）</strong>：Claude 的工作在 Anthropic 伺服器上一個隔離、臨時的環境執行，工作階段和檔案存在你的 Claude 帳號裡。好處是<strong>關掉筆電它也繼續做</strong>、排程任務不需要任何裝置開著、同一個任務可以在桌面版、網頁、手機之間切換。</li>
       <li><strong>碰到你電腦裡的東西時</strong>：雲端任務要讀寫本機資料夾、用瀏覽器或操作電腦，會透過你電腦上的 Claude Desktop 連過去，而且只限你連接過的資料夾、照你設好的權限。<strong>桌面 App 關著，這部分就做不了</strong>（任務本身還會繼續，只是碰不到本機檔案）。</li>
-      <li><strong>本機工作階段</strong>：既有的桌面版部署仍可在你電腦上執行，程式碼跑在本機一台隔離的虛擬機裡。本機任務需要 App 全程開著、電腦不能睡著，也不會使用聊天的記憶。</li>
+      <li><strong>本機工作階段</strong>：2026-10-06 起，Pro／Max 的新 Cowork 任務一律在雲端執行，Settings &gt; General 的「Only on your computer」選項移除；已經在電腦上開始的本機任務可以繼續做完。本機任務的程式碼跑在本機一台隔離的虛擬機裡，需要 App 全程開著、電腦不能睡著，也不會使用聊天的記憶。</li>
     </ul>
     <p class="note">隔離只保護你的電腦不被 Claude 跑的程式碼影響，<strong>不會</strong>限制 Claude 透過你給的權限能讀、能做的事。所以真正要管的是「給它看什麼、准它做什麼」，見下方安全習慣。</p>
 
     <h3 id="cowork-install">下載桌面版並開始</h3>
     <div class="steps">
-      <div class="step"><span class="sn">1</span><div><strong>確認方案</strong>：需要 Pro 以上的付費方案；Team／Enterprise 還要組織管理員在 <code class="inline">Organization settings</code> 開啟 Cowork。</div></div>
+      <div class="step"><span class="sn">1</span><div><strong>確認方案</strong>：需要 Pro 以上的付費方案；Team／Enterprise 的 Cowork 預設開啟，組織 Owner 可在 <code class="inline">Organization settings</code> 關閉；Enterprise 的雲端工作階段預設關閉，要由管理員開啟。</div></div>
       <div class="step"><span class="sn">2</span><div><strong>下載或更新 Claude Desktop</strong>：到 <code class="inline">claude.com/download</code> 下載對應作業系統的版本並安裝，用你的 Claude 帳號登入。已經裝過的請更新到最新版，舊版可能看不到 Cowork 選項。</div></div>
       <div class="step"><span class="sn">3</span><div><strong>開啟 Cowork</strong>：在首頁的輸入框選「Cowork」，再描述任務；要回一般對話就選「Chat」。如果你的輸入框已經沒有這兩個選項，代表你在新體驗，直接在任何對話交代任務即可。</div></div>
       <div class="step"><span class="sn">4</span><div><strong>第一次啟動</strong>：看到「Setting up Claude's workspace」是正常的，代表它在準備或更新工作環境，等它跑完即可。</div></div>
@@ -1120,7 +1120,7 @@ sudo apt install qemu-system-x86 ovmf virtiofsd</code></pre>
       <thead><tr><th>模式</th><th>行為</th><th>什麼時候用</th></tr></thead>
       <tbody>
         <tr><td><strong>Manual</strong>（手動核准，預設；舊稱 Ask before acting）</td><td>每個需要權限的動作都停下來問你 Allow 或 Deny</td><td>新手、第一次用某個工具或網站、碰到敏感檔案或帳號、難以復原的事（寄信、付款）</td></tr>
-        <tr><td><strong>Auto</strong>（自動核准）</td><td>不逐步問你，但每個動作執行前會先做安全檢查（例如資料外洩、提示注入），可疑的會擋下並改找安全做法或回頭問你；一直被擋就會切回逐步詢問</td><td>範圍清楚、你信任所用工具的任務。安全檢查會多耗一些用量</td></tr>
+        <tr><td><strong>Auto</strong>（自動核准；舊稱 Automatically approve）</td><td>不逐步問你，但每個動作執行前會先做安全檢查（例如資料外洩、提示注入），可疑的會擋下並改找安全做法或回頭問你；一直被擋就會切回逐步詢問</td><td>範圍清楚、你信任所用工具的任務。安全檢查會多耗一些用量</td></tr>
         <tr><td><strong>Skip</strong>（略過所有核准；舊稱 Act without asking）</td><td>不問你，也沒有自動檢查</td><td>只有在你完全信任任務涉及的每個動作、連接器、檔案、網站時才用；新體驗下已不提供</td></tr>
       </tbody>
     </table>
@@ -1215,7 +1215,7 @@ sudo apt install qemu-system-x86 ovmf virtiofsd</code></pre>
         <tr><td>在哪裡跑</td><td>Anthropic 的伺服器</td><td>你的電腦</td></tr>
         <tr><td>電腦要不要開著</td><td><strong>不用</strong>：電腦睡著、關機或 App 關著都照跑</td><td><strong>要</strong>：電腦醒著、Claude Desktop 開著才會跑</td></tr>
         <tr><td>能用什麼資料</td><td>你的連接器、存在 Claude 帳號裡的檔案、網路研究；<strong>不能綁你電腦上的資料夾</strong></td><td>可以用本機資料夾與電腦上的 App</td></tr>
-        <tr><td>什麼時候會變成這種</td><td>一般情況</td><td>任務需要本機檔案或 App 時，只能在本機執行</td></tr>
+        <tr><td>什麼時候會變成這種</td><td>一般情況</td><td>任務需要本機檔案或 App 時，只能在本機執行；Pro／Max 自 2026-10-06 起排程一律移到雲端，用到本機檔案的排程要桌面 App 開著</td></tr>
         <tr><td>適合</td><td>每日摘要、週報、追新聞等只靠雲端工具的工作</td><td>定期整理某個本機資料夾這類非碰本機不可的工作</td></tr>
       </tbody>
     </table>
@@ -1228,7 +1228,7 @@ sudo apt install qemu-system-x86 ovmf virtiofsd</code></pre>
     </ul>
     <h4>管理</h4>
     <p>左側欄「Scheduled」可以看所有排程、即將執行與過去的執行紀錄，並且能編輯指示或頻率、暫停、恢復、刪除，或按 <strong>Run now</strong> 立刻跑一次（建議剛建好時先 Run now 一次，順便把要核准的權限處理好）。早期存在本機的排程任務，App 會逐步自動移到雲端，也可以在 App 裡對該任務按 <strong>Move to cloud</strong> 手動搬移。</p>
-    <p class="note"><strong>限制與安全</strong>：再提醒一次，雲端排程不能綁本機資料夾，需要本機檔案的排程只能在本機跑、電腦要開著（見上表）。排程任務在你沒盯著時執行，所以先從摘要、彙整這類低風險工作開始；不要排程會寄訊息、購物、碰敏感檔案的任務；定期檢查執行結果；不用的就暫停或刪除。Team／Enterprise 由管理員決定是否開放。</p>
+    <p class="note"><strong>限制與安全</strong>：再提醒一次，雲端排程不能綁本機資料夾，需要本機檔案的排程只能在本機跑、電腦要開著（見上表）；Pro／Max 自 2026-10-06 起排程都移到雲端，用到本機檔案時桌面 App 仍要開著。排程任務在你沒盯著時執行，所以先從摘要、彙整這類低風險工作開始；不要排程會寄訊息、購物、碰敏感檔案的任務；定期檢查執行結果；不用的就暫停或刪除。Team／Enterprise 由管理員決定是否開放。</p>
 
     <h3 id="cowork-dispatch">Dispatch（目前暫不開放新使用者）</h3>
     <p class="note"><strong>先講結論</strong>：Dispatch <strong>目前暫不開放新使用者</strong>（截至 2026-09），已經在用的人可以暫時繼續用。側欄看不到 Dispatch 的話，<strong>請改用雲端 Cowork（雲端工作階段）</strong>：一樣可以從手機交代任務、關掉電腦它也繼續做，見上方 <a href="#cowork-cloud">任務在哪裡跑</a> 與 <a href="#cowork-surfaces">跨平台</a>。</p>
@@ -1282,7 +1282,7 @@ sudo apt install qemu-system-x86 ovmf virtiofsd</code></pre>
     <h4>2026-08-19 以前在 Cowork 做的 Artifact 改不了？</h4>
     <p>那是「Live artifacts」（在 Artifacts 分頁標有「Cowork」標籤），仍可開啟與分享，但不能直接編輯；打開它 → 按「Share」→ 選擇 <strong>republish</strong> 成新的 Artifact 就能繼續改，原本的分享連結會自動指向新版。</p>
     <h4>我是 Team／Enterprise，怎麼看不到 Cowork 或某些功能？</h4>
-    <p>組織 Owner 要在組織設定開啟 Cowork；雲端工作階段、Auto 模式、網路搜尋、Claude in Chrome、排程、外掛都可以被管理員個別關閉。請聯絡你的管理員；管理端設定見 <a href="#enterprise">企業與團隊</a>。</p>
+    <p>Team／Enterprise 的 Cowork 預設開啟，但組織 Owner 可以整個關閉；雲端工作階段（Enterprise 預設關閉）、Auto 模式、內建瀏覽器、網路搜尋、Claude in Chrome 可以被管理員個別關閉。外掛沒有獨立開關，跟著 Cowork 總開關走。請聯絡你的管理員；管理端設定見 <a href="#enterprise">企業與團隊</a>。</p>
     <h4>Cowork 會記得我之前說過的事嗎？</h4>
     <p>在雲端執行的 Cowork 與聊天共用記憶；Projects 有自己的專案記憶；只在本機執行的任務不使用聊天記憶。記憶設定見 <a href="#claudeai-memory">claude.ai 功能：記憶</a>。</p>
     <h4>要把 Cowork 用在公司資料上，資料會被拿去訓練嗎？</h4>
@@ -1404,7 +1404,7 @@ print("".join(b.text for b in response.content if b.type == "text"))</code></pre
     <h4 id="prompting-thinking">4. 讓它「先想再答」：Thinking 與 Effort</h4>
     <p>以前的招數是在提示裡加一句「請一步一步想」。現在的 Claude 模型內建<strong>思考（thinking）</strong>：回答前會先在內部推理、嘗試不同做法、檢查中間結果。最新的 Opus 5.5、Fable 5.1 等模型採用 <strong>adaptive thinking（自適應思考）</strong>，思考一律開啟，由模型依題目難度自己決定要想多少；你能調的主要是 <strong>Effort（投入程度）</strong>：low／medium／high／xhigh／max，越高想得越深、也越慢、越耗用量。定義與各模型差異見 <a href="#features">功能字典</a>，模型選擇見 <a href="#overview">總覽與選擇</a>。</p>
     <div class="steps">
-      <div class="step"><span class="sn">1</span><div><strong>在 claude.ai 調整</strong>：點送出鍵旁的模型名稱 → 「Effort」選等級；有 Thinking（或 Extended）開關的模型也在這裡切換。日常問答用預設就好；數學、複雜規劃、長文件分析、多步驟技術問題再調高。截至 2026-09，Opus 5.5、Fable 5.1、Opus 5 在 claude.ai 無法關閉思考。</div></div>
+      <div class="step"><span class="sn">1</span><div><strong>在 claude.ai 調整</strong>：點送出鍵旁的模型名稱 → 「Effort」選等級；有 Thinking（或 Extended）開關的模型也在這裡切換。日常問答用預設就好；數學、複雜規劃、長文件分析、多步驟技術問題再調高。截至 2026-09，Sonnet 5.5、Opus 5.5、Fable 5.1、Opus 5 在 claude.ai 無法關閉思考。</div></div>
       <div class="step"><span class="sn">2</span><div><strong>在提示裡怎麼說</strong>：官方發現，一句概括的「請仔細思考」常比你手寫一長串固定步驟效果更好——模型自己的推理往往比人規定的周到。真正有用的是<strong>說清楚任務的難處</strong>與<strong>要它自我檢查</strong>。</div></div>
       <div class="step"><span class="sn">3</span><div><strong>看它怎麼想的</strong>：思考開啟時，回覆上方會有可展開的「Thinking」區塊，顯示推理<strong>摘要</strong>（不是完整原文），可以用來檢查它的結論是怎麼來的。</div></div>
     </div>
@@ -1415,7 +1415,7 @@ print("".join(b.text for b in response.content if b.type == "text"))</code></pre
 完成前，請再用原始報價逐項核對一次你的數字。</code></pre>
 </div>
     <details class="more"><summary>進階：API 上的 thinking 與 effort 寫法</summary>
-      <p>API 用 <code class="inline">output_config.effort</code> 設定投入程度（Opus 5.5 預設 <code class="inline">medium</code>，其他多數模型預設 <code class="inline">high</code>）。Opus 5.5、Fable 5.1 的思考一律開啟，設 <code class="inline">thinking: {"type": "disabled"}</code> 會回 400 錯誤；舊世代的 <code class="inline">budget_tokens</code> 手動預算在 Claude 4.7 以後的模型會回 400。思考的 token 算在輸出費用與 <code class="inline">max_tokens</code> 裡，effort 開高時要把 <code class="inline">max_tokens</code> 設大一點。</p>
+      <p>API 用 <code class="inline">output_config.effort</code> 設定投入程度（Opus 5.5 預設 <code class="inline">medium</code>，其他多數模型預設 <code class="inline">high</code>）。Opus 5.5、Fable 5.1 的思考一律開啟，設 <code class="inline">thinking: {"type": "disabled"}</code> 會回 400 錯誤（Sonnet 5.5 也是，要關掉回答前的思考改用 <code class="inline">{"type": "between_tools"}</code>）；舊世代的 <code class="inline">budget_tokens</code> 手動預算在 Claude 4.7 以後的模型會回 400。思考的 token 算在輸出費用與 <code class="inline">max_tokens</code> 裡，effort 開高時要把 <code class="inline">max_tokens</code> 設大一點。</p>
       <div class="code-block" data-lang="python">
 <div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>python</span><button class="copy-btn">複製</button></div>
 <pre><code>import anthropic
@@ -1611,7 +1611,7 @@ for block in response.content:
           <rect class="pb" x="60" y="106" width="520" height="46" rx="8" stroke="var(--type-violet)"/>
           <text class="pn" x="72" y="134">2</text><text class="pt" x="92" y="126">介面組裝 context</text><text class="ps" x="92" y="142">系統提示＋CLAUDE.md/Project 指示＋記憶＋歷史＋附件＋工具清單（含 MCP、Skills）</text>
           <rect class="pb" x="60" y="172" width="520" height="46" rx="8" stroke="var(--key-blue)"/>
-          <text class="pn" x="72" y="200">3</text><text class="pt" x="92" y="192">Tokenize → 送進模型</text><text class="ps" x="92" y="208">全部切成 token；context window 的上限在這裡生效，塞不下的就掉</text>
+          <text class="pn" x="72" y="200">3</text><text class="pt" x="92" y="192">Tokenize → 送進模型</text><text class="ps" x="92" y="208">全部切成 token；context window 的上限在這裡生效，API 上輸入超過上限會直接回錯誤</text>
           <rect class="pb" x="60" y="238" width="520" height="46" rx="8" stroke="var(--key-blue)"/>
           <text class="pn" x="72" y="266">4</text><text class="pt" x="92" y="258">模型推理</text><text class="ps" x="92" y="274">下一個詞元預測；必要時先想再答（adaptive thinking）；可操控性決定它多聽話</text>
           <rect class="pb" x="60" y="304" width="520" height="46" rx="8" stroke="var(--key-blue)"/>
@@ -1647,7 +1647,7 @@ for block in response.content:
       <tbody>
         <tr><td>1 打字</td><td>選一個入口送出訊息</td><td>四個入口差在「介面幫你做什麼」，背後是同一批模型</td><td><a href="#overview">總覽與選擇</a></td></tr>
         <tr><td>2 組裝 context</td><td>介面把你沒打的東西一起塞進去：系統提示、Project 指示或 CLAUDE.md、記憶、對話歷史、附件、工具清單（含 MCP、Skills）</td><td>Projects、CLAUDE.md、Memory 之所以能「讓它記住你」，就是在這一步被注入</td><td><a href="#claudeai">claude.ai 功能</a>、<a href="#cowork">Cowork</a>、<a href="#features">功能字典</a></td></tr>
-        <tr><td>3 切成 token 送進模型</td><td>全部內容切成 token（模型計算文字的單位）送進模型</td><td>計費用 token 算；context window 有上限，塞不下就會被截掉或壓縮</td><td><a href="#api">API 與 JSON</a>、<a href="#practical">實際操作（成本與 Token）</a></td></tr>
+        <tr><td>3 切成 token 送進模型</td><td>全部內容切成 token（模型計算文字的單位）送進模型</td><td>計費用 token 算；context window 有上限：用 API 時輸入超過上限會回 400 錯誤（prompt is too long），不會自動截掉；聊天介面則會替你壓縮舊內容</td><td><a href="#api">API 與 JSON</a>、<a href="#practical">實際操作（成本與 Token）</a></td></tr>
         <tr><td>4 推理</td><td>模型預測下一個詞元；需要時先思考再答（adaptive thinking，深淺由 Effort 與題目難度決定）</td><td>四特性心智模型：預測、知識、工作記憶、可操控性</td><td><a href="#aifluency">AI 素養</a>、<a href="#features">功能字典</a></td></tr>
         <tr><td>5 決定</td><td>直接回文字，或發出「我要用工具」的請求</td><td>這個「講話 or 動手」的分岔，是整個迴圈的開關</td><td><a href="#api">API 與 JSON</a>、<a href="#tooluse">工具調用</a></td></tr>
         <tr><td>6 執行工具</td><td>模型不執行，是別人執行：雲端沙箱、MCP 外部服務、你的本機、或載入一個 Skill</td><td>工具有三種跑法；MCP 是接外部服務的標準插座；Claude Code 走「本機執行」那條路</td><td><a href="#tooluse">工具調用</a>、<a href="#codeexec">程式碼執行</a>、<a href="#ecosystem">周邊生態（MCP）</a>、<a href="#claudecode">Claude Code 入門</a></td></tr>
@@ -1783,7 +1783,7 @@ for block in message.content:
         <p class="note">stop_reason 描述的是「成功的回應為什麼停」；請求本身失敗（key 錯、額度不足、伺服器過載）則會回 HTTP 錯誤碼，兩者是不同的東西。</p>
 
         <h3 id="api-refusals">被拒絕時怎麼辦：refusal 與 fallback（備援模型）</h3>
-        <p><strong>是什麼</strong>：截至 2026-09，Fable 5.1、Fable 5、Opus 5.5、Opus 5 內建安全分類器，遇到可能涉及資安攻擊、生物危害等高風險的請求會拒絕。拒絕<strong>不是錯誤</strong>：你會拿到 HTTP 200 的正常回應，<code class="inline">stop_reason</code> 是 <code class="inline">"refusal"</code>，<code class="inline">content</code> 可能是空的。通常把同一個請求改送給另一個 Claude 模型就能拿到回答——這就是 fallback（備援）。（在 claude.ai 等聊天產品裡，這件事會自動發生，見<a href="#overview">總覽與選擇</a>。）</p>
+        <p><strong>是什麼</strong>：截至 2026-09，Fable 5.1、Fable 5、Opus 5.5、Opus 5、Sonnet 5.5 內建安全分類器，遇到可能涉及資安攻擊、生物危害等高風險的請求會拒絕。拒絕<strong>不是錯誤</strong>：你會拿到 HTTP 200 的正常回應，<code class="inline">stop_reason</code> 是 <code class="inline">"refusal"</code>，<code class="inline">content</code> 可能是空的。通常把同一個請求改送給另一個 Claude 模型就能拿到回答——這就是 fallback（備援）。（在 claude.ai 等聊天產品裡，這件事會自動發生，見<a href="#overview">總覽與選擇</a>。）</p>
         <div class="code-block" data-lang="json">
 <div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>refusal-response.json</span><button class="copy-btn">複製</button></div>
 <pre><code>{
@@ -1896,7 +1896,7 @@ print("".join(b.text for b in second.content if b.type == "text"))</code></pre>
           </tbody>
         </table>
         </div>
-        <p class="note"><strong>取樣參數警告（截至 2026-09）</strong>：Fable 5 以後、Opus 4.7 以後、Sonnet 5 等模型（官方列出：Fable 5.1、Mythos 5.1、Fable 5、Mythos 5、Mythos Preview、Opus 5.5、Opus 5、Opus 4.8、Opus 4.7、Sonnet 5），只要把 <code class="inline">temperature</code>、<code class="inline">top_p</code> 或 <code class="inline">top_k</code> 設成非預設值，請求就會直接回 <strong>400 錯誤</strong>，不管有沒有開思考。較舊的模型只有在開啟思考時才受限制。舊教學裡「把 temperature 調低讓回答更穩定」的做法，在這些模型上請改用更明確的指示或 <code class="inline">output_config</code> 的 effort。另外，官方 Python SDK v1 起已把這三個參數從函式參數中移除，直接寫 <code class="inline">temperature=0.2</code> 會出現 <code class="inline">TypeError</code>。想控制風格請用提示詞描述。</p>
+        <p class="note"><strong>取樣參數警告（截至 2026-09）</strong>：Claude 4.7 以後的所有模型與 Mythos Preview（例如 Fable 5.1、Fable 5、Opus 5.5、Opus 5、Opus 4.8、Opus 4.7、Sonnet 5.5、Sonnet 5），只要把 <code class="inline">temperature</code>、<code class="inline">top_p</code> 或 <code class="inline">top_k</code> 設成非預設值，請求就會直接回 <strong>400 錯誤</strong>，不管有沒有開思考。較舊的模型只有在開啟思考時才受限制。舊教學裡「把 temperature 調低讓回答更穩定」的做法，在這些模型上請改用更明確的指示或 <code class="inline">output_config</code> 的 effort。另外，官方 Python SDK v1 起已把這三個參數從函式參數中移除，直接寫 <code class="inline">temperature=0.2</code> 會出現 <code class="inline">TypeError</code>。想控制風格請用提示詞描述。</p>
         <p><strong>舊模型還需要 temperature 怎麼辦？</strong>SDK 只是拿掉了參數名稱，API 本身沒有拿掉：還在用「會接受取樣參數」的舊模型時，官方 SDK v1 遷移指南的做法是改用 <code class="inline">extra_body</code> 傳，它會原封不動併進請求的 JSON（Message Batches 則直接把欄位寫進該筆請求的 <code class="inline">params</code>）。以下以 Haiku 4.5 為例（它不在上面的禁用清單）：</p>
         <div class="code-block" data-lang="python">
 <div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>legacy_temperature.py</span><button class="copy-btn">複製</button></div>
@@ -2027,7 +2027,7 @@ print("".join(b.text for b in message.content if b.type == "text"))</code></pre>
             <tr><td>Bash</td><td><code class="inline">bash_20250124</code></td><td>你</td><td>不用</td><td>—</td></tr>
             <tr><td>文字編輯器</td><td><code class="inline">text_editor_20250728</code>（Claude 4 以後）<br><code class="inline">text_editor_20250124</code>（更早的模型）</td><td>你</td><td>不用</td><td>—</td></tr>
             <tr><td>Memory</td><td><code class="inline">memory_20250818</code></td><td>你</td><td>不用</td><td>—</td></tr>
-            <tr><td>Computer use</td><td><code class="inline">computer_toolset_20260801</code>（正式版）<br><code class="inline">computer_20251124</code> / <code class="inline">computer_20250124</code>（舊 beta）</td><td>你</td><td>新版不用；舊版要對應的 beta 標頭</td><td>無另計費用，但宣告本身約佔 4,500 輸入 token，截圖以圖片 token 計（見<a href="#extensions">開發者延伸</a>）</td></tr>
+            <tr><td>Computer use</td><td><code class="inline">computer_toolset_20260801</code>（正式版）<br><code class="inline">computer_20251124</code> / <code class="inline">computer_20250124</code>（舊 beta）</td><td>你</td><td>新版不用；舊版要對應的 beta 標頭。Opus 5.5、Sonnet 5.5 在 Claude API 與 Google Cloud 上只接受新版，舊版會回 400</td><td>無另計費用，但宣告本身約佔 4,500 輸入 token，截圖以圖片 token 計（見<a href="#extensions">開發者延伸</a>）</td></tr>
             <tr><td>Browser use</td><td><code class="inline">browser_toolset_20260801</code></td><td>你</td><td>不用</td><td>—</td></tr>
           </tbody>
         </table>
@@ -2117,7 +2117,7 @@ print("".join(b.text for b in message.content if b.type == "text"))</code></pre>
           </tbody>
         </table>
         </div>
-        <p class="note"><strong>現行模型的重要限制（截至 2026-09）</strong>：Opus 5.5、Fable 5.1、Mythos 5.1 不支援 <code class="inline">any</code> 與 <code class="inline">tool</code>，送出會回 400 錯誤；手動開啟 extended thinking（<code class="inline">thinking: {type: "enabled"}</code>）時也不能用這兩種。官方建議的替代做法：用 <code class="inline">auto</code> 搭配 strict tool use，再在 system 或訊息裡明確要求「先用工具查再回答」；需要固定格式的回答則改用 structured outputs。</p>
+        <p class="note"><strong>現行模型的重要限制（截至 2026-09）</strong>：Opus 5.5、Sonnet 5.5、Fable 5.1、Mythos 5.1 不支援 <code class="inline">any</code> 與 <code class="inline">tool</code>，送出會回 400 錯誤；手動開啟 extended thinking（<code class="inline">thinking: {type: "enabled"}</code>）時也不能用這兩種。官方建議的替代做法：用 <code class="inline">auto</code> 搭配 strict tool use，再在 system 或訊息裡明確要求「先用工具查再回答」；需要固定格式的回答則改用 structured outputs。</p>
         <ul>
           <li>在支援的模型上用 <code class="inline">any</code> / <code class="inline">tool</code> 時，Claude 會直接輸出 <code class="inline">tool_use</code>，前面不會先說一段話。</li>
           <li>修改 <code class="inline">tool_choice</code> 會讓已快取的訊息內容失效（工具定義與 system 的快取不受影響）。</li>
@@ -2244,8 +2244,20 @@ print("".join(b.text for b in message.content if b.type == "text"))</code></pre>
         <p>中間可能夾著 <code class="inline">ping</code> 事件，也可能出現 <code class="inline">error</code> 事件（例如 <code class="inline">overloaded_error</code>）；官方也提醒未來可能新增事件種類，程式要能略過不認得的事件。</p>
         <div class="code-block" data-lang="text">
 <div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>stream-events.txt</span><button class="copy-btn">複製</button></div>
-<pre><code>event: content_block_delta
-data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"我"}}
+<pre><code>event: message_start
+data: {"type":"message_start","message":{"id":"msg_01XFDUDYJgAACzvnptvVoYEL","type":"message","role":"assistant","model":"claude-opus-5-5","content":[],"stop_reason":null}}
+
+event: content_block_start
+data: {"type":"content_block_start","index":0,"content_block":{"type":"thinking","thinking":"","signature":""}}
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":0,"delta":{"type":"thinking_delta","thinking":""}}
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":0,"delta":{"type":"signature_delta","signature":"EqQBCgIYAhIM1gbcDa9GJwZA2b3h…"}}
+
+event: content_block_stop
+data: {"type":"content_block_stop","index":0}
 
 event: content_block_start
 data: {"type":"content_block_start","index":1,"content_block":{"type":"tool_use","id":"toolu_01T1x1fJ34qAmk2tNTrN7Up6","name":"get_weather","input":{}}}
@@ -2260,7 +2272,10 @@ event: content_block_stop
 data: {"type":"content_block_stop","index":1}
 
 event: message_delta
-data: {"type":"message_delta","delta":{"stop_reason":"tool_use","stop_sequence":null},"usage":{"output_tokens":42}}</code></pre>
+data: {"type":"message_delta","delta":{"stop_reason":"tool_use","stop_sequence":null},"usage":{"output_tokens":42}}
+
+event: message_stop
+data: {"type":"message_stop"}</code></pre>
         </div>
         <div class="table-wrap">
         <table>
@@ -2268,7 +2283,7 @@ data: {"type":"message_delta","delta":{"stop_reason":"tool_use","stop_sequence":
           <tbody>
             <tr><td><code class="inline">text_delta</code></td><td>text 區塊</td><td>一段段接起來直接顯示</td></tr>
             <tr><td><code class="inline">input_json_delta</code></td><td>tool_use 區塊</td><td><code class="inline">partial_json</code> 是<strong>不完整的 JSON 字串片段</strong>，先接起來，等 <code class="inline">content_block_stop</code> 再整段解析成物件</td></tr>
-            <tr><td><code class="inline">thinking_delta</code> / <code class="inline">signature_delta</code></td><td>thinking 區塊</td><td>思考內容預設不顯示時，thinking 是空字串，只會收到一個 signature</td></tr>
+            <tr><td><code class="inline">thinking_delta</code> / <code class="inline">signature_delta</code></td><td>thinking 區塊</td><td>思考內容預設不顯示時，每個 thinking 區塊只會收到一個 thinking 為空字串的 <code class="inline">thinking_delta</code>，接著一個 <code class="inline">signature_delta</code>，然後結束</td></tr>
           </tbody>
         </table>
         </div>
@@ -2713,7 +2728,7 @@ print("".join(b.text for b in follow_up.content if b.type == "text"))</code></pr
             <tr><td>在終端機接回<strong>這台電腦</strong>上次的對話</td><td><code class="inline">claude --continue</code>（接最近一次）、<code class="inline">claude --resume</code> 或對話內 <code class="inline">/resume</code>（開選單挑）</td><td>讀的是本機紀錄：<code class="inline">~/.claude/projects/&lt;專案&gt;/&lt;session-id&gt;.jsonl</code>。<strong>不會列出雲端 session</strong></td></tr>
             <tr><td>把終端機的 session 搬到 Desktop</td><td>在 CLI 打 <code class="inline">/desktop</code>；或在 Desktop 的輸入框打 <code class="inline">/resume</code>，會列出你在 CLI 開過的 session</td><td><code class="inline">/desktop</code> 限 macOS 與 x64 Windows、需用 Claude 訂閱登入</td></tr>
             <tr><td>把<strong>雲端</strong> session 拉回自己電腦繼續</td><td>在本機終端機（repo 資料夾裡）打 <code class="inline">claude --teleport</code>（開選單）或 <code class="inline">claude --teleport &lt;session-id&gt;</code>；已經在本機 CLI session 裡，打 <code class="inline">/teleport</code>（簡寫 <code class="inline">/tp</code>）開同一個選單，或 <code class="inline">/tasks</code> 選一個按 <code class="inline">t</code>。<br>人在<strong>雲端 session</strong>（網頁／手機）裡時，在那裡打 <code class="inline">/teleport</code>，它會回你一行現成的 <code class="inline">claude --teleport &lt;session-id&gt;</code> 指令，複製到本機 repo 資料夾的終端機執行即可</td><td>要在同一個 repo 的資料夾、工作區乾淨（沒 commit 的改動會請你先 stash）；拉回來的是一份<strong>副本</strong>，之後在本機做的不會回寫到雲端那份</td></tr>
-            <tr><td>把本機 session 送上雲端</td><td>Desktop：工作列右下 VS Code 圖示 → <strong>Continue in</strong> → Claude Code on the Web</td><td>CLI 不能把既有 session 推上雲；<code class="inline">claude --cloud "任務"</code> 是<strong>開一個新的</strong>雲端 session</td></tr>
+            <tr><td>把本機 session 送上雲端</td><td>Desktop：在 session 標題旁的箭頭（或側欄的 session 列）打開選單 → <strong>Open in</strong> → <strong>Cloud</strong>；對話會以摘要帶過去</td><td>CLI 不能把既有 session 推上雲；<code class="inline">claude --cloud "任務"</code> 是<strong>開一個新的</strong>雲端 session</td></tr>
             <tr><td>人在外面，用手機操作電腦上正在跑的 session</td><td>Remote Control（見 <a href="#claudecode-env">環境選單</a>）</td><td>電腦要開著、那個 <code class="inline">claude</code> 程序要活著</td></tr>
           </tbody>
         </table>
@@ -2754,7 +2769,7 @@ print("".join(b.text for b in follow_up.content if b.type == "text"))</code></pr
           </tbody>
         </table>
         </div>
-        <p class="note">白話區分：<strong>Local＝在家做</strong>；<strong>Cloud＝外包給雲端臨時工，你可以關機</strong>；<strong>SSH＝連到你自己租的那台伺服器上做</strong>；<strong>Remote Control＝用這台（或手機）遙控家裡那台</strong>。Remote Control 需要用 claude.ai 帳號登入（Pro、Max、Team、Enterprise；Team／Enterprise 要 Owner 先在管理設定開啟），不支援 API key；連線只有對外的 HTTPS、不開放你電腦的連入埠。已經在 Local 開始的工作，也可以從工作列右下 VS Code 圖示打開 <strong>Continue in</strong> 選單送上雲端繼續（需要先把改動 commit 乾淨；SSH 工作不能這樣送）。</p>
+        <p class="note">白話區分：<strong>Local＝在家做</strong>；<strong>Cloud＝外包給雲端臨時工，你可以關機</strong>；<strong>SSH＝連到你自己租的那台伺服器上做</strong>；<strong>Remote Control＝用這台（或手機）遙控家裡那台</strong>。Remote Control 需要用 claude.ai 帳號登入（Pro、Max、Team、Enterprise；Team／Enterprise 要 Owner 先在管理設定開啟），不支援 API key；連線只有對外的 HTTPS、不開放你電腦的連入埠。已經在 Local 開始的工作，也可以從 session 標題旁的選單選 <strong>Open in</strong> → <strong>Cloud</strong> 送上雲端繼續（對話以摘要帶過去；確認前，對話框會說明檔案會不會一起移過去；SSH 與 WSL 工作不能這樣送）。</p>
 
         <h3 id="claudecode-permission-modes">權限模式：你要給它多少自主權</h3>
         <p>權限模式決定 Claude 在<strong>不先問你</strong>的情況下能做哪些事。本站其他章節提到 Claude Code 權限模式時都以這張表為準。日常只會用到下面四種；另外兩種給 CI 與隔離環境用的進階模式收在表格下方的折疊區。Cowork、Claude in Chrome 也有各自的權限模式，名字相近但不是同一套，見下方 <a href="#claudecode-permission-compare">三套權限模式對照</a>。</p>
@@ -2782,7 +2797,7 @@ print("".join(b.text for b in follow_up.content if b.type == "text"))</code></pr
         </div>
         <p><strong>預設模式的版本規則（截至 2026-09）</strong></p>
         <ul>
-          <li><strong>終端機與 VS Code</strong>：Pro、Max、Team 方案在 Claude Code v2.1.228 以上（原生 Windows 為 v2.1.233 以上）<strong>內建預設是 Auto</strong>；較舊版本內建預設是 Manual。Enterprise、用 Console API key、透過 Bedrock／Vertex 等雲端供應商、<code class="inline">claude -p</code> 與 Agent SDK 的預設是 <strong>Manual</strong>。剛安裝或升級後的第一個 session、或 Auto 對你不可用時，也會從 Manual 開始。</li>
+          <li><strong>終端機與 VS Code</strong>：Claude Code v2.1.283 以上，不分方案與供應商，<strong>內建預設是 Auto</strong>（設定檔把 <code class="inline">disableAutoMode</code> 設為 <code class="inline">"disable"</code> 時除外）。更早的版本只有 Pro、Max、Team 預設 Auto（需 v2.1.228 以上，原生 Windows 為 v2.1.233 以上），其他情況是 Manual。<code class="inline">claude -p</code> 與 Agent SDK 預設仍是 <strong>Manual</strong>；但用 Bedrock 等第三方供應商或關閉遙測時，v2.1.285 起是 Auto。剛安裝或升級後的第一個 session 可能和上述不同；Auto 對你不可用時，會從 Manual 開始。</li>
           <li>介面上的「Manual」名稱與 CLI 的 <code class="inline">manual</code> 別名需要 v2.1.200 以上；舊版顯示為 default。</li>
           <li><code class="inline">auto</code> 或 <code class="inline">bypassPermissions</code> 寫在專案的 <code class="inline">.claude/settings.json</code>／<code class="inline">settings.local.json</code> 不會生效（避免別人的 repo 替你打開），要寫在使用者設定。</li>
           <li><strong>Desktop</strong>：沒在選單選過模式時，讀設定檔的 <code class="inline">defaultMode</code>。</li>
@@ -3247,8 +3262,8 @@ exit 0</code></pre>
         <table>
           <thead><tr><th>工具</th><th>是什麼</th><th>怎麼開</th><th>何時用／注意</th></tr></thead>
           <tbody>
-            <tr><td><strong>Security guidance 外掛</strong></td><td>讓 Claude 在寫程式的<strong>當下</strong>自我檢查常見漏洞（注入、不安全的反序列化、危險的 DOM API…）並在同一個 session 修掉</td><td><code class="inline">/plugin install security-guidance@claude-plugins-official</code>，裝好就自動運作，沒有要記的指令</td><td>所有方案可用；需要 Python 與 git repo。每次改檔的樣式比對不花額度，每輪結束與每次 commit 的模型審查會算進你的用量</td></tr>
-            <tr><td><strong>Claude Security 外掛</strong></td><td>多代理的<strong>整個 codebase 漏洞掃描</strong>：畫架構、建威脅模型、找漏洞、獨立複核每個發現，再產生修補檔</td><td><code class="inline">/plugin install claude-security@claude-plugins-official</code> → 打 <code class="inline">/claude-security</code> 選 Scan codebase、Scan changes 或 Suggest patches</td><td>需要付費方案（它用 dynamic workflows；Pro 要先在 <code class="inline">/config</code> 開啟）與 Python 3.9+。掃描可能很久、很花 token；修補檔<strong>不會自動套用</strong>，你用 <code class="inline">git apply</code> 自己套。另有企業版的託管服務 Claude Security（Enterprise 方案）</td></tr>
+            <tr><td><strong>Security guidance 外掛</strong></td><td>讓 Claude 在寫程式的<strong>當下</strong>自我檢查常見漏洞（注入、不安全的反序列化、危險的 DOM API…）並在同一個 session 修掉</td><td><code class="inline">/plugin install security-guidance@claude-plugins-official</code>，裝好就自動運作，沒有要記的指令</td><td>所有方案可用；需要 Python 3.7+（commit 審查要 3.10+）。每輪結束與 commit 的審查要在 git repo 裡才會跑，逐次改檔的檢查在任何資料夾都會跑。每次改檔的樣式比對不花額度，每輪結束與每次 commit 的模型審查會算進你的用量</td></tr>
+            <tr><td><strong>Claude Security 外掛</strong></td><td>多代理的<strong>整個 codebase 漏洞掃描</strong>：畫架構、建威脅模型、找漏洞、獨立複核每個發現，再產生修補檔</td><td><code class="inline">/plugin install claude-security@claude-plugins-official</code> → 打 <code class="inline">/claude-security</code> 選 Scan codebase、Scan changes 或 Suggest patches</td><td>需要付費方案、Anthropic API 或 Bedrock 等第三方供應商（它用 dynamic workflows；Pro 要先在 <code class="inline">/config</code> 開啟），以及 Python 3.9+。掃描可能很久、很花 token；修補檔<strong>不會自動套用</strong>，你用 <code class="inline">git apply</code> 自己套。另有企業版的託管服務 Claude Security（Enterprise 方案）</td></tr>
             <tr><td><strong><code class="inline">/security-review</code></strong></td><td>內建指令，對目前分支相對預設分支的改動做一次安全審查</td><td>直接打 <code class="inline">/security-review</code></td><td>快速的一次性檢查；PR 層級的自動審查見 <a href="#claudecode-adv-code-review">Code Review</a></td></tr>
           </tbody>
         </table>
@@ -3271,7 +3286,7 @@ exit 0</code></pre>
             <tr><td><code class="inline">--allowedTools "Read,Edit,Bash(npm test)"</code></td><td>預先核准這些工具，不用問；語法同權限規則，<code class="inline">Bash(git diff *)</code> 表示允許所有 <code class="inline">git diff</code> 開頭的指令</td></tr>
             <tr><td><code class="inline">--permission-mode dontAsk</code></td><td>沒被允許的一律拒絕，CI 裡最保險</td></tr>
             <tr><td><code class="inline">--continue</code>／<code class="inline">--resume &lt;id&gt;</code></td><td>接續先前的對話</td></tr>
-            <tr><td><code class="inline">--bare</code></td><td>不自動載入 hooks、skills、plugins、MCP、CLAUDE.md，啟動更快、結果更可預期（官方建議腳本與 CI 使用）</td></tr>
+            <tr><td><code class="inline">--bare</code></td><td>不自動載入 hooks、skills、plugins、MCP、CLAUDE.md，啟動更快、結果更可預期（官方建議腳本與 CI 使用）。<strong>不讀訂閱登入</strong>，要設 <code class="inline">ANTHROPIC_API_KEY</code>（或 <code class="inline">apiKeyHelper</code>）</td></tr>
           </tbody>
         </table>
         </div>
@@ -3283,7 +3298,7 @@ claude -p "這個專案的 auth 模組在做什麼？"
 # 把 build 錯誤 pipe 進去，解釋寫進檔案
 cat build-error.txt | claude -p "簡短說明這個 build 錯誤的根本原因" &gt; output.txt
 
-# 在 CI 跑測試並修到過，只准它用這幾個工具
+# 在 CI 跑測試並修到過，只准它用這幾個工具（--bare 要先設好 ANTHROPIC_API_KEY）
 claude --bare -p "跑測試並修好失敗的部分" --permission-mode dontAsk \
   --allowedTools "Read,Edit,Bash(npm test)"
 
@@ -3292,7 +3307,7 @@ claude -p "摘要這個專案" --output-format json | jq -r '.result'</code></pr
         </div>
         <ul>
           <li><strong>何時用</strong>：任何「不需要人在旁邊聊」的重複工作：產報告、分類 issue、當成專案專屬的 linter。</li>
-          <li><strong>注意</strong>：<code class="inline">-p</code> 預設權限模式是 Manual，遇到要核准的動作會失敗，所以要用 <code class="inline">--allowedTools</code> 或 <code class="inline">dontAsk</code> 先講好；不加 <code class="inline">--bare</code> 時會執行該資料夾 <code class="inline">.claude/settings.json</code> 裡的 hooks 且<strong>不會跳信任確認</strong>，不要在不信任的 repo 裡跑。Desktop 沒有這個功能。</li>
+          <li><strong>注意</strong>：<code class="inline">-p</code> 預設權限模式通常是 Manual（用第三方供應商或關閉遙測時，v2.1.285 起是 Auto），遇到要核准的動作會失敗，所以要用 <code class="inline">--allowedTools</code> 或 <code class="inline">dontAsk</code> 先講好；不加 <code class="inline">--bare</code> 時會執行該資料夾 <code class="inline">.claude/settings.json</code> 裡的 hooks 且<strong>不會跳信任確認</strong>，不要在不信任的 repo 裡跑。Desktop 沒有這個功能。</li>
         </ul>
 
         <h4 id="claudecode-adv-routines">Routines（例行任務，研究預覽）</h4>
@@ -3311,7 +3326,7 @@ claude -p "摘要這個專案" --output-format json | jq -r '.result'</code></pr
           <li><strong>怎麼建</strong>：網頁 <code class="inline">claude.ai/code/routines</code>；Desktop Code 分頁側欄 <strong>Routines → New routine → Cloud</strong>；CLI 打 <code class="inline">/schedule</code>（別名 <code class="inline">/routines</code>），例如 <code class="inline">/schedule 每天早上 9 點整理昨天合併的 PR</code>，它會用對話問清楚 repo 與提示再存。三處建的是同一份，互相看得到。</li>
           <li><strong>管理</strong>：<code class="inline">/schedule list</code> 列出、<code class="inline">/schedule update</code> 修改、<code class="inline">/schedule run</code> 立刻跑一次；也可以直接問「為什麼今天早上的 routine 什麼都沒做」，它會讀執行紀錄回答。</li>
           <li><strong>何時用</strong>：每晚整理 issue、每週檢查文件是否過時、每個新 PR 跑你們自己的審查清單、部署後自動煙霧測試。</li>
-          <li><strong>注意</strong>：用量跟一般 session 一樣扣方案額度，另有<strong>每日執行次數上限</strong>（一次性排程不算）；它推的分支預設以 <code class="inline">claude/</code> 開頭；能碰到什麼取決於你選的 repo、雲端環境的網路權限與 connectors，只給它需要的就好。</li>
+          <li><strong>注意</strong>：用量跟一般 session 一樣扣方案額度，另有<strong>每小時執行次數上限</strong>（排程執行含一次性排程，每個帳號每小時 100 次；Run now 與 API 觸發每個 routine 合計每小時 30 次）；它推的分支預設以 <code class="inline">claude/</code> 開頭；能碰到什麼取決於你選的 repo、雲端環境的網路權限與 connectors，只給它需要的就好。</li>
         </ul>
 
         <h4 id="claudecode-adv-scheduling">三種排程怎麼選：雲端 Routines、Desktop 排程任務、/loop</h4>
@@ -3391,7 +3406,7 @@ jobs:
             <tr><td><strong>Agent view</strong>（研究預覽）</td><td>一個畫面管理所有背景 session：哪些在跑、哪些在等你、哪些做完</td><td><code class="inline">claude agents</code> 開啟；<code class="inline">claude --bg "任務"</code> 直接派一個背景 session；在 session 裡打 <code class="inline">/bg</code> 把目前對話丟到背景</td><td>手上有好幾件獨立的事，想派出去、偶爾看一眼、需要時再接手。從 agent view 派出的 session 動檔前會自己進 worktree</td></tr>
             <tr><td><strong>Agent teams</strong>（實驗功能，預設關閉）</td><td>一個 session 當隊長，分派任務給多個隊友 session，共用任務清單、隊友之間可以互傳訊息</td><td>設定環境變數 <code class="inline">CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</code>（shell 或 settings.json 的 <code class="inline">env</code>），然後用白話說「開三個隊友，分別從 UX、架構、唱反調的角度研究」</td><td>平行研究與互相挑錯、各自負責一個模組。只在 CLI（Desktop 沒有）；接續 session、收尾有已知限制。可在 tmux 或 iTerm2 讓每個隊友一個窗格</td></tr>
             <tr><td><strong><code class="inline">/goal</code></strong></td><td>設一個<strong>完成條件</strong>，它每輪做完後由一個小模型檢查條件是否成立，沒成立就自己再做一輪</td><td><code class="inline">/goal test/auth 的測試全過而且 lint 乾淨</code>；<code class="inline">/goal clear</code> 取消；也能用在 <code class="inline">claude -p</code></td><td>終點可驗證的大工作：遷移到新 API 直到全部編譯通過、清空某個 issue 標籤。條件要寫成可檢查的狀態，不要寫「做好一點」</td></tr>
-            <tr><td><strong>Dynamic workflows</strong></td><td>Claude 寫一支 JavaScript 腳本，在背景同時調度大量子代理並交叉比對結果，腳本可存下來重跑</td><td>提示裡加關鍵字 <code class="inline">ultracode</code> 或直接說「用 workflow 做」；<code class="inline">/workflows</code> 看進度、暫停、儲存</td><td>全 codebase 找 bug、500 個檔案的遷移、需要多方交叉驗證的研究。付費方案可用，Pro 要先在 <code class="inline">/config</code> 開啟 Dynamic workflows</td></tr>
+            <tr><td><strong>Dynamic workflows</strong></td><td>Claude 寫一支 JavaScript 腳本，在背景同時調度大量子代理並交叉比對結果，腳本可存下來重跑</td><td>提示裡加關鍵字 <code class="inline">ultracode</code> 或直接說「用 workflow 做」；<code class="inline">/workflows</code> 看進度、暫停、儲存</td><td>全 codebase 找 bug、500 個檔案的遷移、需要多方交叉驗證的研究。付費方案、Anthropic API、Bedrock 等第三方供應商可用；Pro 要先在 <code class="inline">/config</code> 開啟 Dynamic workflows</td></tr>
             <tr><td><strong>Ultrareview</strong>（研究預覽）</td><td>在雲端沙箱派一整隊審查代理深度審你的分支或 PR，每個發現都獨立重現驗證</td><td><code class="inline">/code-review ultra</code>（開通後 <code class="inline">/ultrareview</code> 是別名）；啟動前會顯示範圍與預估費用</td><td>合併重要改動前。Pro／Max 各有一次性 3 次免費，之後從 usage credits 扣，通常每次 5–25 美元；需 claude.ai 帳號登入</td></tr>
             <tr><td><strong>Fast mode</strong>（研究預覽）</td><td>同一個 Opus 模型換成「速度優先」的設定，回應最高快約 2.5 倍，品質相同、每 token 較貴</td><td>打 <code class="inline">/fast</code> 開關</td><td>即時除錯、快速來回迭代時。只支援部分 Opus 模型；訂閱方案<strong>一律從 usage credits 扣</strong>，就算方案額度還有剩也一樣，要先開啟 usage credits。價格見官方</td></tr>
           </tbody>
@@ -3421,7 +3436,7 @@ jobs:
           <thead><tr><th>方式</th><th>怎麼觸發</th><th>Claude 跑在哪</th><th>要先設定什麼</th><th>最適合</th></tr></thead>
           <tbody>
             <tr><td><strong>雲端工作階段</strong></td><td>網頁、手機、Desktop 選 Cloud、<code class="inline">claude --cloud</code></td><td>Anthropic 雲端</td><td>連 GitHub（見 <a href="#claudecode-cloud">雲端工作階段</a>）</td><td>長任務、要關電腦</td></tr>
-            <tr><td><strong>Remote Control</strong></td><td>從 claude.ai/code 或手機操作電腦上正在跑的 session</td><td>你的電腦（CLI 或 VS Code）</td><td><code class="inline">claude remote-control</code> 或 <code class="inline">/rc</code>（見 <a href="#claudecode-env">環境選單</a>）</td><td>接著操作進行中的本機工作</td></tr>
+            <tr><td><strong>Remote Control</strong></td><td>從 claude.ai/code 或手機操作電腦上正在跑的 session</td><td>你的電腦（CLI、Desktop 或 VS Code）</td><td><code class="inline">claude remote-control</code> 或 <code class="inline">/rc</code>（見 <a href="#claudecode-env">環境選單</a>）</td><td>接著操作進行中的本機工作</td></tr>
             <tr><td><strong>Dispatch</strong></td><td>在手機的 Claude App 傳訊息派任務</td><td>你的電腦（Desktop）</td><td>手機與 Desktop 配對（Desktop 支援 macOS、Windows x64、Linux，手機 App 要更新到最新版）；限部分 Pro／Max。<strong>目前暫不開放新使用者</strong>，已在用的人可繼續用；新使用者請改用上面的雲端工作階段或雲端 Cowork。細節見 <a href="#cowork">Cowork</a></td><td>已有 Dispatch 的人：人在外面、設定最少</td></tr>
             <tr><td><strong>Channels</strong></td><td>Telegram、Discord、iMessage 或你自己的伺服器推事件</td><td>你的電腦（CLI）</td><td>裝 channel 外掛</td><td>對外部事件（CI 失敗、聊天訊息）即時反應</td></tr>
             <tr><td><strong>Slack</strong></td><td>在頻道裡 <code class="inline">@Claude</code></td><td>Anthropic 雲端</td><td>安裝 Slack App 並啟用雲端工作階段（Team／Enterprise 正改用 Claude Tag）</td><td>從團隊聊天把 bug 回報轉成 PR</td></tr>
@@ -3565,11 +3580,11 @@ claude --chrome
     <h4>管理員設定（Owner 做一次）</h4>
     <p>前置條件：組織 Owner 角色、一位 Slack 工作區管理員、組織已開啟 Routines；Team 方案要先有用量額度（usage credits）才會動。到 <code class="inline">claude.ai/admin-settings/claude-tag</code> 按 <strong>Start setup</strong>，照順序：</p>
     <div class="steps">
-      <div class="step"><span class="sn">1</span><div><strong>配對 Slack 工作區</strong>：從 Slack Marketplace 安裝 Claude App → 在任一頻道 <code class="inline">/invite @Claude</code> → Slack 管理員送出 <code class="inline">@Claude connect</code> 取得配對碼（15 分鐘內有效）→ 貼回設定頁，選整個工作區或指定頻道。</div></div>
-      <div class="step"><span class="sn">2</span><div><strong>選工具</strong>：至少選兩個團隊常用工具（議題追蹤、資料倉儲、文件庫等）。</div></div>
-      <div class="step"><span class="sn">3</span><div><strong>接 GitHub</strong>：安裝 Claude GitHub App 到組織並授權 repo（不做程式工作可略過）。</div></div>
-      <div class="step"><span class="sn">4</span><div><strong>幫 Claude 開帳號</strong>：把它當新同事——給它一個公司信箱，在每個工具加它為成員（給最小權限，能唯讀就唯讀），用它的帳號產生 API key 貼回設定頁。這樣它做的事都會記在各工具的稽核紀錄、也能單獨撤銷。</div></div>
-      <div class="step"><span class="sn">5</span><div><strong>設花費上限並上線</strong>：頻道工作從<strong>組織的用量餘額</strong>扣款（不是個人席位），每月上限可選 $500、$1,000、$2,500、$5,000、無上限或自訂，之後在 <code class="inline">claude.ai/admin-settings/usage/claude-tag</code> 調整，也能設各頻道上限。達到上限時 Claude 會在討論串告知無法完成。私訊（DM）則走發訊者自己的方案額度。</div></div>
+      <div class="step"><span class="sn">1</span><div><strong>配對 Slack 工作區</strong>：從 Slack Marketplace 安裝 Claude App → 在任一頻道 <code class="inline">/invite @Claude</code> → Slack 管理員送出 <code class="inline">@Claude connect</code> 取得配對碼（15 分鐘內有效）→ 貼回設定頁按 Pair workspace（配對涵蓋整個工作區，頻道在上線那步再選）。</div></div>
+      <div class="step"><span class="sn">2</span><div><strong>買用量額度（視情況）</strong>：只有 Team 或自助 Enterprise、以美元刷卡且還沒有額度的組織會看到這步；可先 Skip，之後到 <code class="inline">claude.ai/admin-settings/usage</code> 購買。</div></div>
+      <div class="step"><span class="sn">3</span><div><strong>設花費上限並上線</strong>：頻道工作從<strong>組織的用量餘額</strong>扣款（不是個人席位），每月上限可選 $500、$1,000、$2,500、$5,000、無上限或自訂（有第 2 步的話，上線後再設），之後在 <code class="inline">claude.ai/admin-settings/usage/claude-tag</code> 調整，也能設各頻道上限。達到上限時 Claude 會在討論串告知無法完成。私訊（DM）則走發訊者自己的方案額度。再選至少一個公開頻道讓 Claude 加入，按 Launch Claude Tag。</div></div>
+      <div class="step"><span class="sn">4</span><div><strong>接 GitHub（上線後）</strong>：設定流程只連 Slack；要做程式工作，再由 GitHub 組織擁有者安裝 Claude GitHub App 並授權 repo（不做程式工作可略過）。</div></div>
+      <div class="step"><span class="sn">5</span><div><strong>幫 Claude 開帳號（上線後）</strong>：把它當新同事——給它一個公司信箱，在每個工具加它為成員（給最小權限，能唯讀就唯讀），用它的帳號產生 API key，在 Claude Tag 管理頁的 Access bundle 加成連線。這樣它做的事都會記在各工具的稽核紀錄、也能單獨撤銷。</div></div>
     </div>
     <p>上線後在頻道 <code class="inline">@Claude summarize what this channel decided this week</code> 測試；回覆底部會顯示使用的模型與 <strong>Configure</strong> 連結。</p>
     <h4>日常使用：頻道指示、連接器、routines、記憶</h4>
@@ -3582,7 +3597,7 @@ claude --chrome
     </ul>
 
     <h3 id="ecosystem-mcp">MCP（Model Context Protocol）：萬用插座</h3>
-    <p>MCP 是 Anthropic 提出的<strong>開放標準</strong>，讓 Claude（claude.ai、Cowork、Claude Code、API）用同一種方式串接外部工具與資料源。本質是把「使用者自訂工具」標準化：工具的定義與執行，從你的程式搬到專門的 <strong>MCP server</strong>；Claude 這端（MCP client）只要會講 MCP 就能用任何 server。三個基本元素，記住「誰控制」：</p>
+    <p>MCP 是 Anthropic 提出、2025 年 12 月捐給 Linux Foundation 旗下 Agentic AI Foundation 的<strong>開放標準</strong>，讓 Claude（claude.ai、Cowork、Claude Code、API）用同一種方式串接外部工具與資料源。本質是把「使用者自訂工具」標準化：工具的定義與執行，從你的程式搬到專門的 <strong>MCP server</strong>；Claude 這端（MCP client）只要會講 MCP 就能用任何 server。三個基本元素，記住「誰控制」：</p>
     <div class="table-wrap"><table>
       <thead><tr><th>元素</th><th>誰控制</th><th>是什麼</th><th>例子</th></tr></thead>
       <tbody>
@@ -3929,11 +3944,12 @@ claude mcp add --transport http --scope user my-notes https://notes.example.com/
     <div class="table-wrap"><table>
       <thead><tr><th>狀態碼</th><th>錯誤類型</th><th>意思</th><th>通常怎麼解</th></tr></thead>
       <tbody>
-        <tr><td><code class="inline">400</code></td><td><code class="inline">invalid_request_error</code></td><td>請求格式或內容有問題</td><td>JSON 打錯、少了必填欄位、參數值不合法；到達你自己設的花費上限也可能回 400</td></tr>
+        <tr><td><code class="inline">400</code></td><td><code class="inline">invalid_request_error</code></td><td>請求格式或內容有問題</td><td>JSON 打錯、少了必填欄位、參數值不合法；到達你自己設的花費上限也可能回 400；Opus 5.5、Sonnet 5.5、Fable 5.1 收到 <code class="inline">tool_choice</code> 為 <code class="inline">any</code> 或 <code class="inline">tool</code> 也會回 400</td></tr>
         <tr><td><code class="inline">401</code></td><td><code class="inline">authentication_error</code></td><td>認證失敗</td><td>API key 沒帶、打錯、被撤銷或過期；或用錯 header——要用 <code class="inline">x-api-key</code>，不是 <code class="inline">Authorization: Bearer</code></td></tr>
         <tr><td><code class="inline">402</code></td><td><code class="inline">billing_error</code></td><td>帳務或付款資訊有問題</td><td>到 Console 的 Settings → Billing 檢查付款方式與額度</td></tr>
         <tr><td><code class="inline">403</code></td><td><code class="inline">permission_error</code></td><td>這把 key 沒有權限用這個資源</td><td>檢查組織與 workspace 設定、這把 key 屬於哪個 workspace</td></tr>
         <tr><td><code class="inline">404</code></td><td><code class="inline">not_found_error</code></td><td>找不到資源</td><td>端點路徑、模型 ID、檔案 ID 等打錯或已不存在</td></tr>
+        <tr><td><code class="inline">409</code></td><td><code class="inline">conflict_error</code></td><td>請求和資源目前的狀態衝突</td><td>資源被同時修改、或必須唯一的值已被占用；解決衝突後再重試</td></tr>
         <tr><td><code class="inline">413</code></td><td><code class="inline">request_too_large</code></td><td>請求太大</td><td>Messages API 上限 32 MB、Batch 256 MB、Files API 500 MB；大檔改用 Files API 上傳再引用</td></tr>
         <tr><td><code class="inline">429</code></td><td><code class="inline">rate_limit_error</code></td><td>觸及速率上限，或已達該級距的每月花費上限</td><td>放慢請求、照 <code class="inline">retry-after</code> header 重試；若是每月花費上限（沒有 <code class="inline">retry-after</code>），重試無效，要升級級距或等下個月</td></tr>
         <tr><td><code class="inline">500</code></td><td><code class="inline">api_error</code></td><td>Anthropic 內部非預期錯誤</td><td>以指數退避重試；持續發生就帶著 <code class="inline">request_id</code> 聯絡支援</td></tr>
@@ -4182,7 +4198,7 @@ jobs:
         </div>
         <p class="note">CI 常跑的四件事：<strong>lint</strong>（風格）、<strong>test</strong>（功能對不對）、<strong>build</strong>（能不能順利建置）、<strong>security scan</strong>（有無已知漏洞）。價值在於「沒過就不能合併」——把人不會每次都記得做的檢查變成強制。這跟 <a href="#features">功能字典裡的 Hooks</a> 是同一個精神，只是一個在雲端管 PR、一個在本機管每一步。</p>
         <details class="more"><summary>進階：action 版本號要跟著更新</summary>
-          <p><code class="inline">actions/checkout@v7</code>、<code class="inline">actions/setup-python@v7</code> 的 <code class="inline">@v7</code> 是版本（截至 2026-09，兩者官方 releases 都已有 v7，本站範例一律用 v7）。截至 2026-09，GitHub Actions 的執行環境已不再提供 Node 20，只能跑 Node 24 版的 action；網路上舊教學常見的 <code class="inline">actions/checkout@v4</code>、<code class="inline">actions/setup-python@v5</code> 屬於舊世代，照抄可能跑不起來，請改用各 action 官方 README 標示的最新主版本。不確定時請 Claude「把 workflow 裡的 action 都更新到目前最新主版本」。</p>
+          <p><code class="inline">actions/checkout@v7</code>、<code class="inline">actions/setup-python@v7</code> 的 <code class="inline">@v7</code> 是版本（截至 2026-09，兩者官方 releases 都已有 v7，本站範例一律用 v7）。截至 2026-09，GitHub Actions 的執行環境已移除 Node 20，JavaScript action 一律改用 Node 24 執行；網路上舊教學常見的 <code class="inline">actions/checkout@v4</code>、<code class="inline">actions/setup-python@v5</code> 是為 Node 20 寫的舊世代，照抄可能出現警告或相容問題，請改用各 action 官方 README 標示的最新主版本。不確定時請 Claude「把 workflow 裡的 action 都更新到目前最新主版本」。</p>
         </details>
 
         <h3>AI 把程式改壞了，怎麼救</h3>
@@ -4345,7 +4361,7 @@ git add .nojekyll &amp;&amp; git commit -m "停用 Jekyll 建置" &amp;&amp; git
           </div>
           <p>如果你用的是 Jekyll 以外的產生器（例如 Next.js、Vite、Astro 需要先 build），官方建議改把 Source 設成 <strong>GitHub Actions</strong>，用官方提供的 workflow 範本建置後發佈。</p>
         </details>
-        <p class="note">注意：GitHub Pages 發佈出去的網站<strong>一律是公開的</strong>——即使付費方案讓你從 private repo 發佈，網站本身任何人都看得到。有敏感資料的檔案不要放進發佈來源。想「改完按兩下就上線」，可以用 <a href="#gitflow-deploy-script">Git 與 GitHub 章末的一鍵部署腳本範例</a>（macOS 用 <code class="inline">deploy.command</code>、Windows 用 <code class="inline">deploy.bat</code>）。</p>
+        <p class="note">注意：GitHub Pages 發佈出去的網站<strong>預設是公開的</strong>——即使付費方案讓你從 private repo 發佈，網站本身任何人都看得到（只有 GitHub Enterprise Cloud 的組織能改成私有發佈）。有敏感資料的檔案不要放進發佈來源。想「改完按兩下就上線」，可以用 <a href="#gitflow-deploy-script">Git 與 GitHub 章末的一鍵部署腳本範例</a>（macOS 用 <code class="inline">deploy.command</code>、Windows 用 <code class="inline">deploy.bat</code>）。</p>
 
         <h3>交給 AI 做，但你要看得懂後台</h3>
         <p>部署本身可以整段交給 Claude Code（「幫我把這個專案部署到 Vercel」），但上線後<strong>你得自己看得懂四個地方</strong>：</p>
@@ -4423,7 +4439,7 @@ git add .nojekyll &amp;&amp; git commit -m "停用 Jekyll 建置" &amp;&amp; git
         <dl class="def-list">
           <dt>定義</dt><dd>模型在回答前先做一段內部推理，叫做「思考」。現在有兩種機制：
             <ul>
-              <li><strong>Adaptive thinking（自適應思考）</strong>：現行的 Fable 5.1、Opus 5.5 使用。思考<strong>一律開啟、無法關閉</strong>，模型每一步自己決定要不要想、想多深。你用 <strong>effort</strong>（努力程度）控制整體深淺。</li>
+              <li><strong>Adaptive thinking（自適應思考）</strong>：現行的 Fable 5.1、Opus 5.5、Opus 5、Sonnet 5.5、Sonnet 5 使用，思考預設開啟。Fable 5.1、Opus 5.5 <strong>無法關閉</strong>；Sonnet 5.5 要關掉事前思考改送 <code class="inline">"thinking": {"type": "between_tools"}</code>（xhigh、max 不能用）。模型每一步自己決定要不要想、想多深。你用 <strong>effort</strong>（努力程度）控制整體深淺。</li>
               <li><strong>Extended thinking（延伸思考，舊機制）</strong>：用 <code class="inline">budget_tokens</code> 指定「最多可以想多少 token」。Haiku 4.5 與更舊的 4.5 世代模型只支援這種。Haiku 4.5 <strong>支援</strong> extended thinking，但不支援 effort。</li>
             </ul>
             各模型的差異與模型 ID 請看 <a href="#overview">總覽與選擇</a>。</dd>
@@ -4445,7 +4461,7 @@ git add .nojekyll &amp;&amp; git commit -m "停用 Jekyll 建置" &amp;&amp; git
               <li>日常問答、格式轉換：用 low 或 medium，比較快、比較省。</li>
               <li>會「想錯一步就全錯」的任務（架構決策、複雜推理、長時間 agent 工作）：調到 high 以上。</li>
             </ul>
-            注意：在 Fable 5.1、Opus 5.5 等新模型上，傳入非預設的 <code class="inline">temperature</code>、<code class="inline">top_p</code>、<code class="inline">top_k</code> 會直接回 400 錯誤。對現行模型送 <code class="inline">"type": "enabled"</code> 也會被拒絕。</dd>
+            注意：在 Fable 5.1、Opus 5.5 等新模型上，傳入非預設的 <code class="inline">temperature</code>、<code class="inline">top_p</code>、<code class="inline">top_k</code> 會直接回 400 錯誤。對現行模型送 <code class="inline">"type": "enabled"</code> 也會被拒絕。Opus 5.5、Sonnet 5.5、Fable 5.1 不支援強制工具呼叫，<code class="inline">tool_choice</code> 設成 <code class="inline">any</code> 或 <code class="inline">tool</code> 會回 400，只能用 <code class="inline">auto</code> 或 <code class="inline">none</code>。</dd>
         </dl>
         <div class="code-block" data-lang="json">
 <div class="cb-head"><div class="dots"><span></span><span></span><span></span></div><span>effort.json</span><button class="copy-btn">複製</button></div>
@@ -4519,9 +4535,9 @@ git add .nojekyll &amp;&amp; git commit -m "停用 Jekyll 建置" &amp;&amp; git
                   <li><strong>一般 artifact（Design、Slides、互動工具等）</strong>：
                     <ul>
                       <li>Pro / Max：「Only you」或「Anyone with the link」。也可以用 email 邀請特定的人（beta）。</li>
-                      <li>Team / Enterprise：「Only people invited」「Anyone at 你的組織」或「Anyone with the link」；Enterprise 另外可以分享給群組。預設只能在組織內分享：「Anyone with the link」要 Owner 在 <code class="inline">Organization settings → Artifacts</code> 打開 External sharing（或對單一 artifact 個別放行）；用 email 邀請組織外的人，要另外打開「Email invitations outside your organization」，兩個開關互相獨立。</li>
+                      <li>Team / Enterprise：「Only people invited」「Anyone at 你的組織」或「Anyone with the link」；Enterprise 另外可以分享給群組。Team 的 External sharing 與「Email invitations outside your organization」預設開啟；Enterprise 兩者預設關閉，預設只能在組織內分享：「Anyone with the link」要 Owner 在 <code class="inline">Organization settings → Artifacts</code> 打開 External sharing（或對單一 artifact 個別放行）；用 email 邀請組織外的人，要另外打開「Email invitations outside your organization」，兩個開關互相獨立。</li>
                       <li>會連接你的 apps、或會呼叫 Claude 的 artifact，不能用「Anyone with the link」。</li>
-                      <li>Free 方案不能分享新式 artifact，只能「Publish」在對話中做的舊式 artifact。</li>
+                      <li>Free：只能用「Anyone with the link」分享，不能用 email 邀請；舊式 artifact 仍可「Publish」。</li>
                     </ul></li>
                   <li><strong>Docs</strong>：Pro / Max 可以分享給「有連結的人」；Team / Enterprise 只能分享給組織內的人、群組或全組織，<strong>不能分享到組織外</strong>；任何方案都不能用 email 邀請。權限分「檢視」與「編輯」。</li>
                   <li>打開分享出來的 artifact（含 Docs）都要有 Claude 帳號；只有舊式 artifact 用「Publish」產生的公開連結不需要帳號。</li>
@@ -4577,7 +4593,7 @@ git add .nojekyll &amp;&amp; git commit -m "停用 Jekyll 建置" &amp;&amp; git
                 <ul>
                   <li>建檔位置：<code class="inline">.claude/skills/&lt;名字&gt;/SKILL.md</code>（專案）或 <code class="inline">~/.claude/skills/&lt;名字&gt;/SKILL.md</code>（個人）。</li>
                   <li>開頭的 frontmatter 寫 <code class="inline">name</code> 和 <code class="inline">description</code>。描述寫得準，Claude 才會在對的時機載入。</li>
-                  <li>常用欄位：<code class="inline">allowed-tools</code> 限制可用的工具；<code class="inline">disable-model-invocation: true</code> 讓 skill 只能手動叫出。</li>
+                  <li>常用欄位：<code class="inline">allowed-tools</code> 預先核准 skill 執行時要用的工具（不用再逐次詢問權限）；<code class="inline">disable-model-invocation: true</code> 讓 skill 只能手動叫出。</li>
                   <li>舊的 <code class="inline">.claude/commands/*.md</code> 自訂指令已經併入 skills，兩種寫法都會產生同名的 <code class="inline">/指令</code>。</li>
                   <li>用 claude.ai 帳號登入時，你在 claude.ai 開啟的 skills 會同步到 Claude Code。</li>
                 </ul></li>
@@ -5026,7 +5042,7 @@ git add .nojekyll &amp;&amp; git commit -m "停用 Jekyll 建置" &amp;&amp; git
       <tbody>
         <tr><td>Claude for Education</td><td>大學機構方案，學生與教職員用學校帳號使用；實際開放的功能以學校設定為準。</td><td><a href="https://support.claude.com/en/articles/11139144-use-claude-for-education-at-your-university" target="_blank" rel="noopener">Use Claude for Education at your university</a></td></tr>
         <tr><td>Claude for Teachers</td><td>經驗證的美國 K-12 教師免費使用；學校或學區可替老師建立免費的 Enterprise 組織，2027-06-30 前註冊可免費一年。</td><td><a href="https://support.claude.com/en/articles/16559896-set-up-claude-for-teachers-for-your-school-or-district" target="_blank" rel="noopener">Set up Claude for Teachers</a></td></tr>
-        <tr><td>Claude for Government</td><td>給美國聯邦、州與地方政府機關，在 FedRAMP High 授權環境中執行。所有組織要在 2026-10-04 前轉到新版 Claude for Government（Desktop）。</td><td><a href="https://claude.com/docs/government/overview" target="_blank" rel="noopener">Claude for Government administrator guide</a>；<a href="https://support.claude.com/en/articles/14503590-get-started-with-claude-for-government" target="_blank" rel="noopener">Get started</a></td></tr>
+        <tr><td>Claude for Government</td><td>給美國聯邦、州與地方政府機關，在 FedRAMP High 授權環境中執行。官方要求所有組織在 2026-10-04 前轉到新版 Claude for Government（Desktop）。</td><td><a href="https://claude.com/docs/government/overview" target="_blank" rel="noopener">Claude for Government administrator guide</a>；<a href="https://support.claude.com/en/articles/14503590-get-started-with-claude-for-government" target="_blank" rel="noopener">Get started</a></td></tr>
       </tbody>
     </table></div>
 
@@ -5272,7 +5288,7 @@ print(resp.input_tokens)</code></pre>
       <li><strong>是什麼</strong>：從 Fable 5.1 起，新模型在你把前幾輪的 <code class="inline">thinking</code>／<code class="inline">redacted_thinking</code> 區塊送回時，API 會用區塊的 <code class="inline">signature</code> 檢查兩件事，用來防止思考內容被拿去蒸餾：
         <ul>
           <li><strong>這個模型讀得懂這個區塊嗎</strong>：每個模型只讀自己與一組固定模型的思考區塊。例如 Opus 5.5 讀得懂 Opus 5 與更早的 Opus／Sonnet／Haiku，但讀不懂 Fable、Mythos 系列；在 Claude API 上，Fable 5.1 讀得懂 Opus 5.5。讀不懂的區塊會被<strong>默默略過</strong>（不報錯、不計費），你本地的歷史不會被改。</li>
-          <li><strong>區塊之前的內容有沒有被改過</strong>（Fable 5.1 與 Opus 5.5）：最上層的 <code class="inline">system</code>、<code class="inline">tools</code>、以及該區塊之前的每一則訊息，都要跟產生它時一模一樣；改過的話，這個區塊和之後所有思考區塊都失效，API 會回 400 或丟掉它們。2026-08-31 起新建立的帳號預設強制檢查；較舊的帳號只在請求設了 <code class="inline">thinking.block_binding.prefix_mismatch_behavior</code> 時才檢查。</li>
+          <li><strong>區塊之前的內容有沒有被改過</strong>（Fable 5.1、Opus 5.5 與 Sonnet 5.5；Sonnet 5.5 的思考區塊另外綁定產生它的帳號，換帳號送回也會失效）：最上層的 <code class="inline">system</code>、<code class="inline">tools</code>、以及該區塊之前的每一則訊息，都要跟產生它時一模一樣；改過的話，這個區塊和之後所有思考區塊都失效，API 會回 400 或丟掉它們。2026-08-31 起新建立的帳號預設強制檢查；較舊的帳號只在請求設了 <code class="inline">thinking.block_binding.prefix_mismatch_behavior</code> 時才檢查。</li>
         </ul>
       </li>
       <li><strong>誰要注意</strong>：用 Claude Code、claude.ai、Managed Agents 或 Agent SDK，或你的程式整段對話都<strong>只往後追加</strong>、<code class="inline">system</code> 與 <code class="inline">tools</code> 不動，就不用改。會出事的寫法：每輪重組 system（例如塞入當下日期）、中途增刪工具、在用戶端刪短舊的工具結果或自己摘要舊對話、刪掉部分 thinking 區塊。</li>
@@ -5387,7 +5403,7 @@ print(resp.input_tokens)</code></pre>
     <h4 id="extensions-models">模型版本、alias 與淘汰時程</h4>
     <ul>
       <li><strong>ID 格式</strong>：從 4.6 世代起，模型 ID 不帶日期，例如 <code class="inline">claude-opus-5-5</code>、<code class="inline">claude-sonnet-5</code>；更早的模型帶日期快照，例如 <code class="inline">claude-haiku-4-5-20251001</code>。</li>
-      <li><strong>每個 ID 都是固定快照</strong>：不帶日期的新 ID <strong>不是</strong>「自動指向最新版」的別名——同一個 ID 的權重不會被更新，新版本會用新 ID 發布。舊世代才有會跟著更新的便利別名（例如 <code class="inline">claude-sonnet-4-5</code> 指向該版最新的日期快照）；正式環境建議寫完整 ID，換模型時自己測過再改。</li>
+      <li><strong>每個 ID 都是固定快照</strong>：不帶日期的新 ID <strong>不是</strong>「自動指向最新版」的別名——同一個 ID 的權重不會被更新，新版本會用新 ID 發布。舊世代才有會跟著更新的便利別名（例如 <code class="inline">claude-sonnet-4-5</code> 指向該版最新的日期快照；Sonnet 4.5 已於 2026-09-30 宣布淘汰、2026-11-30 退役，官方建議換成 <code class="inline">claude-sonnet-5-5</code>）；正式環境建議寫完整 ID，換模型時自己測過再改。</li>
       <li><strong>生命週期</strong>：Active（建議使用）→ Legacy（不再更新）→ Deprecated（仍可用但有退休日期）→ Retired（請求會失敗）。公開模型退休前至少 60 天通知；可在 Console 的 Usage 頁 Export 出依 key 與模型分列的用量，找出還在用舊模型的地方。</li>
       <li>目前有哪些模型、各自的 ID、價格與該選哪個，只在 <a href="#overview">總覽與選擇</a> 維護一份；各模型的退休日期以官方 Model deprecations 頁為準。</li>
     </ul>
@@ -5676,7 +5692,7 @@ ant messages create \
         <tr><td><code class="inline">strictKnownMarketplaces</code></td><td>只允許從核准的 plugin 市集安裝</td></tr>
         <tr><td><code class="inline">forceLoginMethod</code> / <code class="inline">forceLoginOrgUUID</code></td><td>強制用指定的方式（<code class="inline">claudeai</code>、<code class="inline">console</code>、<code class="inline">gateway</code>）登入指定的組織，避免成員用個人帳號</td></tr>
         <tr><td><code class="inline">availableModels</code> / <code class="inline">maxEffortLevel</code></td><td>限制可選的模型與最高 effort</td></tr>
-        <tr><td><code class="inline">minimumVersion</code></td><td>設定 Claude Code 的最低版本</td></tr>
+        <tr><td><code class="inline">requiredMinimumVersion</code></td><td>低於這個版本的 Claude Code 不能啟動（只能放在 managed settings）。另一個鍵 <code class="inline">minimumVersion</code> 只是讓自動更新不要裝到更舊的版本，不會擋啟動</td></tr>
         <tr><td><code class="inline">disableRemoteControl</code></td><td>在這台裝置上關掉 Remote Control</td></tr>
         <tr><td><code class="inline">sshConfigs</code></td><td>在 Desktop 的環境下拉選單預先放好 SSH 連線，每筆要有 <code class="inline">id</code>、<code class="inline">name</code>、<code class="inline">sshHost</code>。由組織派送的連線，成員不能修改</td></tr>
         <tr><td><code class="inline">sshHostAllowlist</code></td><td>限制 Desktop SSH session 能連的主機，例如 <code class="inline">*.example.com</code>。只有 Desktop 會讀這個鍵，CLI 不讀。設成空陣列就等於禁用 SSH session</td></tr>
@@ -5734,7 +5750,7 @@ ant messages create \
           <li>被安全機制標記的內容，最多保留 2 年。</li>
           <li>程式碼執行容器、Files API、Batch 等功能，依各自說明保留。例如程式碼執行容器最多保留 30 天。</li>
         </ul></li>
-      <li><strong>Covered Models</strong>：Fable 5.1、Fable 5 等特定模型必須保留 30 天。沒有開啟資料保留的組織或 workspace 呼叫它們，會收到 400 錯誤。已啟用 ZDR 的組織，可以只替單一 workspace 開啟 30 天保留，位置是 <code class="inline">Console → Settings → Workspaces → Privacy controls</code>。</li>
+      <li><strong>Covered Models</strong>：Fable 5.1、Mythos 5.1、Fable 5、Mythos 5 這四個模型必須保留 30 天。沒有開啟資料保留的組織或 workspace 呼叫它們，會收到 400 錯誤。已啟用 ZDR 的組織，可以只替單一 workspace 開啟 30 天保留，位置是 <code class="inline">Console → Settings → Workspaces → Privacy controls</code>。</li>
       <li><strong>ZDR</strong>：請求處理完就不在伺服器上保存提示與回應。
         <ul>
           <li>要向業務申請，以組織為單位開通。</li>
@@ -5771,7 +5787,7 @@ ant messages create \
         <tr><td>稽核紀錄（Audit logs）</td><td>記錄登入、成員、專案、檔案、設定變更等事件（對話與專案只記 ID，不含標題與內容）</td><td>Enterprise；Owner 或 Primary Owner 在 <code class="inline">Organization settings → Data and Privacy</code> 按「Export logs」，匯出最近 180 天，下載連結寄到信箱、24 小時內有效</td><td>使用 CMEK 的組織不能用這個按鈕匯出；同樣的事件也能從 Compliance API 取得</td></tr>
         <tr><td>Compliance API</td><td>用程式持續抓取組織的活動紀錄、對話資料與檔案內容，接進公司的 SIEM 或合規工具；涵蓋對話、Cowork、Claude Code（CLI 與 Desktop）</td><td>Enterprise（公部門組織除外）；只有 Primary Owner 能在 <code class="inline">Organization settings → API</code> 打開，並在同頁建立存取金鑰</td><td>不涵蓋雲端 Claude Code session、在 Bedrock 或 Vertex AI 上跑的 session；技術文件在 platform.claude.com</td></tr>
         <tr><td>Access Transparency</td><td>Anthropic 員工因安全審查或事故處理而查看你的資料時，每次都會寫一筆紀錄到 Compliance API 的活動紀錄</td><td>要向 Anthropic 窗口申請，不能自助開啟；資格依合約</td><td>只記「人為查看」，自動化安全系統的處理不算</td></tr>
-        <tr><td>HIPAA-ready 設定與 BAA</td><td>要處理受 HIPAA 規範的健康資料（PHI）時，開啟 HIPAA-ready 設定並簽署 BAA（業務夥伴協議）</td><td>Enterprise（自助或業務洽談都可以）；Primary Owner 在 <code class="inline">Organization settings → Data and privacy</code> 開啟並接受 BAA，不需要另走業務流程。API 要用 PHI 則要簽 BAA 後聯絡業務開通</td><td>開啟後不能從後台關回來。不是所有功能都在 BAA 範圍內：例如 Cowork 目前不涵蓋；Claude Code 只有在開啟 ZDR 的合格帳號才涵蓋；Covered Models 需 30 天保留，不能搭配 ZDR</td></tr>
+        <tr><td>HIPAA-ready 設定與 BAA</td><td>要處理受 HIPAA 規範的健康資料（PHI）時，開啟 HIPAA-ready 設定並簽署 BAA（業務夥伴協議）</td><td>業務洽談的用量計費 Enterprise、舊版按席計費 Enterprise，或 AWS Marketplace 上的 Enterprise（自助購買的 Enterprise 不能用這個流程）；Primary Owner 在 <code class="inline">Organization settings → Data and privacy</code> 開啟並接受 BAA，不需要另走業務流程。API 要用 PHI：符合資格的 Console 組織可以在 <code class="inline">Console → Settings → Data retention</code> 自行簽署標準 BAA 並開啟；需要議定版 BAA 才找業務</td><td>開啟後不能從後台關回來。不是所有功能都在 BAA 範圍內：例如 Cowork 目前不涵蓋；Claude Code 只有在開啟 ZDR 的合格帳號才涵蓋；Covered Models 需 30 天保留，不能搭配 ZDR</td></tr>
         <tr><td>客戶自管加密金鑰（CMEK）</td><td>用你自己在 AWS KMS、Google Cloud KMS 或 Azure Key Vault 的金鑰加密對話、專案、檔案等資料，所有使用紀錄都留在你的雲端稽核紀錄</td><td>符合資格的 Enterprise 與 Claude Platform（API）組織；要聯絡 Anthropic 窗口開通</td><td>開啟是<strong>永久</strong>的；金鑰遺失或刪除，資料就永遠救不回來。開啟後有多項功能停用或改變，例如對話搜尋、專案 RAG、Claude Docs／Design／Slides、雲端 Claude Code、組織資料與稽核紀錄匯出</td></tr>
         <tr><td>Inference hooks</td><td>每則提示在送進模型前，先送到你（或資安廠商）架設的伺服器判斷允許或拒絕；被拒絕的請求不會進模型。用於防資料外洩、即時封存逐字稿、執行公司政策</td><td>Enterprise（beta）；Owner 或 Primary Owner 在 <code class="inline">Organization settings → Data and privacy</code> 的 Inference hooks 區開啟並填入伺服器網址</td><td>在 Anthropic 伺服器端執行，員工電腦不用裝任何東西，一次涵蓋對話、Claude Code、Cowork 等；目前只檢查「提示」這一側</td></tr>
       </tbody>
@@ -5899,15 +5915,15 @@ ant messages create \
     <p><strong>在哪裡設定</strong>：Team / Enterprise 的 Owner 在 <code class="inline">claude.ai/admin-settings/claude-tag</code> 做一次性設定，步驟如下：</p>
     <div class="steps">
       <div class="step"><span class="sn">1</span><div>Slack 工作區管理員執行 <code class="inline">@Claude connect</code>，完成配對。配對碼 15 分鐘內有效。</div></div>
-      <div class="step"><span class="sn">2</span><div>選擇 Claude 一開始能用的工具。</div></div>
-      <div class="step"><span class="sn">3</span><div>連接 GitHub App，並授權它能存取的 repo。</div></div>
-      <div class="step"><span class="sn">4</span><div>替其他要用的工具建立帳號或 API key。</div></div>
-      <div class="step"><span class="sn">5</span><div>設定每月花費上限，然後啟用。</div></div>
+      <div class="step"><span class="sn">2</span><div>購買用量額度（只有以美元刷卡付款、且還沒有額度的組織會出現這一步）。</div></div>
+      <div class="step"><span class="sn">3</span><div>設定每月花費上限、選至少一個公開頻道讓 Claude 加入，按 Launch Claude Tag 啟用。</div></div>
+      <div class="step"><span class="sn">4</span><div>啟用後再連接 GitHub App，並授權它能存取的 repo。</div></div>
+      <div class="step"><span class="sn">5</span><div>替其他要用的工具建立帳號或 API key，加成 Claude 的連線。</div></div>
     </div>
     <p><strong>前提與限制</strong>：</p>
     <ul>
       <li>組織不能開啟 ZDR 或 CMEK。</li>
-      <li>要先在 Claude Code 管理頁啟用 Routines。</li>
+      <li>要先在 <code class="inline">Admin settings → Capabilities → Remote sessions → Routines</code> 啟用 Routines；沒開的話，Claude 對每次提及都只回覆「目前無法使用」。</li>
       <li>Team 方案要先儲值額外用量。</li>
       <li>按用量計費，用量在 <code class="inline">claude.ai/admin-settings/usage/claude-tag</code> 查看。</li>
       <li>Owner 可以關閉全組織的私訊（DM）功能。</li>
@@ -5917,7 +5933,7 @@ ant messages create \
     <h3 id="enterprise-self-hosted">自架環境：讓雲端工作階段改在自家機器上跑</h3>
     <p><strong>是什麼</strong>：<a href="#claudecode">雲端工作階段</a>預設在 Anthropic 的機器上跑。自架環境（self-hosted environments）讓同樣的工作階段改在<strong>你公司網路裡的機器</strong>上執行——開發者操作起來幾乎一樣，只是在選擇環境時選你們公司的那一個。它由三部分組成：<strong>環境</strong>（在管理後台建立的名稱）、<strong>runner</strong>（你部署在自家主機上、負責接工作的程式，概念跟自架 CI runner 一樣）、<strong>工作階段</strong>（一件交辦的任務）。</p>
     <p><strong>在哪設定</strong>：Owner 到 claude.ai 管理後台的 <strong>Cloud environments</strong> 頁打開「Allow self-hosted environments」（前提是組織已開放雲端工作階段），建立環境後在自家主機啟動 runner。Anthropic 不會連進你的網路，所有連線都是你這邊往外連 <code class="inline">api.anthropic.com</code>。</p>
-    <p><strong>何時需要</strong>：工作階段要連公司內部的服務、資料庫或套件庫；要預先裝好內部工具；或合規上要求程式碼與建置產物留在自己的機器上。代價是你要自己維護 runner 的映像檔與機器。<strong>限制</strong>：Team／Enterprise 公開 beta、預設關閉；開了 ZDR 的組織不能用；模型推論一律走 Anthropic API（不能改走 Bedrock、Google Cloud、Foundry 或 LLM gateway）；對話內容仍會送到 Anthropic 做推論。大多數團隊用 Anthropic 託管的環境就夠了。</p>
+    <p><strong>何時需要</strong>：工作階段要連公司內部的服務、資料庫或套件庫；要預先裝好內部工具；或合規上要求程式碼與建置產物留在自己的機器上。代價是你要自己維護 runner 的映像檔與機器。<strong>限制</strong>：Team／Enterprise 公開 beta、預設關閉；開了 ZDR 的組織不能用；模型推論預設走 Anthropic API，也可以把 runner 設定成改送 Amazon Bedrock 或 Google Cloud Agent Platform，但這樣設定後，伺服器派送的 managed settings 與 claude.ai 的組織政策不會套用到這些 session；不論哪種，對話內容仍會送到 Anthropic。大多數團隊用 Anthropic 託管的環境就夠了。</p>
     <p class="note">官方說明與快速上手：<a href="https://code.claude.com/docs/en/self-hosted-environments" target="_blank" rel="noopener">Self-hosted environments</a>。只是想在自己一台常開的電腦上跑、從手機遙控，用 <a href="#claudecode">Remote Control</a> 就好（Pro／Max 也能用）。</p>
 
     <h3 id="enterprise-checklist">導入順序建議</h3>
@@ -6138,7 +6154,7 @@ jobs:
     <p>其他章節講 Claude 能做什麼，這章講幾個「不是這樣」的地方，以及怎麼保護你自己的資料，避免用錯期待。</p>
 
     <h3 id="safety-cutoff">知識截止日（Knowledge Cutoff）</h3>
-    <p><strong>是什麼</strong>：每個模型的訓練資料都停在某個時間點，之後發生的事、發布的產品、改過的法規，Claude 不會自動知道。各模型的截止日（官方稱 Reliable knowledge cutoff）統一列在 <a href="#overview-models">總覽與選擇：模型陣容</a> 表格的「知識截止日」欄；截至 2026-09，最新的 Fable 5.1、Opus 5.5 是 2026 年 6 月，Haiku 4.5 則早到 2025 年 2 月。</p>
+    <p><strong>是什麼</strong>：每個模型的訓練資料都停在某個時間點，之後發生的事、發布的產品、改過的法規，Claude 不會自動知道。各模型的截止日（官方稱 Reliable knowledge cutoff）統一列在 <a href="#overview-models">總覽與選擇：模型陣容</a> 表格的「知識截止日」欄；截至 2026-09，最新的 Fable 5.1、Opus 5.5、Sonnet 5.5 都是 2026 年 6 月，Haiku 4.5 則早到 2025 年 2 月。</p>
     <p><strong>會怎麼出錯</strong>：你問「目前最新的 iPhone 是哪一款」「今年的報稅截止日」「某套軟體的最新版指令」，它可能用舊資訊回答，而且語氣很自然。它甚至可能不知道自家最新推出的功能。</p>
     <p><strong>怎麼避免</strong>：</p>
     <ul>
@@ -6286,7 +6302,7 @@ jobs:
             <tr><td><strong>知識截止日</strong></td><td>模型訓練資料的最後日期，之後的事它不知道，要靠搜尋</td><td><a href="#safety">安全與限制</a></td></tr>
             <tr><td><strong>預訓練 / 微調</strong></td><td>先讀海量文字學會語言（預訓練），再訓練成有幫助的助手（微調）</td><td><a href="#aifluency">AI 素養</a></td></tr>
             <tr><td><strong>Adaptive thinking / Effort</strong></td><td>現行主力模型回答前會自己決定要想多深（adaptive thinking），你用 effort（low～max）調深淺；較舊模型與 Haiku 4.5 則用 extended thinking 手動給預算</td><td><a href="#features">功能字典</a></td></tr>
-            <tr><td><strong>Temperature</strong></td><td>舊式的「隨機程度」參數；現行模型（Opus 4.7 以後、Sonnet 5、Fable 5 以後）設成非預設值會直接回 400 錯誤，改用提示詞描述風格</td><td><a href="#api">API 與 JSON</a></td></tr>
+            <tr><td><strong>Temperature</strong></td><td>舊式的「隨機程度」參數；現行模型（Opus 4.7 以後、Sonnet 5 以後、Fable 5 以後）設成非預設值會直接回 400 錯誤，改用提示詞描述風格</td><td><a href="#api">API 與 JSON</a></td></tr>
             <tr><td><strong>Agent（代理）</strong></td><td>AI 在「用工具→看結果→再決定」的循環裡，自己完成多步驟任務</td><td><a href="#pipeline">一則訊息的旅程</a></td></tr>
             <tr><td><strong>RAG / 嵌入</strong></td><td>先從你的資料裡找出相關段落（用「嵌入」把文字變成可比較相似度的數字），再讓 AI 根據它回答，減少亂編</td><td><a href="#extensions">開發者延伸</a></td></tr>
             <tr><td><strong>Prompt injection（提示注入）</strong></td><td>網頁、文件或郵件裡藏著「給 AI 的指令」，想騙 AI 做你沒要求的事；讓 AI 讀外部內容時要特別注意</td><td><a href="#safety">安全與限制</a></td></tr>
@@ -6299,7 +6315,7 @@ jobs:
           <thead><tr><th>名詞</th><th>白話解釋</th><th>詳見</th></tr></thead>
           <tbody>
             <tr><td><strong>claude.ai</strong></td><td>Claude 的網頁版／App，最常用的入口</td><td><a href="#claudeai">claude.ai 功能</a></td></tr>
-            <tr><td><strong>Cowork</strong></td><td>把多步驟工作交給 Claude 去做的方式；網頁、手機、桌面都能用，桌面版才能動你電腦上的檔案；正與一般對話整合</td><td><a href="#cowork">Cowork</a></td></tr>
+            <tr><td><strong>Cowork</strong></td><td>把多步驟工作交給 Claude 去做的方式；網頁、手機、桌面都能用，要動你電腦上的檔案需開著桌面版並連線；已與一般對話整合成同一個 Claude</td><td><a href="#cowork">Cowork</a></td></tr>
             <tr><td><strong>Claude Code</strong></td><td>會親自讀寫檔案、跑指令的寫程式助手</td><td><a href="#claudecode">Claude Code 入門</a></td></tr>
             <tr><td><strong>雲端工作階段</strong></td><td>把 Claude Code 任務交給雲端的臨時電腦跑，你的電腦可以關機</td><td><a href="#claudecode">Claude Code 入門</a></td></tr>
             <tr><td><strong>Remote Control</strong></td><td>用手機或網頁遙控你電腦上正在跑的 Claude Code（那台電腦要開著）</td><td><a href="#claudecode">Claude Code 入門</a></td></tr>
@@ -6427,7 +6443,7 @@ jobs:
           <li><a href="https://code.claude.com/docs/en/overview" target="_blank" rel="noopener">Claude Code 文件</a></li>
           <li><a href="https://support.claude.com" target="_blank" rel="noopener">claude.ai 使用說明</a></li>
           <li><a href="https://claude.com/docs" target="_blank" rel="noopener">Claude 產品文件（claude.com/docs）</a> — Cowork、連接器、Skills、Claude Tag、Microsoft 365 等產品說明</li>
-          <li><a href="https://platform.claude.com/docs/en/about-claude/models/overview" target="_blank" rel="noopener">模型總覽</a>與<a href="https://platform.claude.com/docs/en/about-claude/model-deprecations" target="_blank" rel="noopener">模型生命週期表</a> — 模型與價格變動最快，以這兩頁為準</li>
+          <li><a href="https://platform.claude.com/docs/en/models/overview" target="_blank" rel="noopener">模型總覽</a>與<a href="https://platform.claude.com/docs/en/about-claude/model-deprecations" target="_blank" rel="noopener">模型生命週期表</a> — 模型與價格變動最快，以這兩頁為準</li>
           <li><a href="https://privacy.claude.com" target="_blank" rel="noopener">Anthropic 隱私中心</a> — 資料保留、訓練設定等最新規則</li>
           <li><a href="https://status.claude.com" target="_blank" rel="noopener">服務狀態頁</a> — 覺得 Claude 怪怪的、連不上時先來這裡看</li>
           <li><a href="https://www.youtube.com/watch?v=atqcAb7MFAM" target="_blank" rel="noopener">給非技術人員的 GitHub 教學（Gary Chen，中文）</a> — 19 分鐘影片，白話講 Git/GitHub、commit、branch、worktree、PR 與「改壞怎麼救」，對應本站 <a href="#gitflow">Git 與 GitHub 章</a></li>
@@ -6439,7 +6455,7 @@ jobs:
     </section>
 
     <footer>
-      claude.guide.json · 2026-06 建立 · 2026-09 更新，部分名稱與版本以官方文件最新狀態為準
+      claude.guide.json · 2026-06 建立 · 2026-10 更新，部分名稱與版本以官方文件最新狀態為準
       <div class="links">
         <span>各章程式碼區塊右上角都有「複製」按鈕，可直接取用</span>
         <span>✦ <a href="quiz.html">精靈試煉：66 題闖關小測驗</a></span>
