@@ -180,7 +180,7 @@
     border-radius:10px;
     padding:1.4rem 1.6rem;
     color:var(--ink-soft);
-    max-width:560px;
+    width:44rem;max-width:100%;overflow-x:auto;
     box-shadow:0 18px 50px -24px rgba(0,0,0,.6);
   }
   .hero-term .tt-line{white-space:pre;}
@@ -317,7 +317,12 @@
   .content > .closing-brace::before{content:'';}
 
   /* ---------- Tables ---------- */
-  .content > .table-wrap{overflow-x:auto;margin:1.1rem 0 1.4rem;}
+  /* 表格可以比正文寬：最寬 1180px 或到視窗右緣；欄位多時給最小欄寬、橫向捲動，不再擠成一字一行 */
+  .content > .table-wrap{overflow-x:auto;margin:1.1rem 0 1.4rem;width:max-content;min-width:100%;max-width:min(1180px, calc(100vw - 268px - 9rem));}
+  .table-wrap th,.table-wrap td{min-width:7.5em;}
+  .table-wrap th:first-child,.table-wrap td:first-child{min-width:6em;}
+  .table-wrap td code{white-space:nowrap;}
+  @media (max-width:1023px){ .content > .table-wrap{max-width:calc(100vw - 5.5rem);} }
   .content details.more{margin:1rem 0 1.3rem;background:var(--bg-panel);border:1px solid var(--border);border-radius:8px;padding:.2rem 1rem;}
   .content details.more > summary{cursor:pointer;padding:.6rem 0;color:var(--key-blue);font-weight:600;}
   .content details.more[open] > summary{border-bottom:1px solid var(--border);margin-bottom:.6rem;}
@@ -6162,6 +6167,12 @@ const io = new IntersectionObserver((entries)=>{
   });
 }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
 targets.forEach(t => t && io.observe(t));
+
+// ---------- 表格：文字多的欄位給較寬的最小寬度，避免擠成一字一行 ----------
+document.querySelectorAll('.table-wrap td').forEach(td=>{
+  const n = td.textContent.trim().length;
+  if(n > 90) td.style.minWidth = '17em'; else if(n > 45) td.style.minWidth = '12em';
+});
 
 // ---------- hero typing animation ----------
 const typeEl = document.getElementById('typeLine');
