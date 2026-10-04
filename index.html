@@ -18,7 +18,7 @@
     --ink:#2b2320;            /* 內文 */
     --ink-soft:#5b4e46;       /* 次要文字 */
     --ink-faint:#8d8076;      /* 註記 */
-    --key-blue:#2d6a86;       /* 連結、資訊色 */
+    --key-blue:#1f5f6e;       /* 冷色輔助：連結、技術標籤 */
     --string-amber:#b4561a;   /* 赭橘（文字用，較深以確保對比） */
     --accent:#d9772b;         /* 赭橘（裝飾用） */
     --type-violet:#7a4e8a;
@@ -36,8 +36,8 @@
   body{
     margin:0;
     background:var(--bg-deep);
-    background-image:radial-gradient(rgba(120,90,60,.035) 1px, transparent 1px);
-    background-size:4px 4px;
+    background-image:linear-gradient(rgba(120,90,60,.045) 1px, transparent 1px),linear-gradient(90deg, rgba(120,90,60,.045) 1px, transparent 1px);
+    background-size:28px 28px;
     color:var(--ink);
     font-family:var(--sans);
     font-size:17px;
@@ -45,7 +45,7 @@
     -webkit-font-smoothing:antialiased;
   }
   ::selection{background:#f2c9a6;color:var(--ink);}
-  a{color:var(--key-blue);text-decoration:underline;text-decoration-color:rgba(45,106,134,.3);text-underline-offset:3px;}
+  a{color:var(--key-blue);text-decoration:underline;text-decoration-color:rgba(31,95,110,.3);text-underline-offset:3px;}
   a:hover{color:var(--string-amber);text-decoration-color:currentColor;}
   code,.mono{font-family:var(--mono);}
 
@@ -77,11 +77,26 @@
   nav.tree a.active .nl .zh,nav.tree a.active .idx{color:var(--string-amber);font-weight:700;}
   nav.tree a.nav-quiz .idx,nav.tree a.nav-quiz .nl .zh{color:var(--green);}
   .sidebar-foot{padding:1.2rem 1.4rem 0;margin-top:1.2rem;border-top:1px solid var(--border);font-size:.74rem;color:var(--ink-faint);line-height:1.7;}
-  .brand-cat{height:1.5em;width:auto;image-rendering:pixelated;vertical-align:-0.35em;margin-right:.45em;}
+  .brand-cat{height:1.5em;width:auto;vertical-align:-0.35em;margin-right:.45em;flex:none;}
+  /* ---------- 動態睡貓（tools/make-sleepcat.py 產生的 inline SVG） ---------- */
+  .sleepcat{display:block;overflow:visible;}
+  .sleepcat .back-b,.sleepcat .eye-o{opacity:0;}
+  .sleepcat .back-a{animation:cat-exhale 3.6s steps(1) infinite;}
+  .sleepcat .back-b{animation:cat-inhale 3.6s steps(1) infinite;}
+  .sleepcat .ear{animation:cat-ear 9.5s infinite;transform-box:fill-box;}
+  .sleepcat .zz-b,.sleepcat .zz-a{transform-box:fill-box;animation:cat-z 3.2s ease-out infinite;}
+  .sleepcat .zz-a{animation-delay:1.1s;}
+  @keyframes cat-inhale{0%{opacity:0}50%{opacity:1}}
+  @keyframes cat-exhale{0%{opacity:1}50%{opacity:0}}
+  @keyframes cat-ear{0%,88%,92%,96%,100%{transform:translateY(0)}90%,94%{transform:translateY(1px)}}
+  @keyframes cat-z{0%{opacity:0;transform:translate(-1px,2px) scale(.7)}25%{opacity:1}75%{opacity:.85}100%{opacity:0;transform:translate(1px,-2px) scale(1)}}
+  .sleepcat:hover .eye-c,.sleepcat:hover .zz-a,.sleepcat:hover .zz-b{opacity:0;animation:none;}
+  .sleepcat:hover .eye-o{opacity:1;}
+  @media (prefers-reduced-motion:reduce){ .sleepcat *{animation:none!important;} }
 
   /* ---------- 手機頂欄 ---------- */
   .topbar{display:none;position:sticky;top:0;z-index:50;background:#f4ede1;border-bottom:1px solid var(--border);padding:.8rem 1.1rem;align-items:center;justify-content:space-between;}
-  .topbar h1{font-family:var(--serif);font-size:1rem;margin:0;color:var(--ink);font-weight:900;}
+  .topbar h1{font-family:var(--serif);font-size:1rem;margin:0;color:var(--ink);font-weight:900;display:flex;align-items:center;}
   .topbar h1 .b{color:var(--string-amber);}
   .menu-btn{background:none;border:1px solid var(--border);border-radius:6px;color:var(--ink);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
   .menu-btn span,.menu-btn::before,.menu-btn::after{content:'';display:block;width:16px;height:2px;background:var(--ink);position:relative;}
@@ -89,14 +104,17 @@
 
   /* ---------- 封面 ---------- */
   .hero{padding:5rem 2.6rem 3.6rem;max-width:62rem;}
-  .hero-cover{display:flex;align-items:center;gap:2.4rem;flex-wrap:wrap;}
-  .hero-cover img{width:9.5rem;height:auto;image-rendering:pixelated;filter:drop-shadow(0 10px 18px rgba(120,70,30,.18));}
-  .hero .eyebrow{font-family:var(--serif);letter-spacing:.35em;font-size:.82rem;color:var(--string-amber);font-weight:700;}
-  .hero h2{font-family:var(--serif);font-size:clamp(2rem,4.4vw,3.1rem);line-height:1.3;margin:.4rem 0 .9rem;color:var(--ink);font-weight:900;letter-spacing:.04em;}
+  .hero-cover{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2.2rem;align-items:center;}
+  .hero .eyebrow{font-family:var(--mono);letter-spacing:.14em;font-size:.76rem;color:var(--key-blue);font-weight:600;}
+  .hero h2{font-family:var(--serif);font-size:clamp(2rem,4.4vw,3.1rem);line-height:1.3;margin:.5rem 0 .9rem;color:var(--ink);font-weight:900;letter-spacing:.04em;}
   .hero h2 .b{display:block;font-size:.5em;font-weight:600;color:var(--string-amber);letter-spacing:.06em;margin-top:.5rem;}
+  .spec-card{margin:0;position:relative;width:21rem;max-width:100%;border:1px solid var(--border);border-radius:6px;background:#fffdf8;padding:2.2rem 1.1rem .9rem;}
+  .spec-card::before{content:"guide.json";position:absolute;top:0;left:0;right:0;padding:.3rem .8rem;font:500 .7rem var(--mono);color:var(--ink-faint);border-bottom:1px solid var(--border);background:var(--bg-panel-2);}
+  .spec-card .sleepcat{position:absolute;width:5.2rem;right:.9rem;top:-3.1rem;}
+  .spec-card pre{margin:0;font:400 .8rem/1.7 var(--mono);color:var(--ink);white-space:pre;overflow-x:auto;}
   .hero p.lead{color:var(--ink-soft);font-size:1.08rem;max-width:40rem;margin:1.4rem 0 1.2rem;}
   .hero .meta{font-size:.84rem;color:var(--ink-faint);letter-spacing:.04em;}
-  .hero-note{display:flex;gap:.8rem;align-items:flex-start;max-width:44rem;margin:1.2rem 0 0;padding:.8rem 1rem;border:1px solid var(--border);border-radius:10px;background:var(--bg-panel);color:var(--ink-soft);font-size:.88rem;line-height:1.7;}
+  .hero-note{display:block;gap:.8rem;align-items:flex-start;max-width:44rem;margin:1.2rem 0 0;padding:.8rem 1rem;border:1px solid var(--border);border-radius:6px;background:var(--bg-panel);color:var(--ink-soft);font-size:.88rem;line-height:1.7;}
   .hero-cat{width:2.4rem;height:auto;flex:none;image-rendering:pixelated;}
   .scroll-cue{margin-top:1.6rem;font-size:.86rem;color:var(--ink-soft);display:flex;align-items:center;gap:.5rem;}
   .scroll-cue .arrow{color:var(--accent);animation:bob 1.6s ease-in-out infinite;}
@@ -107,17 +125,17 @@
   section.chapter{max-width:62rem;padding:3.2rem 2.6rem 2.6rem;scroll-margin-top:1rem;border-top:1px solid var(--border);}
   .chap-head{margin-bottom:.4rem;}
   .chap-head .brace{display:none;}
-  .chap-head .chap-no{display:block;font-family:var(--serif);font-size:.86rem;font-weight:700;letter-spacing:.16em;color:var(--string-amber);margin-bottom:.2rem;}
+  .chap-head .chap-no{display:block;width:fit-content;font-family:var(--mono);font-size:.76rem;font-weight:600;letter-spacing:.12em;color:var(--key-blue);border:1px solid currentColor;border-radius:3px;padding:0 .45rem;margin-bottom:.55rem;}
   .chap-head h2{font-family:var(--serif);font-size:clamp(1.7rem,3vw,2.2rem);margin:0;color:var(--ink);font-weight:900;letter-spacing:.04em;line-height:1.35;}
   .chap-head h2::after{content:"";display:block;width:3.2rem;height:3px;background:var(--accent);border-radius:2px;margin-top:.8rem;}
   .chap-sub{font-size:.95rem;color:var(--ink-soft);margin:.7rem 0 1.8rem;}
   .content{position:relative;}
   .content > *{position:relative;max-width:var(--content-max);}
   .content > .closing-brace{display:none;}
-  .content > h3{font-family:var(--serif);font-size:1.32rem;color:var(--ink);margin:2.6rem 0 .8rem;font-weight:900;letter-spacing:.03em;padding-left:.75rem;border-left:4px solid var(--accent);line-height:1.4;}
+  .content > h3{font-family:var(--serif);font-size:1.32rem;color:var(--ink);margin:2.6rem 0 .8rem;font-weight:900;letter-spacing:.03em;padding-left:.7rem;border-left:3px solid var(--accent);line-height:1.4;}
   .content h4{font-family:var(--serif);font-size:1.08rem;color:var(--ink);margin:1.8rem 0 .5rem;font-weight:700;}
   .content > p{margin:1rem 0;color:var(--ink);}
-  .content > p.note{color:var(--ink-soft);background:var(--bg-panel);border:1px solid var(--border);border-left:4px solid var(--accent);padding:.9rem 1.15rem;border-radius:0 10px 10px 0;font-size:.95rem;}
+  .content > p.note{color:var(--ink-soft);background:var(--bg-panel);border:1px solid var(--border);border-left:4px solid var(--accent);padding:.9rem 1.15rem;border-radius:0 6px 6px 0;font-size:.95rem;}
   .content > ul,.content > ol{margin:1rem 0;padding-left:1.4rem;color:var(--ink);}
   .content li{margin:.4rem 0;}
   .content li::marker{color:var(--accent);}
@@ -125,12 +143,12 @@
   .content code.inline{overflow-wrap:anywhere;background:#efe5d4;border:1px solid var(--border);border-radius:4px;padding:.05rem .38rem;font-size:.84em;color:#8a3f10;}
 
   /* 白話一句：橘貓書籤 */
-  .content > p.eli5{color:var(--ink);background:#fff8ec;border:1px solid #f0d9bd;border-left:4px solid var(--accent);padding:1rem 1.2rem;border-radius:0 12px 12px 0;font-size:1.02rem;margin:0 0 1.8rem;box-shadow:0 6px 18px -14px rgba(150,90,40,.5);}
-  .eli5-tag{display:inline-flex;align-items:center;font:700 .76rem var(--sans);color:#fff;background:var(--accent);border-radius:99px;padding:.12rem .6rem .12rem .35rem;margin-right:.6rem;vertical-align:.12em;letter-spacing:.06em;}
+  .content > p.eli5{color:var(--ink);background:#fff8ec;border:1px solid #f0d9bd;border-left:4px solid var(--accent);padding:1rem 1.2rem;border-radius:0 6px 6px 0;font-size:1.02rem;margin:0 0 1.8rem;}
+  .eli5-tag{display:inline-flex;align-items:center;font:700 .76rem var(--sans);color:#fff;background:var(--string-amber);border-radius:3px;padding:.12rem .6rem .12rem .35rem;margin-right:.6rem;vertical-align:.12em;letter-spacing:.06em;}
   .eli5-tag::before{content:"";display:inline-block;width:1.25em;height:1.1em;margin-right:.3em;background:url(assets/logo/pixel-cat.svg) no-repeat center/contain;image-rendering:pixelated;}
 
   /* ---------- 表格 ---------- */
-  .content > .table-wrap{overflow-x:auto;margin:1.3rem 0 1.6rem;width:max-content;min-width:100%;max-width:min(1180px, calc(100vw - 268px - 6rem));border:1px solid var(--border);border-radius:10px;background:#fffdf8;}
+  .content > .table-wrap{overflow-x:auto;margin:1.3rem 0 1.6rem;width:max-content;min-width:100%;max-width:min(1180px, calc(100vw - 268px - 6rem));border:1px solid var(--border);border-radius:6px;background:#fffdf8;}
   .table-wrap th,.table-wrap td{min-width:7.5em;}
   .table-wrap th:first-child,.table-wrap td:first-child{min-width:6em;}
   .table-wrap td code{white-space:nowrap;}
@@ -138,7 +156,7 @@
   /* 沒包在 .table-wrap 裡的表格（例如卡片內）也要能橫向捲動，不撐開整頁 */
   .content table{max-width:100%;}
   .content :not(.table-wrap) > table{display:block;overflow-x:auto;}
-  thead th{background:var(--bg-panel-2);color:var(--ink);font-family:var(--serif);font-weight:700;text-align:left;padding:.65rem .95rem;font-size:.86rem;border-bottom:2px solid var(--border);}
+  thead th{background:var(--bg-panel-2);color:var(--ink);font-family:var(--mono),var(--sans);font-weight:600;text-align:left;padding:.6rem .95rem;font-size:.8rem;letter-spacing:.02em;border-bottom:1px solid var(--ink-faint);}
   tbody td{padding:.65rem .95rem;border-bottom:1px solid var(--border-soft);color:var(--ink-soft);vertical-align:top;line-height:1.7;}
   tbody tr:nth-child(even) td{background:rgba(243,236,223,.45);}
   tbody tr:last-child td{border-bottom:none;}
@@ -146,17 +164,17 @@
   tbody td code{color:#8a3f10;font-family:var(--mono);font-size:.85em;}
 
   /* ---------- 折疊、圖表、步驟 ---------- */
-  .content details.more{margin:1.1rem 0 1.4rem;background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;padding:.2rem 1.1rem;}
+  .content details.more{margin:1.1rem 0 1.4rem;background:var(--bg-panel);border:1px solid var(--border);border-radius:6px;padding:.2rem 1.1rem;}
   .content details.more > summary{cursor:pointer;padding:.65rem 0;color:var(--string-amber);font-weight:700;}
   .content details.more[open] > summary{border-bottom:1px solid var(--border);margin-bottom:.6rem;}
-  .diagram-wrap{margin:1.3rem 0 1.6rem;padding:1.1rem;background:#fffdf8;border:1px solid var(--border);border-radius:12px;}
+  .diagram-wrap{margin:1.3rem 0 1.6rem;padding:1.1rem;background:#fffdf8;border:1px solid var(--border);border-radius:6px;}
   .fig-cap{margin:.7rem 0 0;font-size:.84rem;color:var(--ink-soft);text-align:center;}
   .steps{margin:1.1rem 0;display:flex;flex-direction:column;gap:.7rem;}
   .steps .step{display:flex;gap:.75rem;align-items:flex-start;}
-  .steps .sn{flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font:700 13px var(--sans);display:flex;align-items:center;justify-content:center;margin-top:.15rem;}
+  .steps .sn{flex:none;width:24px;height:24px;border-radius:3px;background:var(--ink);color:#fff8ee;font:600 12px var(--mono);display:flex;align-items:center;justify-content:center;margin-top:.15rem;}
 
   /* ---------- 程式碼區塊：淺色 ---------- */
-  .content > .code-block{margin:1.3rem 0 1.6rem;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fbf7f0;}
+  .content > .code-block{margin:1.3rem 0 1.6rem;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:#fbf7f0;}
   .code-block .cb-head{display:flex;align-items:center;justify-content:space-between;background:var(--bg-panel-2);padding:.45rem .95rem;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:.74rem;color:var(--ink-soft);}
   .code-block .dots{display:flex;gap:.35rem;}
   .code-block .dots span{width:9px;height:9px;border-radius:50%;background:#d8c9b2;}
@@ -173,24 +191,24 @@
   .tok-keyword{color:#7a4e8a;font-weight:600;}
 
   /* ---------- 流程圖 ---------- */
-  .content > .flow{margin:1.3rem 0 1.6rem;background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;padding:1.2rem 1.3rem;font-size:.9rem;}
-  .flow .fstep{padding:.55rem .8rem;border-radius:8px;background:#fffdf8;color:var(--ink);border:1px solid var(--border);border-left:4px solid var(--key-blue);}
+  .content > .flow{margin:1.3rem 0 1.6rem;background:var(--bg-panel);border:1px solid var(--border);border-radius:6px;padding:1.2rem 1.3rem;font-size:.9rem;}
+  .flow .fstep{padding:.55rem .8rem;border-radius:6px;background:#fffdf8;color:var(--ink);border:1px solid var(--border);border-left:4px solid var(--key-blue);}
   .flow .fstep.you{border-left-color:var(--accent);}
   .flow .fstep .lab{color:var(--ink-faint);font-size:.76rem;display:block;margin-bottom:.15rem;}
   .flow .farrow{text-align:center;color:var(--accent);padding:.25rem 0;}
 
   /* ---------- 卡片 ---------- */
   .content > .card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin:1.3rem 0 1.6rem;}
-  .card{background:#fffdf8;border:1px solid var(--border);border-radius:12px;padding:1.05rem 1.15rem;}
+  .card{background:#fffdf8;border:1px solid var(--border);border-radius:6px;padding:1.05rem 1.15rem;}
   .card .ck{font-family:var(--serif);color:var(--ink);font-size:1rem;font-weight:900;display:block;margin-bottom:.4rem;}
   .card p{margin:0;color:var(--ink-soft);font-size:.92rem;line-height:1.7;}
   .card.feature{grid-column:1/-1;border-color:#f0c9a3;background:#fff6ea;}
   .card.feature .ck{color:var(--string-amber);font-size:1.08rem;}
-  .pill{display:inline-block;font-size:.74rem;color:var(--type-violet);border:1px solid var(--border);background:#fffdf8;border-radius:99px;padding:.1rem .6rem;margin:0 .25rem .25rem 0;}
+  .pill{display:inline-block;font-size:.74rem;color:var(--type-violet);border:1px solid var(--border);background:#fffdf8;border-radius:3px;padding:.1rem .6rem;margin:0 .25rem .25rem 0;}
 
   /* ---------- 定義卡 ---------- */
   .content > .def-stack{display:flex;flex-direction:column;gap:1rem;margin:1.3rem 0 1.6rem;}
-  .def-card{background:#fffdf8;border:1px solid var(--border);border-radius:12px;padding:1.15rem 1.35rem;}
+  .def-card{background:#fffdf8;border:1px solid var(--border);border-radius:6px;padding:1.15rem 1.35rem;}
   .def-card h4{margin:0 0 .85rem;font-family:var(--serif);color:var(--ink);font-size:1.08rem;font-weight:900;display:flex;align-items:center;gap:.55rem;}
   .def-card h4 .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;}
   .def-list{margin:0;display:grid;grid-template-columns:5.5rem minmax(0,1fr);row-gap:.7rem;column-gap:1rem;}
@@ -213,7 +231,8 @@
     .scrim.show{display:block;}
     section.chapter{padding:2.4rem 1.3rem 1.8rem;}
     .hero{padding:2.6rem 1.3rem 2.4rem;}
-    .hero-cover img{width:6rem;}
+    .hero-cover{grid-template-columns:1fr;}
+    .spec-card{margin-top:2.6rem;}
     .content > .card-grid{grid-template-columns:1fr;}
     .content > .table-wrap{max-width:calc(100vw - 2.6rem);}
     footer{padding:1.6rem 1.3rem 3rem;}
@@ -233,7 +252,7 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <div class="tag">// unofficial · 非官方</div>
-      <h1><img class="brand-cat" src="assets/logo/pixel-cat-sleep.svg" alt="">Claude 全貌指南</h1>
+      <h1><svg class="sleepcat brand-cat" viewBox="0 0 24 18" shape-rendering="crispEdges" role="img" aria-label="睡覺的橘貓"><g class="base"><rect x="3" y="5" width="1" height="1" fill="#3b2416"/><rect x="2" y="6" width="1" height="1" fill="#3b2416"/><rect x="3" y="6" width="1" height="1" fill="#f28c28"/><rect x="4" y="6" width="1" height="1" fill="#3b2416"/><rect x="2" y="7" width="1" height="1" fill="#3b2416"/><rect x="3" y="7" width="1" height="1" fill="#ff9db0"/><rect x="4" y="7" width="1" height="1" fill="#f28c28"/><rect x="5" y="7" width="1" height="1" fill="#3b2416"/><rect x="6" y="7" width="1" height="1" fill="#3b2416"/><rect x="7" y="7" width="1" height="1" fill="#3b2416"/><rect x="1" y="8" width="1" height="1" fill="#3b2416"/><rect x="2" y="8" width="1" height="1" fill="#f28c28"/><rect x="3" y="8" width="1" height="1" fill="#f28c28"/><rect x="4" y="8" width="1" height="1" fill="#f28c28"/><rect x="5" y="8" width="1" height="1" fill="#f28c28"/><rect x="6" y="8" width="1" height="1" fill="#f28c28"/><rect x="7" y="8" width="1" height="1" fill="#f28c28"/><rect x="8" y="8" width="1" height="1" fill="#f28c28"/><rect x="9" y="8" width="1" height="1" fill="#f28c28"/><rect x="10" y="8" width="1" height="1" fill="#f28c28"/><rect x="11" y="8" width="1" height="1" fill="#3b2416"/><rect x="1" y="9" width="1" height="1" fill="#3b2416"/><rect x="2" y="9" width="1" height="1" fill="#f28c28"/><rect x="3" y="9" width="1" height="1" fill="#c4621a"/><rect x="4" y="9" width="1" height="1" fill="#f28c28"/><rect x="5" y="9" width="1" height="1" fill="#f28c28"/><rect x="6" y="9" width="1" height="1" fill="#f28c28"/><rect x="7" y="9" width="1" height="1" fill="#f28c28"/><rect x="8" y="9" width="1" height="1" fill="#f28c28"/><rect x="9" y="9" width="1" height="1" fill="#c4621a"/><rect x="10" y="9" width="1" height="1" fill="#f28c28"/><rect x="11" y="9" width="1" height="1" fill="#3b2416"/><rect x="0" y="10" width="1" height="1" fill="#3b2416"/><rect x="1" y="10" width="1" height="1" fill="#f28c28"/><rect x="2" y="10" width="1" height="1" fill="#f28c28"/><rect x="3" y="10" width="1" height="1" fill="#f28c28"/><rect x="4" y="10" width="1" height="1" fill="#f28c28"/><rect x="5" y="10" width="1" height="1" fill="#f28c28"/><rect x="6" y="10" width="1" height="1" fill="#f28c28"/><rect x="7" y="10" width="1" height="1" fill="#f28c28"/><rect x="8" y="10" width="1" height="1" fill="#f28c28"/><rect x="9" y="10" width="1" height="1" fill="#f28c28"/><rect x="10" y="10" width="1" height="1" fill="#f28c28"/><rect x="11" y="10" width="1" height="1" fill="#f28c28"/><rect x="12" y="10" width="1" height="1" fill="#f28c28"/><rect x="13" y="10" width="1" height="1" fill="#c4621a"/><rect x="14" y="10" width="1" height="1" fill="#f28c28"/><rect x="15" y="10" width="1" height="1" fill="#f28c28"/><rect x="16" y="10" width="1" height="1" fill="#c4621a"/><rect x="17" y="10" width="1" height="1" fill="#f28c28"/><rect x="18" y="10" width="1" height="1" fill="#3b2416"/><rect x="0" y="11" width="1" height="1" fill="#3b2416"/><rect x="1" y="11" width="1" height="1" fill="#f28c28"/><rect x="5" y="11" width="1" height="1" fill="#f28c28"/><rect x="6" y="11" width="1" height="1" fill="#f28c28"/><rect x="7" y="11" width="1" height="1" fill="#f28c28"/><rect x="11" y="11" width="1" height="1" fill="#f28c28"/><rect x="12" y="11" width="1" height="1" fill="#f28c28"/><rect x="13" y="11" width="1" height="1" fill="#f28c28"/><rect x="14" y="11" width="1" height="1" fill="#f28c28"/><rect x="15" y="11" width="1" height="1" fill="#f28c28"/><rect x="16" y="11" width="1" height="1" fill="#f28c28"/><rect x="17" y="11" width="1" height="1" fill="#f28c28"/><rect x="18" y="11" width="1" height="1" fill="#f28c28"/><rect x="19" y="11" width="1" height="1" fill="#3b2416"/><rect x="0" y="12" width="1" height="1" fill="#3b2416"/><rect x="1" y="12" width="1" height="1" fill="#ff9db0"/><rect x="2" y="12" width="1" height="1" fill="#f28c28"/><rect x="3" y="12" width="1" height="1" fill="#f28c28"/><rect x="4" y="12" width="1" height="1" fill="#f28c28"/><rect x="5" y="12" width="1" height="1" fill="#ff9db0"/><rect x="6" y="12" width="1" height="1" fill="#ff9db0"/><rect x="7" y="12" width="1" height="1" fill="#f28c28"/><rect x="8" y="12" width="1" height="1" fill="#f28c28"/><rect x="9" y="12" width="1" height="1" fill="#f28c28"/><rect x="10" y="12" width="1" height="1" fill="#ff9db0"/><rect x="11" y="12" width="1" height="1" fill="#f28c28"/><rect x="12" y="12" width="1" height="1" fill="#f28c28"/><rect x="13" y="12" width="1" height="1" fill="#f28c28"/><rect x="14" y="12" width="1" height="1" fill="#f28c28"/><rect x="15" y="12" width="1" height="1" fill="#c4621a"/><rect x="16" y="12" width="1" height="1" fill="#f28c28"/><rect x="17" y="12" width="1" height="1" fill="#f28c28"/><rect x="18" y="12" width="1" height="1" fill="#f28c28"/><rect x="19" y="12" width="1" height="1" fill="#3b2416"/><rect x="1" y="13" width="1" height="1" fill="#3b2416"/><rect x="2" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="3" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="4" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="5" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="6" y="13" width="1" height="1" fill="#3b2416"/><rect x="7" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="8" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="9" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="10" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="11" y="13" width="1" height="1" fill="#3b2416"/><rect x="12" y="13" width="1" height="1" fill="#f28c28"/><rect x="13" y="13" width="1" height="1" fill="#f28c28"/><rect x="14" y="13" width="1" height="1" fill="#f28c28"/><rect x="15" y="13" width="1" height="1" fill="#f28c28"/><rect x="16" y="13" width="1" height="1" fill="#f28c28"/><rect x="17" y="13" width="1" height="1" fill="#f28c28"/><rect x="18" y="13" width="1" height="1" fill="#f28c28"/><rect x="19" y="13" width="1" height="1" fill="#f28c28"/><rect x="20" y="13" width="1" height="1" fill="#3b2416"/><rect x="1" y="14" width="1" height="1" fill="#3b2416"/><rect x="2" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="3" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="4" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="5" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="6" y="14" width="1" height="1" fill="#3b2416"/><rect x="7" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="8" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="9" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="10" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="11" y="14" width="1" height="1" fill="#3b2416"/><rect x="12" y="14" width="1" height="1" fill="#f28c28"/><rect x="13" y="14" width="1" height="1" fill="#f28c28"/><rect x="14" y="14" width="1" height="1" fill="#f28c28"/><rect x="15" y="14" width="1" height="1" fill="#f28c28"/><rect x="16" y="14" width="1" height="1" fill="#f28c28"/><rect x="17" y="14" width="1" height="1" fill="#f28c28"/><rect x="18" y="14" width="1" height="1" fill="#c4621a"/><rect x="19" y="14" width="1" height="1" fill="#f28c28"/><rect x="20" y="14" width="1" height="1" fill="#3b2416"/><rect x="2" y="15" width="1" height="1" fill="#3b2416"/><rect x="3" y="15" width="1" height="1" fill="#3b2416"/><rect x="4" y="15" width="1" height="1" fill="#3b2416"/><rect x="5" y="15" width="1" height="1" fill="#3b2416"/><rect x="6" y="15" width="1" height="1" fill="#3b2416"/><rect x="7" y="15" width="1" height="1" fill="#3b2416"/><rect x="8" y="15" width="1" height="1" fill="#3b2416"/><rect x="9" y="15" width="1" height="1" fill="#3b2416"/><rect x="10" y="15" width="1" height="1" fill="#3b2416"/><rect x="11" y="15" width="1" height="1" fill="#f28c28"/><rect x="12" y="15" width="1" height="1" fill="#f28c28"/><rect x="13" y="15" width="1" height="1" fill="#f28c28"/><rect x="14" y="15" width="1" height="1" fill="#f28c28"/><rect x="15" y="15" width="1" height="1" fill="#f28c28"/><rect x="16" y="15" width="1" height="1" fill="#c4621a"/><rect x="17" y="15" width="1" height="1" fill="#c4621a"/><rect x="18" y="15" width="1" height="1" fill="#f28c28"/><rect x="19" y="15" width="1" height="1" fill="#3b2416"/><rect x="3" y="16" width="1" height="1" fill="#3b2416"/><rect x="4" y="16" width="1" height="1" fill="#f28c28"/><rect x="5" y="16" width="1" height="1" fill="#f28c28"/><rect x="6" y="16" width="1" height="1" fill="#f28c28"/><rect x="7" y="16" width="1" height="1" fill="#f28c28"/><rect x="8" y="16" width="1" height="1" fill="#f28c28"/><rect x="9" y="16" width="1" height="1" fill="#f28c28"/><rect x="10" y="16" width="1" height="1" fill="#f28c28"/><rect x="11" y="16" width="1" height="1" fill="#f28c28"/><rect x="12" y="16" width="1" height="1" fill="#f28c28"/><rect x="13" y="16" width="1" height="1" fill="#f28c28"/><rect x="14" y="16" width="1" height="1" fill="#f28c28"/><rect x="15" y="16" width="1" height="1" fill="#f28c28"/><rect x="16" y="16" width="1" height="1" fill="#f28c28"/><rect x="17" y="16" width="1" height="1" fill="#f28c28"/><rect x="18" y="16" width="1" height="1" fill="#3b2416"/><rect x="4" y="17" width="1" height="1" fill="#3b2416"/><rect x="5" y="17" width="1" height="1" fill="#3b2416"/><rect x="6" y="17" width="1" height="1" fill="#3b2416"/><rect x="7" y="17" width="1" height="1" fill="#3b2416"/><rect x="8" y="17" width="1" height="1" fill="#3b2416"/><rect x="9" y="17" width="1" height="1" fill="#3b2416"/><rect x="10" y="17" width="1" height="1" fill="#3b2416"/><rect x="11" y="17" width="1" height="1" fill="#3b2416"/><rect x="12" y="17" width="1" height="1" fill="#3b2416"/><rect x="13" y="17" width="1" height="1" fill="#3b2416"/><rect x="14" y="17" width="1" height="1" fill="#3b2416"/><rect x="15" y="17" width="1" height="1" fill="#3b2416"/><rect x="16" y="17" width="1" height="1" fill="#3b2416"/><rect x="17" y="17" width="1" height="1" fill="#3b2416"/></g><g class="ear"><rect x="9" y="5" width="1" height="1" fill="#3b2416"/><rect x="8" y="6" width="1" height="1" fill="#3b2416"/><rect x="9" y="6" width="1" height="1" fill="#f28c28"/><rect x="10" y="6" width="1" height="1" fill="#3b2416"/><rect x="8" y="7" width="1" height="1" fill="#f28c28"/><rect x="9" y="7" width="1" height="1" fill="#ff9db0"/><rect x="10" y="7" width="1" height="1" fill="#3b2416"/></g><g class="back-a"><rect x="12" y="9" width="1" height="1" fill="#3b2416"/><rect x="13" y="9" width="1" height="1" fill="#3b2416"/><rect x="14" y="9" width="1" height="1" fill="#3b2416"/><rect x="15" y="9" width="1" height="1" fill="#3b2416"/><rect x="16" y="9" width="1" height="1" fill="#3b2416"/><rect x="17" y="9" width="1" height="1" fill="#3b2416"/></g><g class="back-b"><rect x="12" y="8" width="1" height="1" fill="#3b2416"/><rect x="13" y="8" width="1" height="1" fill="#3b2416"/><rect x="14" y="8" width="1" height="1" fill="#3b2416"/><rect x="15" y="8" width="1" height="1" fill="#3b2416"/><rect x="16" y="8" width="1" height="1" fill="#3b2416"/><rect x="17" y="8" width="1" height="1" fill="#3b2416"/><rect x="12" y="9" width="1" height="1" fill="#f28c28"/><rect x="13" y="9" width="1" height="1" fill="#f28c28"/><rect x="14" y="9" width="1" height="1" fill="#f28c28"/><rect x="15" y="9" width="1" height="1" fill="#f28c28"/><rect x="16" y="9" width="1" height="1" fill="#f28c28"/><rect x="17" y="9" width="1" height="1" fill="#f28c28"/><rect x="18" y="9" width="1" height="1" fill="#3b2416"/></g><g class="eye-c"><rect x="2" y="11" width="1" height="1" fill="#281c1e"/><rect x="3" y="11" width="1" height="1" fill="#281c1e"/><rect x="4" y="11" width="1" height="1" fill="#281c1e"/><rect x="8" y="11" width="1" height="1" fill="#281c1e"/><rect x="9" y="11" width="1" height="1" fill="#281c1e"/><rect x="10" y="11" width="1" height="1" fill="#281c1e"/></g><g class="eye-o"><rect x="3" y="10" width="1" height="1" fill="#281c1e"/><rect x="3" y="11" width="1" height="1" fill="#281c1e"/><rect x="9" y="10" width="1" height="1" fill="#281c1e"/><rect x="9" y="11" width="1" height="1" fill="#281c1e"/><rect x="2" y="11" width="1" height="1" fill="#f28c28"/><rect x="4" y="11" width="1" height="1" fill="#f28c28"/><rect x="8" y="11" width="1" height="1" fill="#f28c28"/><rect x="10" y="11" width="1" height="1" fill="#f28c28"/></g><g class="zz-b"><rect x="13" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="14" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="15" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="16" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="15" y="5" width="1" height="1" fill="#8fc7ff"/><rect x="14" y="6" width="1" height="1" fill="#8fc7ff"/><rect x="13" y="7" width="1" height="1" fill="#8fc7ff"/><rect x="14" y="7" width="1" height="1" fill="#8fc7ff"/><rect x="15" y="7" width="1" height="1" fill="#8fc7ff"/><rect x="16" y="7" width="1" height="1" fill="#8fc7ff"/></g><g class="zz-a"><rect x="19" y="0" width="1" height="1" fill="#8fc7ff"/><rect x="20" y="0" width="1" height="1" fill="#8fc7ff"/><rect x="21" y="0" width="1" height="1" fill="#8fc7ff"/><rect x="22" y="0" width="1" height="1" fill="#8fc7ff"/><rect x="23" y="0" width="1" height="1" fill="#8fc7ff"/><rect x="22" y="1" width="1" height="1" fill="#8fc7ff"/><rect x="21" y="2" width="1" height="1" fill="#8fc7ff"/><rect x="20" y="3" width="1" height="1" fill="#8fc7ff"/><rect x="19" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="20" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="21" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="22" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="23" y="4" width="1" height="1" fill="#8fc7ff"/></g></svg>Claude 全貌指南</h1>
     </div>
     <nav class="tree">
       <a href="#hero"><span class="idx">◆</span><span class="nl"><span class="zh">前言</span><small>intro</small></span></a>
@@ -274,31 +293,41 @@
 
   <main>
     <div class="topbar">
-      <h1><img class="brand-cat" src="assets/logo/pixel-cat-sleep.svg" alt="">Claude 全貌指南</h1>
+      <h1><svg class="sleepcat brand-cat" viewBox="0 0 24 18" shape-rendering="crispEdges" role="img" aria-label="睡覺的橘貓"><g class="base"><rect x="3" y="5" width="1" height="1" fill="#3b2416"/><rect x="2" y="6" width="1" height="1" fill="#3b2416"/><rect x="3" y="6" width="1" height="1" fill="#f28c28"/><rect x="4" y="6" width="1" height="1" fill="#3b2416"/><rect x="2" y="7" width="1" height="1" fill="#3b2416"/><rect x="3" y="7" width="1" height="1" fill="#ff9db0"/><rect x="4" y="7" width="1" height="1" fill="#f28c28"/><rect x="5" y="7" width="1" height="1" fill="#3b2416"/><rect x="6" y="7" width="1" height="1" fill="#3b2416"/><rect x="7" y="7" width="1" height="1" fill="#3b2416"/><rect x="1" y="8" width="1" height="1" fill="#3b2416"/><rect x="2" y="8" width="1" height="1" fill="#f28c28"/><rect x="3" y="8" width="1" height="1" fill="#f28c28"/><rect x="4" y="8" width="1" height="1" fill="#f28c28"/><rect x="5" y="8" width="1" height="1" fill="#f28c28"/><rect x="6" y="8" width="1" height="1" fill="#f28c28"/><rect x="7" y="8" width="1" height="1" fill="#f28c28"/><rect x="8" y="8" width="1" height="1" fill="#f28c28"/><rect x="9" y="8" width="1" height="1" fill="#f28c28"/><rect x="10" y="8" width="1" height="1" fill="#f28c28"/><rect x="11" y="8" width="1" height="1" fill="#3b2416"/><rect x="1" y="9" width="1" height="1" fill="#3b2416"/><rect x="2" y="9" width="1" height="1" fill="#f28c28"/><rect x="3" y="9" width="1" height="1" fill="#c4621a"/><rect x="4" y="9" width="1" height="1" fill="#f28c28"/><rect x="5" y="9" width="1" height="1" fill="#f28c28"/><rect x="6" y="9" width="1" height="1" fill="#f28c28"/><rect x="7" y="9" width="1" height="1" fill="#f28c28"/><rect x="8" y="9" width="1" height="1" fill="#f28c28"/><rect x="9" y="9" width="1" height="1" fill="#c4621a"/><rect x="10" y="9" width="1" height="1" fill="#f28c28"/><rect x="11" y="9" width="1" height="1" fill="#3b2416"/><rect x="0" y="10" width="1" height="1" fill="#3b2416"/><rect x="1" y="10" width="1" height="1" fill="#f28c28"/><rect x="2" y="10" width="1" height="1" fill="#f28c28"/><rect x="3" y="10" width="1" height="1" fill="#f28c28"/><rect x="4" y="10" width="1" height="1" fill="#f28c28"/><rect x="5" y="10" width="1" height="1" fill="#f28c28"/><rect x="6" y="10" width="1" height="1" fill="#f28c28"/><rect x="7" y="10" width="1" height="1" fill="#f28c28"/><rect x="8" y="10" width="1" height="1" fill="#f28c28"/><rect x="9" y="10" width="1" height="1" fill="#f28c28"/><rect x="10" y="10" width="1" height="1" fill="#f28c28"/><rect x="11" y="10" width="1" height="1" fill="#f28c28"/><rect x="12" y="10" width="1" height="1" fill="#f28c28"/><rect x="13" y="10" width="1" height="1" fill="#c4621a"/><rect x="14" y="10" width="1" height="1" fill="#f28c28"/><rect x="15" y="10" width="1" height="1" fill="#f28c28"/><rect x="16" y="10" width="1" height="1" fill="#c4621a"/><rect x="17" y="10" width="1" height="1" fill="#f28c28"/><rect x="18" y="10" width="1" height="1" fill="#3b2416"/><rect x="0" y="11" width="1" height="1" fill="#3b2416"/><rect x="1" y="11" width="1" height="1" fill="#f28c28"/><rect x="5" y="11" width="1" height="1" fill="#f28c28"/><rect x="6" y="11" width="1" height="1" fill="#f28c28"/><rect x="7" y="11" width="1" height="1" fill="#f28c28"/><rect x="11" y="11" width="1" height="1" fill="#f28c28"/><rect x="12" y="11" width="1" height="1" fill="#f28c28"/><rect x="13" y="11" width="1" height="1" fill="#f28c28"/><rect x="14" y="11" width="1" height="1" fill="#f28c28"/><rect x="15" y="11" width="1" height="1" fill="#f28c28"/><rect x="16" y="11" width="1" height="1" fill="#f28c28"/><rect x="17" y="11" width="1" height="1" fill="#f28c28"/><rect x="18" y="11" width="1" height="1" fill="#f28c28"/><rect x="19" y="11" width="1" height="1" fill="#3b2416"/><rect x="0" y="12" width="1" height="1" fill="#3b2416"/><rect x="1" y="12" width="1" height="1" fill="#ff9db0"/><rect x="2" y="12" width="1" height="1" fill="#f28c28"/><rect x="3" y="12" width="1" height="1" fill="#f28c28"/><rect x="4" y="12" width="1" height="1" fill="#f28c28"/><rect x="5" y="12" width="1" height="1" fill="#ff9db0"/><rect x="6" y="12" width="1" height="1" fill="#ff9db0"/><rect x="7" y="12" width="1" height="1" fill="#f28c28"/><rect x="8" y="12" width="1" height="1" fill="#f28c28"/><rect x="9" y="12" width="1" height="1" fill="#f28c28"/><rect x="10" y="12" width="1" height="1" fill="#ff9db0"/><rect x="11" y="12" width="1" height="1" fill="#f28c28"/><rect x="12" y="12" width="1" height="1" fill="#f28c28"/><rect x="13" y="12" width="1" height="1" fill="#f28c28"/><rect x="14" y="12" width="1" height="1" fill="#f28c28"/><rect x="15" y="12" width="1" height="1" fill="#c4621a"/><rect x="16" y="12" width="1" height="1" fill="#f28c28"/><rect x="17" y="12" width="1" height="1" fill="#f28c28"/><rect x="18" y="12" width="1" height="1" fill="#f28c28"/><rect x="19" y="12" width="1" height="1" fill="#3b2416"/><rect x="1" y="13" width="1" height="1" fill="#3b2416"/><rect x="2" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="3" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="4" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="5" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="6" y="13" width="1" height="1" fill="#3b2416"/><rect x="7" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="8" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="9" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="10" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="11" y="13" width="1" height="1" fill="#3b2416"/><rect x="12" y="13" width="1" height="1" fill="#f28c28"/><rect x="13" y="13" width="1" height="1" fill="#f28c28"/><rect x="14" y="13" width="1" height="1" fill="#f28c28"/><rect x="15" y="13" width="1" height="1" fill="#f28c28"/><rect x="16" y="13" width="1" height="1" fill="#f28c28"/><rect x="17" y="13" width="1" height="1" fill="#f28c28"/><rect x="18" y="13" width="1" height="1" fill="#f28c28"/><rect x="19" y="13" width="1" height="1" fill="#f28c28"/><rect x="20" y="13" width="1" height="1" fill="#3b2416"/><rect x="1" y="14" width="1" height="1" fill="#3b2416"/><rect x="2" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="3" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="4" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="5" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="6" y="14" width="1" height="1" fill="#3b2416"/><rect x="7" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="8" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="9" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="10" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="11" y="14" width="1" height="1" fill="#3b2416"/><rect x="12" y="14" width="1" height="1" fill="#f28c28"/><rect x="13" y="14" width="1" height="1" fill="#f28c28"/><rect x="14" y="14" width="1" height="1" fill="#f28c28"/><rect x="15" y="14" width="1" height="1" fill="#f28c28"/><rect x="16" y="14" width="1" height="1" fill="#f28c28"/><rect x="17" y="14" width="1" height="1" fill="#f28c28"/><rect x="18" y="14" width="1" height="1" fill="#c4621a"/><rect x="19" y="14" width="1" height="1" fill="#f28c28"/><rect x="20" y="14" width="1" height="1" fill="#3b2416"/><rect x="2" y="15" width="1" height="1" fill="#3b2416"/><rect x="3" y="15" width="1" height="1" fill="#3b2416"/><rect x="4" y="15" width="1" height="1" fill="#3b2416"/><rect x="5" y="15" width="1" height="1" fill="#3b2416"/><rect x="6" y="15" width="1" height="1" fill="#3b2416"/><rect x="7" y="15" width="1" height="1" fill="#3b2416"/><rect x="8" y="15" width="1" height="1" fill="#3b2416"/><rect x="9" y="15" width="1" height="1" fill="#3b2416"/><rect x="10" y="15" width="1" height="1" fill="#3b2416"/><rect x="11" y="15" width="1" height="1" fill="#f28c28"/><rect x="12" y="15" width="1" height="1" fill="#f28c28"/><rect x="13" y="15" width="1" height="1" fill="#f28c28"/><rect x="14" y="15" width="1" height="1" fill="#f28c28"/><rect x="15" y="15" width="1" height="1" fill="#f28c28"/><rect x="16" y="15" width="1" height="1" fill="#c4621a"/><rect x="17" y="15" width="1" height="1" fill="#c4621a"/><rect x="18" y="15" width="1" height="1" fill="#f28c28"/><rect x="19" y="15" width="1" height="1" fill="#3b2416"/><rect x="3" y="16" width="1" height="1" fill="#3b2416"/><rect x="4" y="16" width="1" height="1" fill="#f28c28"/><rect x="5" y="16" width="1" height="1" fill="#f28c28"/><rect x="6" y="16" width="1" height="1" fill="#f28c28"/><rect x="7" y="16" width="1" height="1" fill="#f28c28"/><rect x="8" y="16" width="1" height="1" fill="#f28c28"/><rect x="9" y="16" width="1" height="1" fill="#f28c28"/><rect x="10" y="16" width="1" height="1" fill="#f28c28"/><rect x="11" y="16" width="1" height="1" fill="#f28c28"/><rect x="12" y="16" width="1" height="1" fill="#f28c28"/><rect x="13" y="16" width="1" height="1" fill="#f28c28"/><rect x="14" y="16" width="1" height="1" fill="#f28c28"/><rect x="15" y="16" width="1" height="1" fill="#f28c28"/><rect x="16" y="16" width="1" height="1" fill="#f28c28"/><rect x="17" y="16" width="1" height="1" fill="#f28c28"/><rect x="18" y="16" width="1" height="1" fill="#3b2416"/><rect x="4" y="17" width="1" height="1" fill="#3b2416"/><rect x="5" y="17" width="1" height="1" fill="#3b2416"/><rect x="6" y="17" width="1" height="1" fill="#3b2416"/><rect x="7" y="17" width="1" height="1" fill="#3b2416"/><rect x="8" y="17" width="1" height="1" fill="#3b2416"/><rect x="9" y="17" width="1" height="1" fill="#3b2416"/><rect x="10" y="17" width="1" height="1" fill="#3b2416"/><rect x="11" y="17" width="1" height="1" fill="#3b2416"/><rect x="12" y="17" width="1" height="1" fill="#3b2416"/><rect x="13" y="17" width="1" height="1" fill="#3b2416"/><rect x="14" y="17" width="1" height="1" fill="#3b2416"/><rect x="15" y="17" width="1" height="1" fill="#3b2416"/><rect x="16" y="17" width="1" height="1" fill="#3b2416"/><rect x="17" y="17" width="1" height="1" fill="#3b2416"/></g><g class="ear"><rect x="9" y="5" width="1" height="1" fill="#3b2416"/><rect x="8" y="6" width="1" height="1" fill="#3b2416"/><rect x="9" y="6" width="1" height="1" fill="#f28c28"/><rect x="10" y="6" width="1" height="1" fill="#3b2416"/><rect x="8" y="7" width="1" height="1" fill="#f28c28"/><rect x="9" y="7" width="1" height="1" fill="#ff9db0"/><rect x="10" y="7" width="1" height="1" fill="#3b2416"/></g><g class="back-a"><rect x="12" y="9" width="1" height="1" fill="#3b2416"/><rect x="13" y="9" width="1" height="1" fill="#3b2416"/><rect x="14" y="9" width="1" height="1" fill="#3b2416"/><rect x="15" y="9" width="1" height="1" fill="#3b2416"/><rect x="16" y="9" width="1" height="1" fill="#3b2416"/><rect x="17" y="9" width="1" height="1" fill="#3b2416"/></g><g class="back-b"><rect x="12" y="8" width="1" height="1" fill="#3b2416"/><rect x="13" y="8" width="1" height="1" fill="#3b2416"/><rect x="14" y="8" width="1" height="1" fill="#3b2416"/><rect x="15" y="8" width="1" height="1" fill="#3b2416"/><rect x="16" y="8" width="1" height="1" fill="#3b2416"/><rect x="17" y="8" width="1" height="1" fill="#3b2416"/><rect x="12" y="9" width="1" height="1" fill="#f28c28"/><rect x="13" y="9" width="1" height="1" fill="#f28c28"/><rect x="14" y="9" width="1" height="1" fill="#f28c28"/><rect x="15" y="9" width="1" height="1" fill="#f28c28"/><rect x="16" y="9" width="1" height="1" fill="#f28c28"/><rect x="17" y="9" width="1" height="1" fill="#f28c28"/><rect x="18" y="9" width="1" height="1" fill="#3b2416"/></g><g class="eye-c"><rect x="2" y="11" width="1" height="1" fill="#281c1e"/><rect x="3" y="11" width="1" height="1" fill="#281c1e"/><rect x="4" y="11" width="1" height="1" fill="#281c1e"/><rect x="8" y="11" width="1" height="1" fill="#281c1e"/><rect x="9" y="11" width="1" height="1" fill="#281c1e"/><rect x="10" y="11" width="1" height="1" fill="#281c1e"/></g><g class="eye-o"><rect x="3" y="10" width="1" height="1" fill="#281c1e"/><rect x="3" y="11" width="1" height="1" fill="#281c1e"/><rect x="9" y="10" width="1" height="1" fill="#281c1e"/><rect x="9" y="11" width="1" height="1" fill="#281c1e"/><rect x="2" y="11" width="1" height="1" fill="#f28c28"/><rect x="4" y="11" width="1" height="1" fill="#f28c28"/><rect x="8" y="11" width="1" height="1" fill="#f28c28"/><rect x="10" y="11" width="1" height="1" fill="#f28c28"/></g><g class="zz-b"><rect x="13" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="14" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="15" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="16" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="15" y="5" width="1" height="1" fill="#8fc7ff"/><rect x="14" y="6" width="1" height="1" fill="#8fc7ff"/><rect x="13" y="7" width="1" height="1" fill="#8fc7ff"/><rect x="14" y="7" width="1" height="1" fill="#8fc7ff"/><rect x="15" y="7" width="1" height="1" fill="#8fc7ff"/><rect x="16" y="7" width="1" height="1" fill="#8fc7ff"/></g><g class="zz-a"><rect x="19" y="0" width="1" height="1" fill="#8fc7ff"/><rect x="20" y="0" width="1" height="1" fill="#8fc7ff"/><rect x="21" y="0" width="1" height="1" fill="#8fc7ff"/><rect x="22" y="0" width="1" height="1" fill="#8fc7ff"/><rect x="23" y="0" width="1" height="1" fill="#8fc7ff"/><rect x="22" y="1" width="1" height="1" fill="#8fc7ff"/><rect x="21" y="2" width="1" height="1" fill="#8fc7ff"/><rect x="20" y="3" width="1" height="1" fill="#8fc7ff"/><rect x="19" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="20" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="21" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="22" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="23" y="4" width="1" height="1" fill="#8fc7ff"/></g></svg>Claude 全貌指南</h1>
       <button class="menu-btn" id="menuBtn" aria-label="開啟選單"><span></span></button>
     </div>
 
     <!-- ============ HERO ============ -->
     <section class="hero" id="hero">
       <div class="hero-cover">
-        <img src="assets/logo/pixel-cat.svg" alt="橘貓">
-        <div>
-          <div class="eyebrow">非官方學習指南</div>
-      <h2>Claude 全貌指南<span class="b">從「Claude 是什麼」到「做出東西、放上網路」</span></h2>
+        <div class="hero-title">
+          <div class="eyebrow">UNOFFICIAL GUIDE · 非官方學習指南</div>
+          <h2>Claude 全貌指南<span class="b">從「Claude 是什麼」到「做出東西、放上網路」</span></h2>
         </div>
+        <figure class="spec-card" aria-label="這本指南的規格">
+          <svg class="sleepcat" viewBox="0 0 24 18" shape-rendering="crispEdges" role="img" aria-label="睡覺的橘貓"><g class="base"><rect x="3" y="5" width="1" height="1" fill="#3b2416"/><rect x="2" y="6" width="1" height="1" fill="#3b2416"/><rect x="3" y="6" width="1" height="1" fill="#f28c28"/><rect x="4" y="6" width="1" height="1" fill="#3b2416"/><rect x="2" y="7" width="1" height="1" fill="#3b2416"/><rect x="3" y="7" width="1" height="1" fill="#ff9db0"/><rect x="4" y="7" width="1" height="1" fill="#f28c28"/><rect x="5" y="7" width="1" height="1" fill="#3b2416"/><rect x="6" y="7" width="1" height="1" fill="#3b2416"/><rect x="7" y="7" width="1" height="1" fill="#3b2416"/><rect x="1" y="8" width="1" height="1" fill="#3b2416"/><rect x="2" y="8" width="1" height="1" fill="#f28c28"/><rect x="3" y="8" width="1" height="1" fill="#f28c28"/><rect x="4" y="8" width="1" height="1" fill="#f28c28"/><rect x="5" y="8" width="1" height="1" fill="#f28c28"/><rect x="6" y="8" width="1" height="1" fill="#f28c28"/><rect x="7" y="8" width="1" height="1" fill="#f28c28"/><rect x="8" y="8" width="1" height="1" fill="#f28c28"/><rect x="9" y="8" width="1" height="1" fill="#f28c28"/><rect x="10" y="8" width="1" height="1" fill="#f28c28"/><rect x="11" y="8" width="1" height="1" fill="#3b2416"/><rect x="1" y="9" width="1" height="1" fill="#3b2416"/><rect x="2" y="9" width="1" height="1" fill="#f28c28"/><rect x="3" y="9" width="1" height="1" fill="#c4621a"/><rect x="4" y="9" width="1" height="1" fill="#f28c28"/><rect x="5" y="9" width="1" height="1" fill="#f28c28"/><rect x="6" y="9" width="1" height="1" fill="#f28c28"/><rect x="7" y="9" width="1" height="1" fill="#f28c28"/><rect x="8" y="9" width="1" height="1" fill="#f28c28"/><rect x="9" y="9" width="1" height="1" fill="#c4621a"/><rect x="10" y="9" width="1" height="1" fill="#f28c28"/><rect x="11" y="9" width="1" height="1" fill="#3b2416"/><rect x="0" y="10" width="1" height="1" fill="#3b2416"/><rect x="1" y="10" width="1" height="1" fill="#f28c28"/><rect x="2" y="10" width="1" height="1" fill="#f28c28"/><rect x="3" y="10" width="1" height="1" fill="#f28c28"/><rect x="4" y="10" width="1" height="1" fill="#f28c28"/><rect x="5" y="10" width="1" height="1" fill="#f28c28"/><rect x="6" y="10" width="1" height="1" fill="#f28c28"/><rect x="7" y="10" width="1" height="1" fill="#f28c28"/><rect x="8" y="10" width="1" height="1" fill="#f28c28"/><rect x="9" y="10" width="1" height="1" fill="#f28c28"/><rect x="10" y="10" width="1" height="1" fill="#f28c28"/><rect x="11" y="10" width="1" height="1" fill="#f28c28"/><rect x="12" y="10" width="1" height="1" fill="#f28c28"/><rect x="13" y="10" width="1" height="1" fill="#c4621a"/><rect x="14" y="10" width="1" height="1" fill="#f28c28"/><rect x="15" y="10" width="1" height="1" fill="#f28c28"/><rect x="16" y="10" width="1" height="1" fill="#c4621a"/><rect x="17" y="10" width="1" height="1" fill="#f28c28"/><rect x="18" y="10" width="1" height="1" fill="#3b2416"/><rect x="0" y="11" width="1" height="1" fill="#3b2416"/><rect x="1" y="11" width="1" height="1" fill="#f28c28"/><rect x="5" y="11" width="1" height="1" fill="#f28c28"/><rect x="6" y="11" width="1" height="1" fill="#f28c28"/><rect x="7" y="11" width="1" height="1" fill="#f28c28"/><rect x="11" y="11" width="1" height="1" fill="#f28c28"/><rect x="12" y="11" width="1" height="1" fill="#f28c28"/><rect x="13" y="11" width="1" height="1" fill="#f28c28"/><rect x="14" y="11" width="1" height="1" fill="#f28c28"/><rect x="15" y="11" width="1" height="1" fill="#f28c28"/><rect x="16" y="11" width="1" height="1" fill="#f28c28"/><rect x="17" y="11" width="1" height="1" fill="#f28c28"/><rect x="18" y="11" width="1" height="1" fill="#f28c28"/><rect x="19" y="11" width="1" height="1" fill="#3b2416"/><rect x="0" y="12" width="1" height="1" fill="#3b2416"/><rect x="1" y="12" width="1" height="1" fill="#ff9db0"/><rect x="2" y="12" width="1" height="1" fill="#f28c28"/><rect x="3" y="12" width="1" height="1" fill="#f28c28"/><rect x="4" y="12" width="1" height="1" fill="#f28c28"/><rect x="5" y="12" width="1" height="1" fill="#ff9db0"/><rect x="6" y="12" width="1" height="1" fill="#ff9db0"/><rect x="7" y="12" width="1" height="1" fill="#f28c28"/><rect x="8" y="12" width="1" height="1" fill="#f28c28"/><rect x="9" y="12" width="1" height="1" fill="#f28c28"/><rect x="10" y="12" width="1" height="1" fill="#ff9db0"/><rect x="11" y="12" width="1" height="1" fill="#f28c28"/><rect x="12" y="12" width="1" height="1" fill="#f28c28"/><rect x="13" y="12" width="1" height="1" fill="#f28c28"/><rect x="14" y="12" width="1" height="1" fill="#f28c28"/><rect x="15" y="12" width="1" height="1" fill="#c4621a"/><rect x="16" y="12" width="1" height="1" fill="#f28c28"/><rect x="17" y="12" width="1" height="1" fill="#f28c28"/><rect x="18" y="12" width="1" height="1" fill="#f28c28"/><rect x="19" y="12" width="1" height="1" fill="#3b2416"/><rect x="1" y="13" width="1" height="1" fill="#3b2416"/><rect x="2" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="3" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="4" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="5" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="6" y="13" width="1" height="1" fill="#3b2416"/><rect x="7" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="8" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="9" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="10" y="13" width="1" height="1" fill="#ffd9a8"/><rect x="11" y="13" width="1" height="1" fill="#3b2416"/><rect x="12" y="13" width="1" height="1" fill="#f28c28"/><rect x="13" y="13" width="1" height="1" fill="#f28c28"/><rect x="14" y="13" width="1" height="1" fill="#f28c28"/><rect x="15" y="13" width="1" height="1" fill="#f28c28"/><rect x="16" y="13" width="1" height="1" fill="#f28c28"/><rect x="17" y="13" width="1" height="1" fill="#f28c28"/><rect x="18" y="13" width="1" height="1" fill="#f28c28"/><rect x="19" y="13" width="1" height="1" fill="#f28c28"/><rect x="20" y="13" width="1" height="1" fill="#3b2416"/><rect x="1" y="14" width="1" height="1" fill="#3b2416"/><rect x="2" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="3" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="4" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="5" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="6" y="14" width="1" height="1" fill="#3b2416"/><rect x="7" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="8" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="9" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="10" y="14" width="1" height="1" fill="#ffd9a8"/><rect x="11" y="14" width="1" height="1" fill="#3b2416"/><rect x="12" y="14" width="1" height="1" fill="#f28c28"/><rect x="13" y="14" width="1" height="1" fill="#f28c28"/><rect x="14" y="14" width="1" height="1" fill="#f28c28"/><rect x="15" y="14" width="1" height="1" fill="#f28c28"/><rect x="16" y="14" width="1" height="1" fill="#f28c28"/><rect x="17" y="14" width="1" height="1" fill="#f28c28"/><rect x="18" y="14" width="1" height="1" fill="#c4621a"/><rect x="19" y="14" width="1" height="1" fill="#f28c28"/><rect x="20" y="14" width="1" height="1" fill="#3b2416"/><rect x="2" y="15" width="1" height="1" fill="#3b2416"/><rect x="3" y="15" width="1" height="1" fill="#3b2416"/><rect x="4" y="15" width="1" height="1" fill="#3b2416"/><rect x="5" y="15" width="1" height="1" fill="#3b2416"/><rect x="6" y="15" width="1" height="1" fill="#3b2416"/><rect x="7" y="15" width="1" height="1" fill="#3b2416"/><rect x="8" y="15" width="1" height="1" fill="#3b2416"/><rect x="9" y="15" width="1" height="1" fill="#3b2416"/><rect x="10" y="15" width="1" height="1" fill="#3b2416"/><rect x="11" y="15" width="1" height="1" fill="#f28c28"/><rect x="12" y="15" width="1" height="1" fill="#f28c28"/><rect x="13" y="15" width="1" height="1" fill="#f28c28"/><rect x="14" y="15" width="1" height="1" fill="#f28c28"/><rect x="15" y="15" width="1" height="1" fill="#f28c28"/><rect x="16" y="15" width="1" height="1" fill="#c4621a"/><rect x="17" y="15" width="1" height="1" fill="#c4621a"/><rect x="18" y="15" width="1" height="1" fill="#f28c28"/><rect x="19" y="15" width="1" height="1" fill="#3b2416"/><rect x="3" y="16" width="1" height="1" fill="#3b2416"/><rect x="4" y="16" width="1" height="1" fill="#f28c28"/><rect x="5" y="16" width="1" height="1" fill="#f28c28"/><rect x="6" y="16" width="1" height="1" fill="#f28c28"/><rect x="7" y="16" width="1" height="1" fill="#f28c28"/><rect x="8" y="16" width="1" height="1" fill="#f28c28"/><rect x="9" y="16" width="1" height="1" fill="#f28c28"/><rect x="10" y="16" width="1" height="1" fill="#f28c28"/><rect x="11" y="16" width="1" height="1" fill="#f28c28"/><rect x="12" y="16" width="1" height="1" fill="#f28c28"/><rect x="13" y="16" width="1" height="1" fill="#f28c28"/><rect x="14" y="16" width="1" height="1" fill="#f28c28"/><rect x="15" y="16" width="1" height="1" fill="#f28c28"/><rect x="16" y="16" width="1" height="1" fill="#f28c28"/><rect x="17" y="16" width="1" height="1" fill="#f28c28"/><rect x="18" y="16" width="1" height="1" fill="#3b2416"/><rect x="4" y="17" width="1" height="1" fill="#3b2416"/><rect x="5" y="17" width="1" height="1" fill="#3b2416"/><rect x="6" y="17" width="1" height="1" fill="#3b2416"/><rect x="7" y="17" width="1" height="1" fill="#3b2416"/><rect x="8" y="17" width="1" height="1" fill="#3b2416"/><rect x="9" y="17" width="1" height="1" fill="#3b2416"/><rect x="10" y="17" width="1" height="1" fill="#3b2416"/><rect x="11" y="17" width="1" height="1" fill="#3b2416"/><rect x="12" y="17" width="1" height="1" fill="#3b2416"/><rect x="13" y="17" width="1" height="1" fill="#3b2416"/><rect x="14" y="17" width="1" height="1" fill="#3b2416"/><rect x="15" y="17" width="1" height="1" fill="#3b2416"/><rect x="16" y="17" width="1" height="1" fill="#3b2416"/><rect x="17" y="17" width="1" height="1" fill="#3b2416"/></g><g class="ear"><rect x="9" y="5" width="1" height="1" fill="#3b2416"/><rect x="8" y="6" width="1" height="1" fill="#3b2416"/><rect x="9" y="6" width="1" height="1" fill="#f28c28"/><rect x="10" y="6" width="1" height="1" fill="#3b2416"/><rect x="8" y="7" width="1" height="1" fill="#f28c28"/><rect x="9" y="7" width="1" height="1" fill="#ff9db0"/><rect x="10" y="7" width="1" height="1" fill="#3b2416"/></g><g class="back-a"><rect x="12" y="9" width="1" height="1" fill="#3b2416"/><rect x="13" y="9" width="1" height="1" fill="#3b2416"/><rect x="14" y="9" width="1" height="1" fill="#3b2416"/><rect x="15" y="9" width="1" height="1" fill="#3b2416"/><rect x="16" y="9" width="1" height="1" fill="#3b2416"/><rect x="17" y="9" width="1" height="1" fill="#3b2416"/></g><g class="back-b"><rect x="12" y="8" width="1" height="1" fill="#3b2416"/><rect x="13" y="8" width="1" height="1" fill="#3b2416"/><rect x="14" y="8" width="1" height="1" fill="#3b2416"/><rect x="15" y="8" width="1" height="1" fill="#3b2416"/><rect x="16" y="8" width="1" height="1" fill="#3b2416"/><rect x="17" y="8" width="1" height="1" fill="#3b2416"/><rect x="12" y="9" width="1" height="1" fill="#f28c28"/><rect x="13" y="9" width="1" height="1" fill="#f28c28"/><rect x="14" y="9" width="1" height="1" fill="#f28c28"/><rect x="15" y="9" width="1" height="1" fill="#f28c28"/><rect x="16" y="9" width="1" height="1" fill="#f28c28"/><rect x="17" y="9" width="1" height="1" fill="#f28c28"/><rect x="18" y="9" width="1" height="1" fill="#3b2416"/></g><g class="eye-c"><rect x="2" y="11" width="1" height="1" fill="#281c1e"/><rect x="3" y="11" width="1" height="1" fill="#281c1e"/><rect x="4" y="11" width="1" height="1" fill="#281c1e"/><rect x="8" y="11" width="1" height="1" fill="#281c1e"/><rect x="9" y="11" width="1" height="1" fill="#281c1e"/><rect x="10" y="11" width="1" height="1" fill="#281c1e"/></g><g class="eye-o"><rect x="3" y="10" width="1" height="1" fill="#281c1e"/><rect x="3" y="11" width="1" height="1" fill="#281c1e"/><rect x="9" y="10" width="1" height="1" fill="#281c1e"/><rect x="9" y="11" width="1" height="1" fill="#281c1e"/><rect x="2" y="11" width="1" height="1" fill="#f28c28"/><rect x="4" y="11" width="1" height="1" fill="#f28c28"/><rect x="8" y="11" width="1" height="1" fill="#f28c28"/><rect x="10" y="11" width="1" height="1" fill="#f28c28"/></g><g class="zz-b"><rect x="13" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="14" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="15" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="16" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="15" y="5" width="1" height="1" fill="#8fc7ff"/><rect x="14" y="6" width="1" height="1" fill="#8fc7ff"/><rect x="13" y="7" width="1" height="1" fill="#8fc7ff"/><rect x="14" y="7" width="1" height="1" fill="#8fc7ff"/><rect x="15" y="7" width="1" height="1" fill="#8fc7ff"/><rect x="16" y="7" width="1" height="1" fill="#8fc7ff"/></g><g class="zz-a"><rect x="19" y="0" width="1" height="1" fill="#8fc7ff"/><rect x="20" y="0" width="1" height="1" fill="#8fc7ff"/><rect x="21" y="0" width="1" height="1" fill="#8fc7ff"/><rect x="22" y="0" width="1" height="1" fill="#8fc7ff"/><rect x="23" y="0" width="1" height="1" fill="#8fc7ff"/><rect x="22" y="1" width="1" height="1" fill="#8fc7ff"/><rect x="21" y="2" width="1" height="1" fill="#8fc7ff"/><rect x="20" y="3" width="1" height="1" fill="#8fc7ff"/><rect x="19" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="20" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="21" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="22" y="4" width="1" height="1" fill="#8fc7ff"/><rect x="23" y="4" width="1" height="1" fill="#8fc7ff"/></g></svg>
+          <pre><span class="tok-null">{</span>
+  <span class="tok-key">"name"</span>: <span class="tok-string">"Claude"</span>,
+  <span class="tok-key">"made_by"</span>: <span class="tok-string">"Anthropic"</span>,
+  <span class="tok-key">"this_guide"</span>: <span class="tok-string">"unofficial"</span>,
+  <span class="tok-key">"surfaces"</span>: [<span class="tok-string">"claude.ai"</span>, <span class="tok-string">"cowork"</span>,
+               <span class="tok-string">"claude_code"</span>, <span class="tok-string">"api"</span>],
+  <span class="tok-key">"updated"</span>: <span class="tok-string">"2026-10"</span>
+<span class="tok-null">}</span></pre>
+        </figure>
       </div>
       <p class="lead">一份給所有人的 Claude 說明書。不管你只是想跟它聊天、想請它幫你做小工具，還是要把它接進自己的程式——這裡從最白話的地方講起，再一路往深處走。每章開頭都有一句「白話一句」，看不懂的名詞隨時到 <a href="#glossary">術語表</a> 查。</p>
       <div class="meta">給一般使用者、開發者與團隊管理者 · 19 章＋3 篇附錄 · 含可複製的指令與程式碼</div>
-      <p class="hero-note"><img class="hero-cat" src="assets/logo/pixel-cat.svg" alt=""><span>本站是個人整理的<strong>非官方</strong>學習指南，與 Anthropic 沒有隸屬或合作關係；Claude 是 Anthropic 的商標。功能、價格與限制以 Anthropic 官方文件為準。每章開頭的「白話一句」由這隻橘貓帶你先抓重點。</span></p>
+      <p class="hero-note"><span>本站是個人整理的<strong>非官方</strong>學習指南，與 Anthropic 沒有隸屬或合作關係；Claude 是 Anthropic 的商標。功能、價格與限制以 Anthropic 官方文件為準。</span></p>
       <div class="scroll-cue"><span class="arrow">↓</span> 不知道從哪讀？先看 <a href="#getting-started">新手入門</a> 的閱讀路線</div>
-      <div class="scroll-cue"><span class="arrow">✦</span> 讀完想驗收？每章結尾都有 3 題小關卡，或直接挑戰 <a href="quiz.html">精靈試煉</a>（66 題闖關）</div>
+      <div class="scroll-cue"><span class="arrow">✦</span> 讀完想驗收？每章結尾都有 3 題自我檢測，或挑戰 <a href="quiz.html">精靈試煉</a>（66 題闖關遊戲）</div>
     </section>
 
     <!-- ============ 00. 新手入門 ============ -->
     <section class="chapter" id="getting-started">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="chap-no">序章</span>新手入門</h2>
+    <h2><span class="chap-no">CH.00 · 序章</span>新手入門</h2>
   </div>
   <p class="chap-sub">新手第一步：它是什麼、去哪裡下載、從哪一章開始讀</p>
   <div class="content">
@@ -371,7 +400,7 @@
     <section class="chapter" id="overview">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="chap-no">第 1 章</span>總覽與選擇</h2>
+    <h2><span class="chap-no">CH.01</span>總覽與選擇</h2>
   </div>
   <p class="chap-sub">Claude 不是一個東西，是一個產品家族：模型、方案、入口一次看懂</p>
   <div class="content">
@@ -495,7 +524,7 @@
     <section class="chapter" id="claudeai">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="chap-no">第 2 章</span>claude.ai 功能</h2>
+    <h2><span class="chap-no">CH.02</span>claude.ai 功能</h2>
   </div>
   <p class="chap-sub">一般使用者怎麼用：網頁、桌面版、手機 App 的每個功能在哪裡、怎麼開</p>
   <div class="content">
@@ -692,7 +721,7 @@
     <section class="chapter" id="cowork">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="chap-no">第 3 章</span>Cowork</h2>
+    <h2><span class="chap-no">CH.03</span>Cowork</h2>
   </div>
   <p class="chap-sub">把一件多步驟的工作真的交出去：從下載、連資料夾、第一個任務，到排程與外掛</p>
   <div class="content">
@@ -911,7 +940,7 @@ sudo apt install qemu-system-x86 ovmf virtiofsd</code></pre>
     <section class="chapter" id="ecosystem">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="chap-no">第 4 章</span>周邊生態</h2>
+    <h2><span class="chap-no">CH.04</span>周邊生態</h2>
   </div>
   <p class="chap-sub">周邊生態：從聊天視窗延伸到瀏覽器、Office、Slack、設計與科學研究，再用 MCP 接上各種外部工具</p>
   <div class="content">
@@ -1104,7 +1133,7 @@ claude --chrome
     <section class="chapter" id="prompting">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="chap-no">第 5 章</span>怎麼問問題</h2>
+    <h2><span class="chap-no">CH.05</span>怎麼問問題</h2>
   </div>
   <p class="chap-sub">怎麼跟 Claude 講話 — 在學 JSON 之前，先學會「問」</p>
   <div class="content">
@@ -1283,7 +1312,7 @@ for block in response.content:
     <section class="chapter" id="aifluency">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="chap-no">第 6 章</span>AI 素養</h2>
+    <h2><span class="chap-no">CH.06</span>AI 素養</h2>
   </div>
   <p class="chap-sub">AI 素養 — 跟 AI 好好協作的思維，模型再怎麼變都適用</p>
   <div class="content">
@@ -1371,7 +1400,7 @@ for block in response.content:
     <section class="chapter" id="safety">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="chap-no">第 7 章</span>安全與限制</h2>
+    <h2><span class="chap-no">CH.07</span>安全與限制</h2>
   </div>
   <p class="chap-sub">Claude 不是萬能的 — 限制、隱私、代理操作的安全，幾個新手容易誤踩的點</p>
   <div class="content">
@@ -1504,7 +1533,7 @@ for block in response.content:
     <section class="chapter" id="pipeline">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="chap-no">第 8 章</span>一則訊息的旅程</h2>
+    <h2><span class="chap-no">CH.08</span>一則訊息的旅程</h2>
   </div>
   <p class="chap-sub">一則訊息的旅程 — 你打下一行字之後，整條鏈路是怎麼被驅動的</p>
   <div class="content">
@@ -1628,7 +1657,7 @@ for block in response.content:
     <section class="chapter" id="api">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="chap-no">第 9 章</span>API 與 JSON</h2>
+        <h2><span class="chap-no">CH.09</span>API 與 JSON</h2>
       </div>
       <p class="chap-sub">開發者怎麼跟 Claude「對話」— 核心只有一個端點</p>
       <div class="content">
@@ -1908,7 +1937,7 @@ print("".join(b.text for b in second.content if b.type == "text"))</code></pre>
     <section class="chapter" id="tooluse">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="chap-no">第 10 章</span>工具調用</h2>
+        <h2><span class="chap-no">CH.10</span>工具調用</h2>
       </div>
       <p class="chap-sub">Claude 怎麼「做事」而不只是「講話」— 完整 JSON 定義</p>
       <div class="content">
@@ -2332,7 +2361,7 @@ if __name__ == "__main__":
     <section class="chapter" id="codeexec">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="chap-no">第 11 章</span>程式碼執行</h2>
+        <h2><span class="chap-no">CH.11</span>程式碼執行</h2>
       </div>
       <p class="chap-sub">程式碼到底怎麼「跑」起來的</p>
       <div class="content">
@@ -2562,7 +2591,7 @@ print("".join(b.text for b in follow_up.content if b.type == "text"))</code></pr
     <section class="chapter" id="claudecode">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="chap-no">第 12 章</span>Claude Code 入門</h2>
+        <h2><span class="chap-no">CH.12</span>Claude Code 入門</h2>
       </div>
       <p class="chap-sub">會自己動手的寫程式助手：在哪用、怎麼控制它、怎麼交給雲端</p>
       <div class="content">
@@ -2961,7 +2990,7 @@ claude --cloud "照 docs/plan.md 的計畫執行"</code></pre>
     <section class="chapter" id="claudecode-adv">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="chap-no">第 13 章</span>Claude Code 進階</h2>
+        <h2><span class="chap-no">CH.13</span>Claude Code 進階</h2>
       </div>
       <p class="chap-sub">把 Claude Code 變成你的：客製化、設定、安全、自動化、平行作業</p>
       <div class="content">
@@ -3362,7 +3391,7 @@ jobs:
     <section class="chapter" id="practical">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="chap-no">第 14 章</span>實際操作</h2>
+    <h2><span class="chap-no">CH.14</span>實際操作</h2>
   </div>
   <p class="chap-sub">實務層面：終端機指令、介面操作、API 怎麼真的打一輪、錢怎麼省、錯誤怎麼看</p>
   <div class="content">
@@ -3639,7 +3668,7 @@ claude mcp add --transport http --scope user my-notes https://notes.example.com/
     <section class="chapter" id="extensions">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="chap-no">第 15 章</span>開發者延伸</h2>
+    <h2><span class="chap-no">CH.15</span>開發者延伸</h2>
   </div>
   <p class="chap-sub">給開發者的延伸：IDE 外掛、瀏覽器、GitHub、Agent SDK，以及 Claude API 的進階功能</p>
   <div class="content">
@@ -4013,7 +4042,7 @@ ant messages create \
     <section class="chapter" id="enterprise">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="chap-no">第 16 章</span>企業與團隊</h2>
+    <h2><span class="chap-no">CH.16</span>企業與團隊</h2>
   </div>
   <p class="chap-sub">給團隊管理者與企業 IT：帳號、權限、政策、資料保留、雲端部署與用量控管</p>
   <div class="content">
@@ -4440,7 +4469,7 @@ ant messages create \
     <section class="chapter" id="features">
   <div class="chap-head">
     <span class="brace">{</span>
-    <h2><span class="chap-no">第 17 章</span>功能字典</h2>
+    <h2><span class="chap-no">CH.17</span>功能字典</h2>
   </div>
   <p class="chap-sub">claude.ai、API、Claude Code 各項功能的定義：是什麼 / 能做什麼 / 在哪裡開 / 什麼時候用</p>
   <div class="content">
@@ -5073,7 +5102,7 @@ ant messages create \
     <section class="chapter" id="resources">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="chap-no">第 18 章</span>術語表與延伸閱讀</h2>
+        <h2><span class="chap-no">CH.18</span>術語表與延伸閱讀</h2>
       </div>
       <p class="chap-sub">術語表 + 延伸閱讀，官方文件最新狀態以連結為準</p>
       <div class="content">
@@ -5215,7 +5244,7 @@ ant messages create \
     <section class="chapter" id="gitflow">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="chap-no">附錄 A1</span>Git 與 GitHub</h2>
+        <h2><span class="chap-no">APPENDIX A1</span>Git 與 GitHub</h2>
       </div>
       <p class="chap-sub">Git 與 GitHub — 為什麼 AI 寫程式之後，這件事反而更重要</p>
       <div class="content">
@@ -5517,7 +5546,7 @@ pause</code></pre>
     <section class="chapter" id="deploy">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="chap-no">附錄 A2</span>部署上線</h2>
+        <h2><span class="chap-no">APPENDIX A2</span>部署上線</h2>
       </div>
       <p class="chap-sub">部署上線 — 東西做好了，怎麼讓別人也打得開</p>
       <div class="content">
@@ -5606,7 +5635,7 @@ git add .nojekyll &amp;&amp; git commit -m "停用 Jekyll 建置" &amp;&amp; git
     <section class="chapter" id="aicoding">
       <div class="chap-head">
         <span class="brace">{</span>
-        <h2><span class="chap-no">附錄 A3</span>AI coding 地圖</h2>
+        <h2><span class="chap-no">APPENDIX A3</span>AI coding 地圖</h2>
       </div>
       <p class="chap-sub">一個系統的 12 塊積木 — 換個視角：用 AI 打造系統，需要哪些零件</p>
       <div class="content">
