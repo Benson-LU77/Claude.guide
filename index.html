@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Claude 全貌指南 · claude.json</title>
+<title>Claude 全貌指南（非官方）· claude.guide.json</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -107,6 +107,10 @@
   nav.tree a .nl small{font-size:.68rem;color:var(--ink-faint);overflow:hidden;text-overflow:ellipsis;}
   nav.tree a.active .nl .zh{color:var(--string-amber);}
   .content > p.eli5{color:var(--ink);background:var(--bg-panel);border:1px solid var(--border);border-left:3px solid var(--green);padding:.85rem 1.1rem;border-radius:0 8px 8px 0;font-size:1rem;margin-bottom:1.4rem;}
+  .eli5-tag::before{content:"";display:inline-block;width:1.15em;height:1.05em;margin-right:.3em;vertical-align:-.22em;background:url(assets/logo/pixel-cat.svg) no-repeat center/contain;image-rendering:pixelated;}
+  .hero-note{display:flex;gap:.7rem;align-items:flex-start;max-width:46rem;margin:1rem 0 0;padding:.7rem .9rem;border:1px solid var(--border);border-radius:8px;background:var(--bg-panel);color:var(--ink-soft);font-size:.86rem;line-height:1.65;}
+  .hero-cat{width:2.6rem;height:auto;flex:none;image-rendering:pixelated;}
+  footer .disclaimer{margin-top:.5rem;font-size:.8rem;opacity:.85;}
   .eli5-tag{display:inline-block;font:700 .72rem system-ui,sans-serif;color:var(--bg-deep);background:var(--green);border-radius:4px;padding:.08rem .45rem;margin-right:.55rem;vertical-align:.1em;}
   nav.tree a:hover{background:var(--bg-panel-2);color:var(--ink);}
   nav.tree a.active{
@@ -563,7 +567,7 @@
 
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-      <div class="tag">// anthropic / claude</div>
+      <div class="tag">// unofficial · 非官方</div>
       <h1><img class="brand-cat" src="assets/logo/pixel-cat-sleep.svg" alt="">claude<span class="b">.</span>guide<span class="b">.json</span></h1>
     </div>
     <nav class="tree">
@@ -616,7 +620,8 @@
       </div>
       <h2>Claude 全貌指南<br><span class="b">{ 從「Claude 是什麼」到「做出東西、放上網路」 }</span></h2>
       <p class="lead">一份給所有人的 Claude 說明書。不管你只是想跟它聊天、想請它幫你做小工具，還是要把它接進自己的程式——這裡從最白話的地方講起，再一路往深處走。每章開頭都有一句「白話一句」，看不懂的名詞隨時到 <a href="#glossary">術語表</a> 查。</p>
-      <div class="meta">給一般使用者與開發者 · 22 個章節 · 含可複製的指令與程式碼</div>
+      <div class="meta">給一般使用者、開發者與團隊管理者 · 19 章＋3 篇附錄 · 含可複製的指令與程式碼</div>
+      <p class="hero-note"><img class="hero-cat" src="assets/logo/pixel-cat.svg" alt=""><span>本站是個人整理的<strong>非官方</strong>學習指南，與 Anthropic 沒有隸屬或合作關係；Claude 是 Anthropic 的商標。功能、價格與限制以 Anthropic 官方文件為準。每章開頭的「白話一句」由這隻橘貓帶你先抓重點。</span></p>
       <div class="scroll-cue"><span class="arrow">↓</span> 不知道從哪讀？先看 <a href="#getting-started">新手入門</a> 的閱讀路線</div>
       <div class="scroll-cue"><span class="arrow">✦</span> 讀完想驗收？每章結尾都有 3 題小關卡，或直接挑戰 <a href="quiz.html">精靈試煉</a>（66 題闖關）</div>
     </section>
@@ -6123,6 +6128,7 @@ jobs:
 
     <footer>
       claude.guide.json · 2026-06 建立 · 2026-10 更新，部分名稱與版本以官方文件最新狀態為準
+      <div class="disclaimer">本站是個人整理的<strong>非官方</strong>學習指南，與 Anthropic 沒有隸屬或合作關係；Claude 是 Anthropic 的商標。功能、價格與限制以 Anthropic 官方文件為準。</div>
       <div class="links">
         <span>各章程式碼區塊右上角都有「複製」按鈕，可直接取用</span>
         <span>✦ <a href="quiz.html">精靈試煉：66 題闖關小測驗</a></span>
@@ -6163,6 +6169,7 @@ const ttLines = [
   '{',
   '  "name": "Claude",',
   '  "made_by": "Anthropic",',
+  '  "this_guide": "unofficial",',
   '  "surfaces": ["claude.ai", "cowork", "claude_code", "api"],',
   '  "status": "reading guide..."',
   '}'
